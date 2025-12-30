@@ -10,11 +10,22 @@ router.get('/', async (req, res) => {
 
 // Create new incident
 router.post('/', async (req, res) => {
+  console.log("POST /api/incidents HIT");
+  console.log("Request body:", req.body);
+
   const { reporterName, incidentType, description, location } = req.body;
-  const incident = new Incident({ reporterName, incidentType, description, location });
+
+  const incident = new Incident({
+    reporterName,
+    incidentType,
+    description,
+    location
+  });
+
   await incident.save();
-  res.json({ message: "Incident submitted successfully", incident });
+  res.json({ message: "Incident submitted successfully" });
 });
+
 
 // Update status
 router.patch('/:id', async (req, res) => {
