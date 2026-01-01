@@ -7,26 +7,23 @@ const API_URL = "https://tunasan-portal.onrender.com/api/incidents";
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const reporter = document.getElementById("reporter").value;
-  const type = document.getElementById("type").value;
-  const description = document.getElementById("description").value;
-  const location = document.getElementById("location").value;
+  const payload = {
+    reporterName: document.getElementById("reporter").value,
+    incidentType: document.getElementById("type").value,
+    description: document.getElementById("description").value,
+    location: document.getElementById("location").value
+  };
 
-  const response = await fetch(API_URL, {
+  console.log("📤 Sending data:", payload);
+
+  const res = await fetch(API_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      reporterName: reporter,
-      incidentType: type,
-      description,
-      location
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
   });
 
-  const data = await response.json();
+  const data = await res.json();
   alert(data.message);
-  form.reset();
 });
+
 

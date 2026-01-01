@@ -2,16 +2,14 @@ const express = require('express');
 const router = express.Router();
 const Incident = require('../models/Incident');
 
-// Get all incidents
 router.get('/', async (req, res) => {
   const incidents = await Incident.find().sort({ createdAt: -1 });
   res.json(incidents);
 });
 
-// Create new incident
 router.post('/', async (req, res) => {
-  console.log("POST /api/incidents HIT");
-  console.log("Request body:", req.body);
+  console.log("🔥 POST /api/incidents HIT");
+  console.log(req.body);
 
   const { reporterName, incidentType, description, location } = req.body;
 
@@ -19,19 +17,13 @@ router.post('/', async (req, res) => {
     reporterName,
     incidentType,
     description,
-    location
+    location,
+    status: "Pending"
   });
 
   await incident.save();
+
   res.json({ message: "Incident submitted successfully" });
-});
-
-
-// Update status
-router.patch('/:id', async (req, res) => {
-  const { status } = req.body;
-  await Incident.findByIdAndUpdate(req.params.id, { status });
-  res.json({ message: "Status updated successfully" });
 });
 
 module.exports = router;
