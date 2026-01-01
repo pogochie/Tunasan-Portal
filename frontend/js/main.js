@@ -2,14 +2,6 @@
 import QRCode from "https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js";
 
 const qrContainer = document.getElementById("qr-code");
-const portalURL = window.location.href;
-
-QRCode.toCanvas(qrContainer, portalURL, (error) => {
-  if (error) console.error(error);
-});
-
-// Incident form submission
-const form = document.getElementById("incident-form");
 const API_URL = "https://tunasan-portal.onrender.com/api/incidents";
 
 form.addEventListener("submit", async (e) => {
@@ -22,7 +14,9 @@ form.addEventListener("submit", async (e) => {
 
   const response = await fetch(API_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({
       reporterName: reporter,
       incidentType: type,
@@ -35,3 +29,4 @@ form.addEventListener("submit", async (e) => {
   alert(data.message);
   form.reset();
 });
+
