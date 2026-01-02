@@ -68,4 +68,52 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+const News = require("../models/News");
+
+// Approve incident and create news
+router.post("/:id/approve", async (req, res) => {
+  try {
+    const incident = await Incident.findById(req.params.id);
+    if (!incident) return res.status(404).json({ message: "Incident not found" });
+
+    if (incident.status === "Approved") {
+      return res.status(400).json({ message: "Incident already approved" });
+    }
+
+    // Create news from incident
+    const news = new News({
+      title: incident.incidentType,
+      description: incident.description,
+      images: incident.images,
+      location: incident.location,
+    });
+    await news.save();
+
+    // Update incident status
+    incident.status = "Approved";
+    await incident.save();
+
+    res.json({ message: "Incident approved and news published" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Reject incident
+router.post("/:id/reject", async (req, res) => {
+  try {
+    const incident = await Incident.findById(req.params.id);
+    if (!incident) return res.status(404).json({ message: "Incident not found" });
+
+    incident.status = "Rejected";
+    await incident.save();
+
+    res.json({ message: "Incident rejected" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;

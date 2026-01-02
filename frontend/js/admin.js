@@ -20,22 +20,8 @@ async function loadIncidents() {
   });
 }
 
-async function reviewReport(id) {
-  const res = await fetch(`/api/incidents/${id}`);
-  const incident = await res.json();
-
-  modal.style.display = "block";
-  modal.innerHTML = `
-    <h3>Review Incident</h3>
-    <p>${incident.description}</p>
-    <p><strong>Location:</strong> ${incident.location}</p>
-
-    ${incident.images.map(img => `<img src="${img}" width="200">`).join("")}
-
-    <br><br>
-    <button onclick="approve('${id}')">Approve → Publish News</button>
-    <button onclick="reject('${id}')">Reject</button>
-  `;
+function reviewReport(id) {
+  window.location.href = `review.html?id=${id}`;
 }
 
 loadIncidents();
