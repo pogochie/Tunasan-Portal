@@ -8,22 +8,13 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  console.log("🔥 POST /api/incidents HIT");
-  console.log(req.body);
+  console.log("POST /api/incidents received:", req.body);
 
-  const { reporterName, incidentType, description, location } = req.body;
-
-  const incident = new Incident({
-    reporterName,
-    incidentType,
-    description,
-    location,
-    status: "Pending"
-  });
-
+  const incident = new Incident(req.body);
   await incident.save();
 
   res.json({ message: "Incident submitted successfully" });
 });
+
 
 module.exports = router;
