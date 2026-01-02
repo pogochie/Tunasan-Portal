@@ -3,10 +3,6 @@ const mongoose = require("mongoose");
 const NewsSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
-  location: {
-    lat: Number,
-    lng: Number,
-  },
   images: [String],
   createdAt: {
     type: Date,
