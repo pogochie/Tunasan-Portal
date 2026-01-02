@@ -24,5 +24,18 @@ router.post('/', async (req, res) => {
   res.json({ message: "Incident saved" });
 });
 
+// Approve or Reject incident
+router.patch("/:id/status", async (req, res) => {
+  const { status } = req.body;
+
+  if (!["Approved", "Rejected"].includes(status)) {
+    return res.status(400).json({ message: "Invalid status" });
+  }
+
+  await Incident.findByIdAndUpdate(req.params.id, { status });
+  res.json({ message: `Incident ${status}` });
+});
+
+
 
 module.exports = router;

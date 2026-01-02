@@ -25,13 +25,22 @@ const fetchIncidents = async () => {
 };
 
 const updateStatus = async (id, status) => {
-  await fetch(`https://tunasan-portal.onrender.com/api/incidents/${id}`, {
+  await fetch(`/api/incidents/${id}/status`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({ status })
   });
-  fetchIncidents();
+
+  fetchIncidents(); // refresh table
 };
+
+<td>
+  <span class="status ${incident.status.toLowerCase()}">
+    ${incident.status}
+  </span>
+</td>
 
 // Initial load
 fetchIncidents();

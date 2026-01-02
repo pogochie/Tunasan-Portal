@@ -1,0 +1,254 @@
+/* General styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 20px;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+h1, h2 {
+  color: #2c3e50;
+}
+
+h1 {
+  margin-bottom: 10px;
+}
+
+h2 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+/* Form styles */
+form#incident-form {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+form#incident-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+form#incident-form input[type="text"],
+form#incident-form select,
+form#incident-form textarea {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+form#incident-form input[type="text"]:focus,
+form#incident-form select:focus,
+form#incident-form textarea:focus {
+  border-color: #2980b9;
+  outline: none;
+}
+
+form#incident-form button {
+  background-color: #2980b9;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form#incident-form button:hover {
+  background-color: #1c5980;
+}
+
+/* QR code canvas */
+#qr-code {
+  display: block;
+  margin: 10px 0 30px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+/* Incident list (for real-time display) */
+#incident-list {
+  list-style: none;
+  padding-left: 0;
+  max-width: 700px;
+}
+
+#incident-list li {
+  background: #fff;
+  margin-bottom: 10px;
+  padding: 12px 15px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  font-size: 0.95rem;
+  color: #444;
+}
+
+/* Admin table styles */
+#incident-table {
+  width: 100%;
+  border-collapse: collapse;
+  max-width: 1000px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#incident-table thead {
+  background-color: #2980b9;
+  color: white;
+}
+
+#incident-table th, #incident-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  vertical-align: middle;
+}
+
+#incident-table tbody tr:hover {
+  background-color: #f1f7fc;
+}
+
+#incident-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Buttons in admin actions */
+button.action-btn {
+  background-color: #2980b9;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin-right: 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+button.action-btn:hover {
+  background-color: #1c5980;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  form#incident-form, #incident-list, #incident-table {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #incident-table th, #incident-table td {
+    padding: 8px 10px;
+  }
+}
+
+/* Admin Dashboard Styles */
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 20px;
+  background-color: #f4f6f8;
+  color: #2c3e50;
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+h2 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  color: #34495e;
+}
+
+#incident-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#incident-table thead {
+  background-color: #2980b9;
+  color: white;
+}
+
+#incident-table th, #incident-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  vertical-align: middle;
+}
+
+#incident-table tbody tr:hover {
+  background-color: #ecf0f1;
+}
+
+button.action-btn {
+  background-color: #2980b9;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin-right: 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+button.action-btn:hover {
+  background-color: #1c5980;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #incident-table, #incident-table thead, #incident-table tbody, #incident-table th, #incident-table td, #incident-table tr {
+    display: block;
+  }
+
+  #incident-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  #incident-table tr {
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ddd;
+  }
+
+  #incident-table td {
+    border: none;
+    position: relative;
+    padding-left: 50%;
+    text-align: right;
+  }
+
+  #incident-table td::before {
+    position: absolute;
+    top: 12px;
+    left: 15px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    font-weight: 600;
+    text-align: left;
+    content: attr(data-label);
+  }
+}
