@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const connectDB = require('./db');
 const path = require('path');
 const fs = require('fs');
-const path = require('path');
 
 const uploadsDir = path.join(__dirname, 'uploads');
 
