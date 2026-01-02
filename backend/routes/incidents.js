@@ -132,4 +132,16 @@ router.post("/:id/reject", async (req, res) => {
   }
 });
 
+// Delete incident by ID
+router.delete("/:id", async (req, res) => {
+  try {
+    const incident = await Incident.findByIdAndDelete(req.params.id);
+    if (!incident) return res.status(404).json({ message: "Incident not found" });
+    res.json({ message: "Incident deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;
