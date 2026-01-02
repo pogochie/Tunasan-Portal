@@ -4,14 +4,15 @@ const IncidentSchema = new mongoose.Schema({
   reporterName: String,
   incidentType: String,
   description: String,
-  location: String,
-
+  location: {
+    lat: Number,
+    lng: Number
+  },
+  images: [String],
   status: {
     type: String,
-    enum: ["Pending", "Approved", "Rejected"],
-    default: "Pending"
+    default: "Pending" // Pending | Approved | Rejected
   },
-
   createdAt: {
     type: Date,
     default: Date.now

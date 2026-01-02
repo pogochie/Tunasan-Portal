@@ -17,7 +17,12 @@ form.addEventListener("submit", async (e) => {
   });
 
   const data = await res.json();
-  alert(data.message);
-  form.reset();
+
+  if (res.ok) {
+    alert(data.message);
+    form.reset();
+  } else {
+    alert("Failed to submit report");
+  }
 });
 

@@ -41,4 +41,15 @@ router.get("/", async (req, res) => {
   res.json(incidents);
 });
 
+// Add route to get single incident by id
+router.get("/:id", async (req, res) => {
+  try {
+    const incident = await Incident.findById(req.params.id);
+    if (!incident) return res.status(404).json({ message: "Incident not found" });
+    res.json(incident);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;

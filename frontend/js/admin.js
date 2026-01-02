@@ -21,9 +21,8 @@ async function loadIncidents() {
 }
 
 async function reviewReport(id) {
-  const res = await fetch("/api/incidents");
-  const incidents = await res.json();
-  const incident = incidents.find(i => i._id === id);
+  const res = await fetch(`/api/incidents/${id}`);
+  const incident = await res.json();
 
   modal.style.display = "block";
   modal.innerHTML = `
