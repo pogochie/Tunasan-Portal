@@ -359,3 +359,60 @@ button.action-btn:hover {
     display: block;
   }
 }
+
+.admin-navbar {
+  background-color: #2980b9;
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-navbar .logo {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: white;
+  text-decoration: none;
+}
+
+.admin-navbar .nav-menu {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-navbar .nav-menu li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.admin-navbar .nav-menu li a:hover {
+  background-color: #1c5980;
+}
+
+/* Responsive for smaller screens */
+@media (max-width: 768px) {
+  .admin-navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .admin-navbar .nav-menu {
+    flex-direction: column;
+    width: 100%;
+  }
+  .admin-navbar .nav-menu li {
+    width: 100%;
+  }
+  .admin-navbar .nav-menu li a {
+    display: block;
+    width: 100%;
+    padding: 10px 0;
+  }
+}

@@ -4,10 +4,6 @@
   <meta charset="UTF-8" />
   <title>Admin - Add News</title>
   <link rel="stylesheet" href="css/style.css" />
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-  />
   <style>
     #map {
       height: 300px;
@@ -16,10 +12,17 @@
   </style>
 </head>
 <body>
-  <!-- Include your navbar here -->
-  <nav class="navbar">
-    <!-- navbar content -->
-  </nav>
+  <nav class="admin-navbar">
+  <div class="container">
+    <a href="admin.html" class="logo">Admin Dashboard</a>
+    <ul class="nav-menu">
+      <li><a href="admin.html">Incidents</a></li>
+      <li><a href="admin-news.html">Add News</a></li>
+      <li><a href="admin-events.html">Add Events</a></li>
+      <li><a href="#" id="logout-link">Logout</a></li>
+    </ul>
+  </div>
+</nav>
 
   <h1>Add News</h1>
   <form id="news-form" enctype="multipart/form-data">
@@ -36,38 +39,12 @@
     <button type="submit">Submit News</button>
   </form>
 
-  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script>
-    // Initialize map centered on Barangay Tunasan
-    const map = L.map("map").setView([14.4089, 121.0341], 15);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
-
-    let marker;
-
-    map.on("click", function (e) {
-      const { lat, lng } = e.latlng;
-      if (marker) {
-        marker.setLatLng(e.latlng);
-      } else {
-        marker = L.marker(e.latlng).addTo(map);
-      }
-      document.getElementById("lat").value = lat;
-      document.getElementById("lng").value = lng;
-    });
-
     const form = document.getElementById("news-form");
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const formData = new FormData(form);
-
-      if (!formData.get("location[lat]") || !formData.get("location[lng]")) {
-        alert("Please select a location on the map.");
-        return;
-      }
 
       try {
         const res = await fetch("/api/news", {

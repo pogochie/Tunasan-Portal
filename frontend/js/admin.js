@@ -35,4 +35,13 @@ function reviewReport(id) {
   window.location.href = `review.html?id=${id}`;
 }
 
+const logoutLink = document.getElementById("logout-link");
+if (logoutLink) {
+  logoutLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    localStorage.removeItem("adminLoggedIn");
+    window.location.href = "admin-login.html";
+  });
+}
+
 loadIncidents();
