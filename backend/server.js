@@ -24,6 +24,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/incidents', require('./routes/incidents'));
 app.use('/api/news', require('./routes/news'));
 app.use('/api/events', require('./routes/events'));
+app.use("/api/users", require("./routes/users"));
 
 
 // Start server
