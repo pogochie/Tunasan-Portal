@@ -1,4 +1,4 @@
-// review.js
+// frontend/js/review.js
 const urlParams = new URLSearchParams(window.location.search);
 const incidentId = urlParams.get("id");
 
@@ -28,7 +28,6 @@ async function loadIncident() {
     incidentTypeEl.textContent = incident.incidentType;
     descriptionEl.textContent = incident.description;
 
-    // Location display
     if (typeof incident.location === "string") {
       locationTextEl.textContent = incident.location;
     } else if (incident.location && incident.location.lat && incident.location.lng) {
@@ -38,7 +37,6 @@ async function loadIncident() {
       locationTextEl.textContent = "No location data";
     }
 
-    // Images
     imagesEl.innerHTML = "";
     if (incident.images && incident.images.length > 0) {
       incident.images.forEach((img) => {
@@ -98,4 +96,4 @@ backBtn.addEventListener("click", () => {
   window.location.href = "admin.html";
 });
 
-loadIncident();s
+loadIncident();
