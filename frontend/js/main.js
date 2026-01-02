@@ -6,32 +6,18 @@ if (!form) {
   console.error("❌ FORM NOT FOUND");
 }
 
-form.addEventListener("submit", async function (e) {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  console.log("✅ Form Submitted");
 
-  const data = {
-    reporterName: document.getElementById("reporter").value,
-    incidentType: document.getElementById("type").value,
-    description: document.getElementById("description").value,
-    location: document.getElementById("location").value
-  };
+  const formData = new FormData(form);
 
-  console.log("Sending data:", data);
+  const res = await fetch("/api/incidents", {
+    method: "POST",
+    body: formData
+  });
 
-  try {
-    const res = await fetch("/api/incidents", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
-    const result = await res.json();
-    console.log("Server response:", result);
-
-    alert("Report submitted successfully");
-    form.reset();
-  } catch (err) {
-    console.error("❌ Fetch error:", err);
-  }
+  const data = await res.json();
+  alert(data.message);
+  form.reset();
 });
+

@@ -12,19 +12,15 @@
   <canvas id="qr-code"></canvas>
 
   <h2>Report an Incident</h2>
-  <form id="incident-form">
-    <input type="text" id="reporter" placeholder="Your Name" required>
-    <select id="type" required>
-      <option value="">Select Incident Type</option>
-      <option value="Crime">Crime</option>
-      <option value="Health">Health</option>
-      <option value="Fire">Fire</option>
-      <option value="Other">Other</option>
-    </select>
-    <textarea id="description" placeholder="Description" required></textarea>
-    <input type="text" id="location" placeholder="Location" required>
-    <button type="submit">Submit Report</button>
-  </form>
+  <form id="incident-form" enctype="multipart/form-data">
+  <input type="text" name="reporterName" placeholder="Your Name" required>
+  <input type="text" name="incidentType" placeholder="Incident Type" required>
+  <textarea name="description" placeholder="Description" required></textarea>
+  <input type="text" name="location" placeholder="Location" required>
+  <input type="file" name="images" multiple accept="image/*">
+  <button type="submit">Submit Report</button>
+</form>
+
 
   <script src="js/main.js"></script>
 </body>

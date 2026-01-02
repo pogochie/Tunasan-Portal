@@ -1,41 +1,44 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Incident = require('../models/Incident');
+const Incident = require("../models/Incident");
+const multer = require("multer");
+const path = require("path");
 
-router.get('/', async (req, res) => {
-  const incidents = await Incident.find().sort({ createdAt: -1 });
-  res.json(incidents);
+// Storage config
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
 });
 
-router.post('/', async (req, res) => {
-  console.log("POST /api/incidents HIT");
-  console.log(req.body);
+const upload = multer({ storage });
 
+// Create incident (with images)
+router.post("/", upload.array("images", 3), async (req, res) => {
   const { reporterName, incidentType, description, location } = req.body;
+
+  const imagePaths = req.files.map(file => `/uploads/${file.filename}`);
 
   const incident = new Incident({
     reporterName,
     incidentType,
     description,
-    location
+    location,
+    images: imagePaths,
+    status: "pending"
   });
 
   await incident.save();
-  res.json({ message: "Incident saved" });
+  res.json({ message: "Report submitted for review" });
 });
 
-// Approve or Reject incident
-router.patch("/:id/status", async (req, res) => {
-  const { status } = req.body;
-
-  if (!["Approved", "Rejected"].includes(status)) {
-    return res.status(400).json({ message: "Invalid status" });
-  }
-
-  await Incident.findByIdAndUpdate(req.params.id, { status });
-  res.json({ message: `Incident ${status}` });
+// Get all incidents
+router.get("/", async (req, res) => {
+  const incidents = await Incident.find().sort({ createdAt: -1 });
+  res.json(incidents);
 });
-
-
 
 module.exports = router;

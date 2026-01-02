@@ -1,40 +1,42 @@
 const tableBody = document.querySelector("#incident-table tbody");
+const modal = document.getElementById("review-modal");
 
-// Fetch incidents and populate table
-const fetchIncidents = async () => {
+async function loadIncidents() {
   const res = await fetch("/api/incidents");
-  const incidents = await res.json();
+  const data = await res.json();
 
   tableBody.innerHTML = "";
-  incidents.forEach((incident) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${incident.reporterName}</td>
-      <td>${incident.incidentType}</td>
-      <td>${incident.description}</td>
-      <td>${incident.location}</td>
-      <td>${incident.status}</td>
-      <td>
-        <button onclick="updateStatus('${incident._id}','Pending')">Pending</button>
-        <button onclick="updateStatus('${incident._id}','In Progress')">In Progress</button>
-        <button onclick="updateStatus('${incident._id}','Resolved')">Resolved</button>
-      </td>
+  data.forEach(i => {
+    tableBody.innerHTML += `
+      <tr>
+        <td>${i.reporterName}</td>
+        <td>${i.incidentType}</td>
+        <td>${i.status}</td>
+        <td>
+          <button onclick="reviewReport('${i._id}')">Review Report</button>
+        </td>
+      </tr>
     `;
-    tableBody.appendChild(tr);
   });
-};
+}
 
-const updateStatus = async (id, status) => {
-  await fetch(`/api/incidents/${id}/status`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ status })
-  });
+async function reviewReport(id) {
+  const res = await fetch("/api/incidents");
+  const incidents = await res.json();
+  const incident = incidents.find(i => i._id === id);
 
-  fetchIncidents(); // refresh table
-};
+  modal.style.display = "block";
+  modal.innerHTML = `
+    <h3>Review Incident</h3>
+    <p>${incident.description}</p>
+    <p><strong>Location:</strong> ${incident.location}</p>
 
-// Initial load
-fetchIncidents();
+    ${incident.images.map(img => `<img src="${img}" width="200">`).join("")}
+
+    <br><br>
+    <button onclick="approve('${id}')">Approve → Publish News</button>
+    <button onclick="reject('${id}')">Reject</button>
+  `;
+}
+
+loadIncidents();
