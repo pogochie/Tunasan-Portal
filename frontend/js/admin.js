@@ -36,11 +36,5 @@ const updateStatus = async (id, status) => {
   fetchIncidents(); // refresh table
 };
 
-<td>
-  <span class="status ${incident.status.toLowerCase()}">
-    ${incident.status}
-  </span>
-</td>
-
 // Initial load
 fetchIncidents();
