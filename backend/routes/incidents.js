@@ -4,10 +4,9 @@ const Incident = require("../models/Incident");
 const multer = require("multer");
 const path = require("path");
 
-// Storage config
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, path.join(__dirname, '../uploads')); // adjust path relative to this file
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
