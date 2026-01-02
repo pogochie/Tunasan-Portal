@@ -40,6 +40,10 @@ router.post("/", (req, res, next) => {
 
       // Safely handle req.files
       const imagePaths = req.files.map(file => file.path); // full Cloudinary URL
+      const loc = {
+  lat: parseFloat(location.lat),
+  lng: parseFloat(location.lng),
+};
 
       const incident = new Incident({
         reporterName,

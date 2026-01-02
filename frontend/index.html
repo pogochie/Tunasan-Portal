@@ -11,15 +11,29 @@
   <h2>Scan QR Code to Access the Portal</h2>
   <canvas id="qr-code"></canvas>
 
-  <h2>Report an Incident</h2>
-  <form id="incident-form" enctype="multipart/form-data">
+ <h2>Report an Incident</h2>
+<form id="incident-form" enctype="multipart/form-data">
   <input type="text" name="reporterName" placeholder="Your Name" required>
   <input type="text" name="incidentType" placeholder="Incident Type" required>
   <textarea name="description" placeholder="Description" required></textarea>
-  <input type="text" name="location" placeholder="Location" required>
+
+  <!-- Hidden inputs for lat/lng -->
+  <input type="hidden" name="location[lat]" id="lat" required>
+  <input type="hidden" name="location[lng]" id="lng" required>
+
+  <!-- Map container -->
+  <div id="map" style="height: 300px; margin-bottom: 15px;"></div>
+
   <input type="file" name="images" multiple accept="image/*">
   <button type="submit">Submit Report</button>
 </form>
+
+<!-- Leaflet CSS & JS -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 
 <script src="js/main.js"></script>
 </body>

@@ -4,7 +4,10 @@ const IncidentSchema = new mongoose.Schema({
   reporterName: String,
   incidentType: String,
   description: String,
-  location: String, // changed to string for simplicity
+  location: {
+  lat: Number,
+  lng: Number
+},
   images: [String],
   status: {
     type: String,
