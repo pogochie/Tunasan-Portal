@@ -17,27 +17,35 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Create incident (with images)
-router.post("/", upload.array("images", 3), async (req, res) => {
-  try {
-    const { reporterName, incidentType, description, location } = req.body;
+router.post("/", (req, res, next) => {
+  upload.array("images", 3)(req, res, async (err) => {
+    if (err) {
+      console.error("Multer error:", err);
+      return res.status(400).json({ message: "Image upload failed" });
+    }
 
-    const imagePaths = (req.files || []).map(file => `/uploads/${file.filename}`);
+    try {
+      const { reporterName, incidentType, description, location } = req.body;
 
-    const incident = new Incident({
-      reporterName,
-      incidentType,
-      description,
-      location,
-      images: imagePaths,
-      status: "Pending"
-    });
+      // Safely handle req.files
+      const imagePaths = (req.files || []).map(file => `/uploads/${file.filename}`);
 
-    await incident.save();
-    res.json({ message: "Report submitted for review" });
-  } catch (error) {
-    console.error("Error saving incident:", error);
-    res.status(500).json({ message: "Server error" });
-  }
+      const incident = new Incident({
+        reporterName,
+        incidentType,
+        description,
+        location,
+        images: imagePaths,
+        status: "Pending"
+      });
+
+      await incident.save();
+      res.json({ message: "Report submitted for review" });
+    } catch (error) {
+      console.error("Error saving incident:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
 });
 
 // Get all incidents
