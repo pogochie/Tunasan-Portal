@@ -1,17 +1,14 @@
 console.log("main.js loaded");
 
-// QR CODE
-const qrCanvas = document.getElementById("qr-code");
-QRCode.toCanvas(qrCanvas, window.location.href, function (error) {
-  if (error) console.error(error);
-});
-
-// INCIDENT FORM
 const form = document.getElementById("incident-form");
+
+if (!form) {
+  console.error("❌ FORM NOT FOUND");
+}
 
 form.addEventListener("submit", async function (e) {
   e.preventDefault();
-  console.log("Form submitted");
+  console.log("✅ Form Submitted");
 
   const data = {
     reporterName: document.getElementById("reporter").value,
@@ -25,17 +22,16 @@ form.addEventListener("submit", async function (e) {
   try {
     const res = await fetch("/api/incidents", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
 
     const result = await res.json();
-    console.log(result);
-    alert("Report submitted successfully!");
+    console.log("Server response:", result);
+
+    alert("Report submitted successfully");
     form.reset();
   } catch (err) {
-    console.error("Submit error:", err);
+    console.error("❌ Fetch error:", err);
   }
 });
