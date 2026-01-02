@@ -1,17 +1,17 @@
-console.log("main.js loaded ✅");
+console.log("main.js loaded");
 
-// QR Code
-import QRCode from "https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js";
-
+// QR CODE
 const qrCanvas = document.getElementById("qr-code");
-QRCode.toCanvas(qrCanvas, window.location.href);
+QRCode.toCanvas(qrCanvas, window.location.href, function (error) {
+  if (error) console.error(error);
+});
 
-// Incident form
+// INCIDENT FORM
 const form = document.getElementById("incident-form");
 
-form.addEventListener("submit", async (e) => {
+form.addEventListener("submit", async function (e) {
   e.preventDefault();
-  console.log("Submit clicked ✅");
+  console.log("Form submitted");
 
   const data = {
     reporterName: document.getElementById("reporter").value,
@@ -22,14 +22,20 @@ form.addEventListener("submit", async (e) => {
 
   console.log("Sending data:", data);
 
-  const res = await fetch("/api/incidents", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+  try {
+    const res = await fetch("/api/incidents", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
 
-  const result = await res.json();
-  alert(result.message);
-
-  form.reset();
+    const result = await res.json();
+    console.log(result);
+    alert("Report submitted successfully!");
+    form.reset();
+  } catch (err) {
+    console.error("Submit error:", err);
+  }
 });
