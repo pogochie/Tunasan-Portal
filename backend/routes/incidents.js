@@ -18,10 +18,12 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "barangay_incidents",  // folder in your Cloudinary account
+    folder: "barangay_incidents",
     allowed_formats: ["jpg", "jpeg", "png"],
   },
 });
+
+
 
 const upload = multer({ storage });
 
@@ -37,7 +39,7 @@ router.post("/", (req, res, next) => {
       const { reporterName, incidentType, description, location } = req.body;
 
       // Safely handle req.files
-      const imagePaths = (req.files || []).map(file => `/uploads/${file.filename}`);
+      const imagePaths = req.files.map(file => file.path); // full Cloudinary URL
 
       const incident = new Incident({
         reporterName,
