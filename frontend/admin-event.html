@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin - Add Event</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+  />
+  <style>
+    #map {
+      height: 300px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Include your navbar here -->
+  <nav class="navbar">
+    <!-- navbar content -->
+  </nav>
+
+  <h1>Add Event</h1>
+  <form id="event-form" enctype="multipart/form-data">
+    <input type="text" name="title" placeholder="Title" required />
+    <textarea name="description" placeholder="Description" required></textarea>
+    <input type="date" name="date" required />
+
+    <!-- Hidden inputs for location -->
+    <input type="hidden" name="location[lat]" id="lat" required />
+    <input type="hidden" name="location[lng]" id="lng" required />
+
+    <div id="map"></div>
+
+    <input type="file" name="images" multiple accept="image/*" />
+    <button type="submit">Submit Event</button>
+  </form>
+
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <script>
+    // Initialize map centered on Barangay Tunasan
+    const map = L.map("map").setView([14.4089, 121.0341], 15);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+
+    let marker;
+
+    map.on("click", function (e) {
+      const { lat, lng } = e.latlng;
+      if (marker) {
+        marker.setLatLng(e.latlng);
+      } else {
+        marker = L.marker(e.latlng).addTo(map);
+      }
+      document.getElementById("lat").value = lat;
+      document.getElementById("lng").value = lng;
+    });
+
+    const form = document.getElementById("event-form");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+
+      if (!formData.get("location[lat]") || !formData.get("location[lng]")) {
+        alert("Please select a location on the map.");
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/events", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert(data.message);
+          form.reset();
+          if (marker) {
+            map.removeLayer(marker);
+            marker = null;
+          }
+        } else {
+          alert("Failed to submit event: " + (data.message || ""));
+        }
+      } catch (err) {
+        alert("Error submitting event: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>

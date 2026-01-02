@@ -1,14 +1,17 @@
 const mongoose = require("mongoose");
 
 const NewsSchema = new mongoose.Schema({
-  title: String,
-  description: String,
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  location: {
+    lat: Number,
+    lng: Number,
+  },
   images: [String],
-  location: Object,
   createdAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 module.exports = mongoose.model("News", NewsSchema);
