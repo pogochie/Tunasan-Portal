@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Barangay Tunasan Incidents</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Include your navbar here -->
+  <nav class="navbar">
+    <!-- navbar content -->
+  </nav>
+
+  <h1>Recent Incidents</h1>
+  <ul id="incident-list"></ul>
+
+  <script>
+    async function loadIncidents() {
+      try {
+        const res = await fetch("/api/incidents");
+        const incidents = await res.json();
+        const incidentList = document.getElementById("incident-list");
+        incidentList.innerHTML = "";
+
+        // Filter only approved incidents
+        const approvedIncidents = incidents.filter(i => i.status.toLowerCase() === "approved");
+
+        if (approvedIncidents.length === 0) {
+          incidentList.innerHTML = "<li>No approved incidents available.</li>";
+          return;
+        }
+
+        approvedIncidents.forEach(incident => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <h3>${incident.incidentType}</h3>
+            <p><strong>Reported by:</strong> ${incident.reporterName}</p>
+            <p>${incident.description}</p>
+            ${incident.images && incident.images.length > 0 ? incident.images.map(img => `<img src="${img}" width="200" style="margin-right:10px;">`).join("") : ""}
+            <hr>
+          `;
+          incidentList.appendChild(li);
+        });
+      } catch (err) {
+        console.error("Failed to load incidents:", err);
+      }
+    }
+
+    loadIncidents();
+  </script>
+  <script src="js/navbar.js"></script>
+</body>
+</html>

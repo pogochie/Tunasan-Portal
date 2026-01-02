@@ -1,3 +1,7 @@
+if (localStorage.getItem("adminLoggedIn") !== "true") {
+  alert("Please login first");
+  window.location.href = "admin-login.html";
+}
 const tableBody = document.querySelector("#incident-table tbody");
 const modal = document.getElementById("review-modal");
 

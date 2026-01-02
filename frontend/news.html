@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Barangay Tunasan News</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Include your navbar here -->
+  <nav class="navbar">
+    <!-- navbar content -->
+  </nav>
+
+  <h1>Latest News</h1>
+  <ul id="news-list"></ul>
+
+  <script>
+    async function loadNews() {
+      try {
+        const res = await fetch("/api/news");
+        const newsItems = await res.json();
+        const newsList = document.getElementById("news-list");
+        newsList.innerHTML = "";
+
+        if (newsItems.length === 0) {
+          newsList.innerHTML = "<li>No news available.</li>";
+          return;
+        }
+
+        newsItems.forEach(item => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <h3>${item.title}</h3>
+            <p>${item.description}</p>
+            ${item.images && item.images.length > 0 ? item.images.map(img => `<img src="${img}" width="200" style="margin-right:10px;">`).join("") : ""}
+            <hr>
+          `;
+          newsList.appendChild(li);
+        });
+      } catch (err) {
+        console.error("Failed to load news:", err);
+      }
+    }
+    
+
+    loadNews();
+  </script>
+  <script src="js/navbar.js"></script>
+</body>
+</html>

@@ -1,4 +1,3 @@
-// frontend/js/review.js
 const urlParams = new URLSearchParams(window.location.search);
 const incidentId = urlParams.get("id");
 
