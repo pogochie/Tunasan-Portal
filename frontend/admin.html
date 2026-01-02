@@ -15,7 +15,14 @@
         <th>Description</th>
         <th>Location</th>
         <th>Status</th>
-        <th>Actions</th>
+        <td>
+  <button class="approve" onclick="updateStatus('${incident._id}', 'Approved')">
+    Approve
+  </button>
+  <button class="reject" onclick="updateStatus('${incident._id}', 'Rejected')">
+    Reject
+  </button>
+</td>
       </tr>
     </thead>
     <tbody></tbody>
