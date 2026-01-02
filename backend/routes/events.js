@@ -44,7 +44,6 @@ router.post("/", upload.array("images", 3), async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-s
 // Get all events
 router.get("/", async (req, res) => {
   try {
