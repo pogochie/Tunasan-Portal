@@ -19,29 +19,15 @@ const upload = multer({ storage });
 // Create incident (with images)
 router.post("/", upload.array("images", 3), async (req, res) => {
   try {
-    console.log("POST /api/incidents hit");
-    console.log("Body:", req.body);
-    console.log("Files:", req.files);
-
     const { reporterName, incidentType, description, location } = req.body;
 
-    // If location is JSON string, parse it; else keep as string
-    let loc = location;
-    if (typeof location === "string") {
-      try {
-        loc = JSON.parse(location);
-      } catch {
-        // keep as string if not JSON
-      }
-    }
-
-    const imagePaths = req.files.map(file => `/uploads/${file.filename}`);
+    const imagePaths = (req.files || []).map(file => `/uploads/${file.filename}`);
 
     const incident = new Incident({
       reporterName,
       incidentType,
       description,
-      location: loc,
+      location,
       images: imagePaths,
       status: "Pending"
     });
