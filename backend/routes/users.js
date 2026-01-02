@@ -2,17 +2,14 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const authMiddleware = require("../middleware/auth"); // your auth middleware
 
-// Register new user (admin or official)
+// Register new official (status = pending)
 router.post("/register", async (req, res) => {
   const { username, password, role } = req.body;
 
-  if (!username || !password || !role) {
-    return res.status(400).json({ message: "Please provide username, password, and role" });
-  }
-
-  if (!["admin", "official"].includes(role)) {
-    return res.status(400).json({ message: "Role must be 'admin' or 'official'" });
+  if (role !== "official") {
+    return res.status(400).json({ message: "Only Barangay Officials can register" });
   }
 
   try {
@@ -25,13 +22,58 @@ router.post("/register", async (req, res) => {
     const user = new User({
       username,
       password: hashedPassword,
-      role
+      role,
+      status: "pending"
     });
 
     await user.save();
-    res.json({ message: "User registered successfully" });
+    res.json({ message: "Registration submitted. Await admin approval." });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Get pending officials (admin only)
+router.get("/pending", authMiddleware, async (req, res) => {
+  if (req.user.role !== "admin") return res.status(403).json({ message: "Access denied" });
+
+  try {
+    const pendingUsers = await User.find({ status: "pending", role: "official" });
+    res.json(pendingUsers);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Approve official (admin only)
+router.post("/:id/approve", authMiddleware, async (req, res) => {
+  if (req.user.role !== "admin") return res.status(403).json({ message: "Access denied" });
+
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.status = "approved";
+    await user.save();
+    res.json({ message: "User approved" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Reject official (admin only)
+router.post("/:id/reject", authMiddleware, async (req, res) => {
+  if (req.user.role !== "admin") return res.status(403).json({ message: "Access denied" });
+
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.status = "rejected";
+    await user.save();
+    res.json({ message: "User rejected" });
+  } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 });

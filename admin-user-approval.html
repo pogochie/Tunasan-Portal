@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin - Approve Officials</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="admin-navbar">
+    <div class="container">
+      <a href="admin.html" class="logo">Admin Dashboard</a>
+      <ul class="nav-menu">
+        <li><a href="admin.html">Incidents</a></li>
+        <li><a href="admin-news.html">Add News</a></li>
+        <li><a href="admin-events.html">Add Events</a></li>
+        <li><a href="admin-user-approval.html">User Approvals</a></li>
+        <li><a href="#" id="logout-link">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <h1>Pending Barangay Officials</h1>
+  <ul id="pending-users-list">Loading...</ul>
+
+  <script>
+    const pendingUsersList = document.getElementById("pending-users-list");
+
+    async function loadPendingUsers() {
+      try {
+        // Replace with your auth token retrieval method
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api/users/pending", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Failed to fetch pending users");
+        const users = await res.json();
+
+        pendingUsersList.innerHTML = "";
+        if (users.length === 0) {
+          pendingUsersList.innerHTML = "<li>No pending users.</li>";
+          return;
+        }
+
+        users.forEach(user => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <strong>${user.username}</strong> - Status: ${user.status}
+            <button class="approve-btn" data-id="${user._id}">Approve</button>
+            <button class="reject-btn" data-id="${user._id}">Reject</button>
+          `;
+          pendingUsersList.appendChild(li);
+        });
+      } catch (err) {
+        console.error(err);
+        pendingUsersList.innerHTML = "<li>Failed to load pending users.</li>";
+      }
+    }
+
+    pendingUsersList.addEventListener("click", async (e) => {
+      const token = localStorage.getItem("token");
+      if (e.target.classList.contains("approve-btn")) {
+        const id = e.target.getAttribute("data-id");
+        if (confirm("Approve this user?")) {
+          try {
+            const res = await fetch(`/api/users/${id}/approve`, {
+              method: "POST",
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (res.ok) {
+              alert(data.message);
+              loadPendingUsers();
+            } else {
+              alert("Failed: " + data.message);
+            }
+          } catch (err) {
+            alert("Error: " + err.message);
+          }
+        }
+      } else if (e.target.classList.contains("reject-btn")) {
+        const id = e.target.getAttribute("data-id");
+        if (confirm("Reject this user?")) {
+          try {
+            const res = await fetch(`/api/users/${id}/reject`, {
+              method: "POST",
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (res.ok) {
+              alert(data.message);
+              loadPendingUsers();
+            } else {
+              alert("Failed: " + data.message);
+            }
+          } catch (err) {
+            alert("Error: " + err.message);
+          }
+        }
+      }
+    });
+
+    loadPendingUsers();
+
+    // Logout link handler
+    const logoutLink = document.getElementById("logout-link");
+    logoutLink.addEventListener("click", () => {
+      localStorage.removeItem("token");
+      window.location.href = "admin-login.html";
+    });
+  </script>
+</body>
+</html>
