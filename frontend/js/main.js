@@ -1,28 +1,31 @@
-console.log("main.js loaded");
-
 const form = document.getElementById("incident-form");
-
-if (!form) {
-  console.error("❌ FORM NOT FOUND");
-}
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const formData = new FormData(form);
 
-  const res = await fetch("/api/incidents", {
-    method: "POST",
-    body: formData
-  });
+  try {
+    const res = await fetch("/api/incidents", {
+      method: "POST",
+      body: formData
+    });
 
-  const data = await res.json();
+    const text = await res.text();
 
-  if (res.ok) {
-    alert(data.message);
-    form.reset();
-  } else {
-    alert("Failed to submit report");
+    try {
+      const data = JSON.parse(text);
+      if (res.ok) {
+        alert(data.message);
+        form.reset();
+      } else {
+        alert("Failed to submit report: " + (data.message || text));
+      }
+    } catch {
+      console.error("Response is not JSON:", text);
+      alert("Unexpected server response. See console.");
+    }
+  } catch (err) {
+    alert("Network error: " + err.message);
   }
 });
-

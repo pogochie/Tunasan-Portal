@@ -18,30 +18,53 @@ const upload = multer({ storage });
 
 // Create incident (with images)
 router.post("/", upload.array("images", 3), async (req, res) => {
-  const { reporterName, incidentType, description, location } = req.body;
+  try {
+    console.log("POST /api/incidents hit");
+    console.log("Body:", req.body);
+    console.log("Files:", req.files);
 
-  const imagePaths = req.files.map(file => `/uploads/${file.filename}`);
+    const { reporterName, incidentType, description, location } = req.body;
 
-  const incident = new Incident({
-    reporterName,
-    incidentType,
-    description,
-    location,
-    images: imagePaths,
-    status: "pending"
-  });
+    // If location is JSON string, parse it; else keep as string
+    let loc = location;
+    if (typeof location === "string") {
+      try {
+        loc = JSON.parse(location);
+      } catch {
+        // keep as string if not JSON
+      }
+    }
 
-  await incident.save();
-  res.json({ message: "Report submitted for review" });
+    const imagePaths = req.files.map(file => `/uploads/${file.filename}`);
+
+    const incident = new Incident({
+      reporterName,
+      incidentType,
+      description,
+      location: loc,
+      images: imagePaths,
+      status: "Pending"
+    });
+
+    await incident.save();
+    res.json({ message: "Report submitted for review" });
+  } catch (error) {
+    console.error("Error saving incident:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 // Get all incidents
 router.get("/", async (req, res) => {
-  const incidents = await Incident.find().sort({ createdAt: -1 });
-  res.json(incidents);
+  try {
+    const incidents = await Incident.find().sort({ createdAt: -1 });
+    res.json(incidents);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
-// Add route to get single incident by id
+// Get single incident by id
 router.get("/:id", async (req, res) => {
   try {
     const incident = await Incident.findById(req.params.id);

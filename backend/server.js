@@ -11,11 +11,12 @@ connectDB();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
+app.use("/uploads", express.static("uploads"));
 
 // Routes
 app.use('/api/incidents', require('./routes/incidents'));
 
-// Fallback for SPA
+// Fallback for SPA (only for GET requests)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
