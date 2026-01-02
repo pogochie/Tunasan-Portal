@@ -15,3 +15,12 @@
     </ul>
   </div>
 </nav>
+
+<script>
+  fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('navbar-placeholder').innerHTML = data;
+    })
+    .catch(err => console.error('Failed to load navbar:', err));
+</script>
