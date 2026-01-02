@@ -28,13 +28,6 @@
   <form id="news-form" enctype="multipart/form-data">
     <input type="text" name="title" placeholder="Title" required />
     <textarea name="description" placeholder="Description" required></textarea>
-
-    <!-- Hidden inputs for location -->
-    <input type="hidden" name="location[lat]" id="lat" required />
-    <input type="hidden" name="location[lng]" id="lng" required />
-
-    <div id="map"></div>
-
     <input type="file" name="images" multiple accept="image/*" />
     <button type="submit">Submit News</button>
   </form>

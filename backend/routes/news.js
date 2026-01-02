@@ -32,7 +32,6 @@ router.post("/", upload.array("images", 3), async (req, res) => {
     const news = new News({
       title,
       description,
-      location,
       images: imagePaths,
     });
 
