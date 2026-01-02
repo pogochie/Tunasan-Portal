@@ -1,19 +1,27 @@
 const newsList = document.getElementById("news-list");
 
 async function loadNews() {
-  const res = await fetch("/api/news");
-  const newsItems = await res.json();
+  try {
+    const res = await fetch("/api/news");
+    if (!res.ok) throw new Error("Failed to fetch news");
+    const newsItems = await res.json();
 
-  newsList.innerHTML = "";
-  newsItems.forEach(item => {
-    newsList.innerHTML += `
-      <li>
-        <h3>${item.title}</h3>
-        <p>${item.description}</p>
-        <button class="delete-news-btn" data-id="${item._id}">Delete</button>
-      </li>
-    `;
-  });
+    newsList.innerHTML = "";
+    newsItems.forEach(item => {
+      newsList.innerHTML += `
+        <li>
+          <h3>${item.title}</h3>
+          <p>${item.description}</p>
+          ${item.images && item.images.length > 0 ? item.images.map(img => `<img src="${img}" width="200" style="margin-right:10px;">`).join("") : ""}
+          <br>
+          <button class="delete-news-btn" data-id="${item._id}">Delete</button>
+        </li>
+      `;
+    });
+  } catch (err) {
+    console.error(err);
+    newsList.innerHTML = "<li>Failed to load news.</li>";
+  }
 }
 
 newsList.addEventListener("click", async (e) => {

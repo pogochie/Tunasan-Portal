@@ -1,19 +1,27 @@
 const eventsList = document.getElementById("events-list");
 
 async function loadEvents() {
-  const res = await fetch("/api/events");
-  const events = await res.json();
+  try {
+    const res = await fetch("/api/events");
+    if (!res.ok) throw new Error("Failed to fetch events");
+    const events = await res.json();
 
-  eventsList.innerHTML = "";
-  events.forEach(event => {
-    eventsList.innerHTML += `
-      <li>
-        <h3>${event.title}</h3>
-        <p>${new Date(event.date).toLocaleDateString()}</p>
-        <button class="delete-event-btn" data-id="${event._id}">Delete</button>
-      </li>
-    `;
-  });
+    eventsList.innerHTML = "";
+    events.forEach(event => {
+      eventsList.innerHTML += `
+        <li>
+          <h3>${event.title}</h3>
+          <p>${new Date(event.date).toLocaleDateString()}</p>
+          ${event.images && event.images.length > 0 ? event.images.map(img => `<img src="${img}" width="200" style="margin-right:10px;">`).join("") : ""}
+          <br>
+          <button class="delete-event-btn" data-id="${event._id}">Delete</button>
+        </li>
+      `;
+    });
+  } catch (err) {
+    console.error(err);
+    eventsList.innerHTML = "<li>Failed to load events.</li>";
+  }
 }
 
 eventsList.addEventListener("click", async (e) => {
