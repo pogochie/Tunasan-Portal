@@ -1,28 +1,48 @@
-<nav class="navbar">
-  <div class="container">
-    <a href="index.html" class="logo">Barangay Tunasan Portal</a>
+<nav class="fb-navbar" role="navigation" aria-label="Main">
+  <div class="container fb-nav-inner">
+    <!-- Left: Logo -->
+    <div class="nav-left">
+      <a href="index.html" class="logo" aria-label="Barangay Tunasan Portal">Barangay Tunasan</a>
+    </div>
 
-    <!-- Mobile hamburger -->
-    <input type="checkbox" id="nav-toggle" class="nav-toggle" />
-    <label for="nav-toggle" class="nav-toggle-label" aria-label="Open Menu">
-      <span></span>
-    </label>
+    <!-- Center: Primary nav (desktop/tablet) -->
+    <div class="nav-center">
+      <ul class="nav-items">
+        <li><a href="index.html" class="nav-link"><span class="ico">🏠</span><span class="txt">Home</span></a></li>
+        <li><a href="news.html" class="nav-link"><span class="ico">📰</span><span class="txt">News</span></a></li>
+        <li><a href="incidents.html" class="nav-link"><span class="ico">⚠️</span><span class="txt">Incidents</span></a></li>
+        <li><a href="events.html" class="nav-link"><span class="ico">📅</span><span class="txt">Events</span></a></li>
+      </ul>
+    </div>
 
-    <ul class="nav-menu">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="news.html">News</a></li>
-      <li><a href="incidents.html">Incidents</a></li>
-      <li><a href="events.html">Events</a></li>
-      <li><a href="admin.html" id="admin-link">Admin Dashboard</a></li>
-      <li><a href="#" id="logout-link" style="display:none;">Logout</a></li>
-      <!-- Show register inside drawer on mobile -->
-      <li class="mobile-only"><a href="register.html">Register Admin/Official</a></li>
-    </ul>
+    <!-- Right: Search + Actions (desktop/tablet) -->
+    <div class="nav-right">
+      <div class="search-wrap">
+        <input type="search" class="search-input" placeholder="Search..." aria-label="Search">
+      </div>
+      <a href="admin.html" id="admin-link" class="pill-btn">Dashboard</a>
+      <a href="#" id="logout-link" class="pill-btn" style="display:none;">Logout</a>
+      <a href="register.html" class="pill-btn secondary">Register</a>
+    </div>
+  </div>
 
-    <!-- Desktop CTA -->
-    <a href="register.html" class="desktop-only desktop-cta">Register Admin/Official</a>
-
-    <!-- Overlay for mobile drawer -->
-    <div class="nav-overlay"></div>
+  <!-- Mobile bottom tab bar -->
+  <div class="mobile-tabbar" role="navigation" aria-label="Quick">
+    <a href="index.html" class="tab-link">
+      <span class="ico">🏠</span>
+      <span class="txt">Home</span>
+    </a>
+    <a href="news.html" class="tab-link">
+      <span class="ico">📰</span>
+      <span class="txt">News</span>
+    </a>
+    <a href="incidents.html" class="tab-link">
+      <span class="ico">⚠️</span>
+      <span class="txt">Incidents</span>
+    </a>
+    <a href="events.html" class="tab-link">
+      <span class="ico">📅</span>
+      <span class="txt">Events</span>
+    </a>
   </div>
 </nav>

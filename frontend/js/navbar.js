@@ -48,6 +48,20 @@ export function initNavbar() {
   }
 }
 
+(function enhanceNav() {
+  try {
+    const path = window.location.pathname.split('/').pop() || 'index.html';
+    const links = document.querySelectorAll('.fb-navbar .nav-link, .mobile-tabbar .tab-link');
+    links.forEach(a => {
+      const href = a.getAttribute('href');
+      if (!href) return;
+      if (href === path || (path === '' && href === 'index.html')) {
+        a.classList.add('active');
+      }
+    });
+  } catch (_) {}
+})();
+
 // Auto-init if partial is already on page and module loaded late
 if (document.querySelector(".navbar")) {
   try { initNavbar(); } catch (e) {}

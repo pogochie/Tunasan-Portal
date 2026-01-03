@@ -5,23 +5,255 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin Login</title>
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Scoped styles for the login screen (uses your global theme tokens if present) */
+    :root {
+      --card: rgba(255,255,255,.9);
+      --border: #E4E6EB;
+      --text: #1C1E21;
+      --muted: #65676B;
+      --primary: #1877F2;
+      --primary-hover: #166FE5;
+      --shadow: 0 2px 12px rgba(0,0,0,.06);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,.08);
+    }
+    body { color: var(--text); }
+    .auth-wrapper {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px 16px;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      backdrop-filter: saturate(120%) blur(6px);
+      padding: 22px 20px;
+      animation: fadeInUp .35s ease both;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .brand-logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #39a0ff);
+      box-shadow: var(--shadow);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: .5px;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+    .subtitle {
+      margin: 2px 0 16px 58px;
+      font-size: .9rem;
+      color: var(--muted);
+    }
+
+    #login-form {
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      padding: 0;
+    }
+    .field {
+      margin-bottom: 12px;
+    }
+    .field label {
+      display: block;
+      font-size: .9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #050505;
+    }
+    .input-wrap {
+      position: relative;
+    }
+    .input-wrap input {
+      width: 100%;
+      padding: 12px 14px;
+      padding-right: 42px; /* space for toggle */
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      font-size: 1rem;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    .input-wrap input:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(24,119,242,.15);
+    }
+    .toggle-password {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #f0f2f5;
+      border: 1px solid var(--border);
+      color: #050505;
+      padding: 6px 8px;
+      border-radius: 8px;
+      font-size: .85rem;
+      cursor: pointer;
+      transition: background .2s ease, box-shadow .2s ease;
+    }
+    .toggle-password:hover { background: #e7e9ee; }
+
+    .form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 6px 0 14px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    .form-row a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .form-row a:hover { text-decoration: underline; }
+
+    #loginBtn {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      border: 1px solid transparent;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
+      box-shadow: var(--shadow);
+    }
+    #loginBtn:hover { background: var(--primary-hover); box-shadow: var(--shadow-lg); }
+    #loginBtn:disabled { opacity: .8; cursor: not-allowed; }
+
+    .form-message {
+      min-height: 18px;
+      margin-top: 10px;
+      font-size: .92rem;
+    }
+    .form-message.error { color: #E53935; }
+    .form-message.success { color: #2e7d32; }
+
+    .auth-footer {
+      margin-top: 16px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+    .auth-footer a { color: var(--primary); text-decoration: none; }
+    .auth-footer a:hover { text-decoration: underline; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-  <h1>Admin / Official Login</h1>
-  <form id="login-form">
-    <input type="text" id="username" placeholder="Username" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <button type="submit">Login</button>
-  </form>
+  <div class="auth-wrapper">
+    <div class="auth-card" role="dialog" aria-labelledby="loginTitle" aria-describedby="loginSubtitle">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">BT</div>
+        <h1 id="loginTitle">Admin / Official Login</h1>
+      </div>
+      <p class="subtitle" id="loginSubtitle">Sign in to manage incidents, news, and events.</p>
 
-  <p>Don't have an account? <a href="register.html">Register here</a></p>
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label for="username">Username</label>
+          <div class="input-wrap">
+            <input type="text" id="username" name="username" placeholder="Enter your username" required autocomplete="username" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password" />
+            <button type="button" class="toggle-password" id="togglePassword" aria-label="Show password">Show</button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label><input type="checkbox" id="rememberMe"> Remember me</label>
+          <a href="#" onclick="event.preventDefault()">Forgot password?</a>
+        </div>
+
+        <button type="submit" id="loginBtn">Sign in</button>
+        <div class="form-message" id="form-message" aria-live="polite"></div>
+      </form>
+
+      <div class="auth-footer">
+        <span>Don't have an account? <a href="register.html">Register here</a></span><br>
+        <a href="index.html" style="display:inline-block; margin-top:6px;">← Back to Portal</a>
+      </div>
+    </div>
+  </div>
 
   <script>
     const form = document.getElementById("login-form");
+    const btn = document.getElementById("loginBtn");
+    const msg = document.getElementById("form-message");
+    const togglePassword = document.getElementById("togglePassword");
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const rememberMe = document.getElementById("rememberMe");
+
+    // Prefill from "Remember me"
+    (function initRemember() {
+      const remembered = localStorage.getItem("rememberUsername");
+      if (remembered) {
+        usernameInput.value = remembered;
+        rememberMe.checked = true;
+      }
+    })();
+
+    function setMessage(text, type = "") {
+      msg.textContent = text || "";
+      msg.className = "form-message " + (type ? type : "");
+    }
+
+    togglePassword.addEventListener("click", () => {
+      const isHidden = passwordInput.type === "password";
+      passwordInput.type = isHidden ? "text" : "password";
+      togglePassword.textContent = isHidden ? "Hide" : "Show";
+      togglePassword.setAttribute("aria-label", isHidden ? "Hide password" : "Show password");
+      passwordInput.focus();
+    });
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
+      setMessage("");
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = "Signing in...";
+
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!username || !password) {
+        setMessage("Please enter username and password.", "error");
+        btn.disabled = false;
+        btn.textContent = originalText;
+        return;
+      }
 
       try {
         const res = await fetch("/api/auth/login", {
@@ -30,17 +262,30 @@
           body: JSON.stringify({ username, password }),
         });
         const data = await res.json();
+
         if (res.ok) {
-          localStorage.setItem("adminLoggedIn", "true");  // <-- Add this
+          // Remember me
+          if (rememberMe.checked) {
+            localStorage.setItem("rememberUsername", username);
+          } else {
+            localStorage.removeItem("rememberUsername");
+          }
+
+          localStorage.setItem("adminLoggedIn", "true");
           localStorage.setItem("username", data.username);
           localStorage.setItem("role", data.role);
-          alert("Login successful");
-          window.location.href = "admin.html";
+
+          setMessage("Login successful. Redirecting...", "success");
+          // Small delay for UX
+          setTimeout(() => { window.location.href = "admin.html"; }, 400);
         } else {
-          alert("Login failed: " + data.message);
+          setMessage("Login failed: " + (data.message || "Invalid credentials"), "error");
         }
       } catch (err) {
-        alert("Error: " + err.message);
+        setMessage("Network error: " + err.message, "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
       }
     });
   </script>
