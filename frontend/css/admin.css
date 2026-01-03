@@ -1,0 +1,363 @@
+/* Admin-only styles (extracted to avoid conflicts with public UI) */
+
+/* Admin top navigation */
+.admin-navbar {
+  background: rgba(255,255,255,.95);
+  color: var(--text);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  backdrop-filter: saturate(120%) blur(6px);
+}
+.admin-navbar .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.admin-navbar .logo {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--primary);
+  text-decoration: none;
+}
+.admin-navbar .nav-menu {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
+}
+.admin-navbar .nav-menu li a {
+  color: #050505;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 999px;
+  transition: background-color 0.2s ease;
+}
+.admin-navbar .nav-menu li a:hover { background-color: #F0F2F5; }
+
+/* Mobile drawer (only for admin navbar when used with nav-toggle) */
+.nav-toggle { display: none; }
+.nav-toggle-label {
+  display: none;
+  cursor: pointer;
+  padding: 8px;
+}
+.nav-toggle-label span,
+.nav-toggle-label span::before,
+.nav-toggle-label span::after {
+  display: block;
+  background: #050505;
+  height: 2px;
+  width: 24px;
+  border-radius: 2px;
+  position: relative;
+  transition: transform .25s ease, opacity .2s ease, background .25s ease;
+}
+.nav-toggle-label span::before,
+.nav-toggle-label span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+.nav-toggle-label span::before { top: -7px; }
+.nav-toggle-label span::after { top: 7px; }
+
+.nav-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(2px);
+}
+
+@media (max-width: 768px) {
+  .nav-toggle { display: block; }
+  .nav-toggle-label { display: block; z-index: 1002; }
+  .admin-navbar .nav-menu {
+    position: fixed;
+    top: 0; right: 0;
+    height: 100vh;
+    width: min(80vw, 300px);
+    background: #fff;
+    border-left: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    flex-direction: column;
+    padding: 70px 16px 16px;
+    gap: 6px;
+    transform: translateX(100%);
+    transition: transform .25s ease;
+    z-index: 1001;
+    will-change: transform;
+  }
+  .admin-navbar .nav-toggle:checked ~ .nav-menu {
+    transform: translateX(0);
+  }
+  .admin-navbar .nav-toggle:checked ~ .nav-overlay {
+    display: block;
+  }
+  body:has(#nav-toggle:checked) {
+    overflow-y: hidden; /* lock scroll when drawer open */
+  }
+}
+
+/* Admin header + stat cards (dashboard) */
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 10px 0 16px;
+}
+.admin-header .title { margin: 0; }
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 12px 0 18px;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 12px;
+}
+.stat-card .label {
+  font-size: .85rem;
+  color: var(--muted);
+}
+.stat-card .value {
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: #050505;
+}
+@media (max-width: 900px) {
+  .admin-stats { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  .admin-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Admin tables */
+#incident-table {
+  width: 100%;
+  border-collapse: collapse;
+  max-width: 1000px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: 12px;
+  overflow: hidden;
+}
+#incident-table thead {
+  background-color: #fff;
+  color: #050505;
+  border-bottom: 1px solid var(--border);
+}
+#incident-table th, #incident-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  vertical-align: middle;
+}
+#incident-table tbody tr:hover { background-color: #F7F8FA; }
+
+/* Table responsive */
+@media (max-width: 768px) {
+  #incident-table, #incident-table thead, #incident-table tbody, #incident-table th, #incident-table td, #incident-table tr {
+    display: block;
+  }
+  #incident-table thead tr {
+    position: absolute;
+    top: -9999px; left: -9999px;
+  }
+  #incident-table tr {
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ddd;
+  }
+  #incident-table td {
+    border: none;
+    position: relative;
+    padding-left: 50%;
+    text-align: right;
+  }
+  #incident-table td::before {
+    position: absolute;
+    top: 12px; left: 15px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    font-weight: 600;
+    text-align: left;
+    content: attr(data-label);
+  }
+}
+
+/* Action buttons in admin tables */
+button.action-btn {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin-right: 5px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background .2s ease, box-shadow .2s ease;
+  box-shadow: var(--shadow);
+}
+button.action-btn:hover {
+  background-color: var(--primary-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Theme tokens */
+:root {
+  --bg: #f4f6f8;
+  --card: #ffffff;
+  --text: #1C1E21;
+  --muted: #65676B;
+  --primary: #1877F2;
+  --primary-hover: #166FE5;
+  --border: #E4E6EB;
+  --shadow: 0 2px 12px rgba(0,0,0,.06);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.08);
+}
+
+/* Base */
+html, body { overflow-x: hidden; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 20px;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+.container { max-width: 1120px; margin: 0 auto; }
+
+/* Headings */
+h1 { margin: 10px 0 16px; font-weight: 700; color: #050505; }
+h2 { margin: 24px 0 12px; font-weight: 600; color: #34495e; }
+
+/* Pill button (used in dashboard actions) */
+.pill-btn {
+  background: #E4E6EB;
+  color: #050505;
+  padding: 8px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+  border: 1px solid transparent;
+  transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
+  box-shadow: var(--shadow);
+}
+.pill-btn:hover { background: #DADDE1; box-shadow: var(--shadow-lg); }
+.pill-btn.secondary { background: var(--primary); color: #fff; }
+.pill-btn.secondary:hover { background: var(--primary-hover); }
+
+/* Forms as cards */
+form#news-form,
+form#event-form,
+form#edit-incident-form {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+form#news-form label,
+form#event-form label,
+form#edit-incident-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #050505;
+}
+form#news-form input[type="text"],
+form#news-form textarea,
+form#event-form input[type="text"],
+form#event-form textarea,
+form#event-form input[type="date"],
+form#edit-incident-form input[type="text"],
+form#edit-incident-form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 15px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+form#news-form input[type="text"]:focus,
+form#news-form textarea:focus,
+form#event-form input[type="text"]:focus,
+form#event-form textarea:focus,
+form#event-form input[type="date"]:focus,
+form#edit-incident-form input[type="text"]:focus,
+form#edit-incident-form textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(24,119,242,.15);
+}
+form#news-form button,
+form#event-form button,
+form#edit-incident-form button {
+  background: var(--primary);
+  color: #fff;
+  border: 0;
+  padding: 12px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
+  box-shadow: var(--shadow);
+}
+form#news-form button:hover,
+form#event-form button:hover,
+form#edit-incident-form button:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+/* File input styled as button */
+input[type="file"] {
+  border: 1px dashed var(--border);
+  padding: 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.7);
+}
+input[type="file"]::file-selector-button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  margin-right: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
+  box-shadow: var(--shadow);
+}
+input[type="file"]::file-selector-button:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Map containers */
+#map,
+.leaflet-container {
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  height: clamp(220px, 35vh, 420px) !important;
+  width: 100%;
+}
