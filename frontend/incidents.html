@@ -10,9 +10,34 @@
   <div id="navbar-placeholder"></div>
 
   <h1>Recent Incidents</h1>
-  <ul id="incident-list"></ul>
+  <ul id="incident-list" class="feed"></ul>
 
   <script>
+    function timeAgo(dateInput) {
+      const d = new Date(dateInput);
+      const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
+      const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+      let unit = "second", value = -Math.floor(seconds);
+      if (seconds >= 31536000) { unit = "year"; value = -Math.floor(seconds / 31536000); }
+      else if (seconds >= 2592000) { unit = "month"; value = -Math.floor(seconds / 2592000); }
+      else if (seconds >= 604800) { unit = "week"; value = -Math.floor(seconds / 604800); }
+      else if (seconds >= 86400) { unit = "day"; value = -Math.floor(seconds / 86400); }
+      else if (seconds >= 3600) { unit = "hour"; value = -Math.floor(seconds / 3600); }
+      else if (seconds >= 60) { unit = "minute"; value = -Math.floor(seconds / 60); }
+      return rtf.format(value, unit);
+    }
+
+    function getLikeKey(id) { return `likes_inc_${id}`; }
+    function getLikedKey(id) { return `liked_inc_${id}`; }
+    function getLikes(id) { return parseInt(localStorage.getItem(getLikeKey(id)) || "0", 10); }
+    function isLiked(id) { return localStorage.getItem(getLikedKey(id)) === "true"; }
+    function setLiked(id, liked) {
+      localStorage.setItem(getLikedKey(id), liked ? "true" : "false");
+      const count = Math.max(0, getLikes(id) + (liked ? 1 : -1));
+      localStorage.setItem(getLikeKey(id), String(count));
+      return count;
+    }
+
     async function loadIncidents() {
       try {
         const res = await fetch("/api/incidents");
@@ -20,25 +45,61 @@
         const incidentList = document.getElementById("incident-list");
         incidentList.innerHTML = "";
 
-        // Filter only approved incidents
-        const approvedIncidents = incidents.filter(i => i.status.toLowerCase() === "approved");
+        // Only approved incidents
+        const approvedIncidents = incidents.filter(i => (i.status || "").toLowerCase() === "approved");
 
         if (approvedIncidents.length === 0) {
-          incidentList.innerHTML = "<li>No approved incidents available.</li>";
+          incidentList.innerHTML = '<li class="post-card">No approved incidents available.</li>';
           return;
         }
 
         approvedIncidents.forEach(incident => {
+          const liked = isLiked(incident._id);
+          const likeCount = getLikes(incident._id);
+          const avatar = `https://i.pravatar.cc/80?u=incident_${incident._id}`;
+
+          const images = (incident.images && incident.images.length > 0)
+            ? `
+              <div class="post-images ${incident.images.length === 1 ? 'single' : ''}">
+                ${incident.images.map(img => `<img src="${img}" loading="lazy" decoding="async" alt="incident image">`).join("")}
+              </div>
+            ` : "";
+
           const li = document.createElement("li");
+          li.className = "post-card";
           li.innerHTML = `
-            <h3>${incident.incidentType}</h3>
-            <p><strong>Reported by:</strong> ${incident.reporterName}</p>
-            <p>${incident.description}</p>
-            ${incident.images && incident.images.length > 0 ? incident.images.map(img => `<img src="${img}" loading="lazy" width="200" style="margin-right:10px;">`).join("") : ""}
-            <hr>
+            <div class="post-header">
+              <img class="avatar" src="${avatar}" alt="Profile">
+              <div class="title-wrap">
+                <h3>${incident.incidentType}</h3>
+                <span class="meta">Reported by ${incident.reporterName} • ${timeAgo(incident.createdAt || Date.now())}</span>
+              </div>
+            </div>
+            <div class="post-content">
+              <p>${incident.description}</p>
+              ${images}
+            </div>
+            <div class="post-actions">
+              <div class="like-btn ${liked ? 'liked' : ''}" data-id="${incident._id}">
+                <span>👍</span><span class="like-text">${liked ? 'Liked' : 'Like'}</span>
+              </div>
+              <div class="like-count" data-id="${incident._id}">${likeCount}</div>
+            </div>
           `;
           incidentList.appendChild(li);
         });
+
+        incidentList.addEventListener("click", (e) => {
+          const btn = e.target.closest(".like-btn");
+          if (!btn) return;
+          const id = btn.getAttribute("data-id");
+          const currentlyLiked = isLiked(id);
+          const newCount = setLiked(id, !currentlyLiked);
+          btn.classList.toggle("liked", !currentlyLiked);
+          btn.querySelector(".like-text").textContent = !currentlyLiked ? "Liked" : "Like";
+          const countEl = incidentList.querySelector(`.like-count[data-id="${id}"]`);
+          if (countEl) countEl.textContent = newCount;
+        }, { once: true });
       } catch (err) {
         console.error("Failed to load incidents:", err);
       }
@@ -49,8 +110,8 @@
   <script type="module">
     import { initNavbar } from './js/navbar.js';
     fetch('partials/navbar.html')
-      .then(r => r.text())
-      .then(html => { document.getElementById('navbar-placeholder').innerHTML = html; initNavbar(); })
+      .then(response => response.text())
+      .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; initNavbar(); })
       .catch(err => console.error('Failed to load navbar:', err));
   </script>
 </body>

@@ -10,9 +10,48 @@
   <div id="navbar-placeholder"></div>
 
   <h1>Latest News</h1>
-  <ul id="news-list"></ul>
+  <ul id="news-list" class="feed"></ul>
 
   <script>
+    function timeAgo(dateInput) {
+      const d = new Date(dateInput);
+      const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
+      const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+      const intervals = [
+        { s: 60, unit: "second" },
+        { s: 3600, unit: "minute" },
+        { s: 86400, unit: "hour" },
+        { s: 604800, unit: "day" },
+        { s: 2592000, unit: "week" },
+        { s: 31536000, unit: "month" },
+      ];
+      let value = -Math.floor(seconds);
+      let unit = "second";
+      if (seconds >= 31536000) { unit = "year"; value = -Math.floor(seconds / 31536000); }
+      else if (seconds >= 2592000) { unit = "month"; value = -Math.floor(seconds / 2592000); }
+      else if (seconds >= 604800) { unit = "week"; value = -Math.floor(seconds / 604800); }
+      else if (seconds >= 86400) { unit = "day"; value = -Math.floor(seconds / 86400); }
+      else if (seconds >= 3600) { unit = "hour"; value = -Math.floor(seconds / 3600); }
+      else if (seconds >= 60) { unit = "minute"; value = -Math.floor(seconds / 60); }
+      return rtf.format(value, unit);
+    }
+
+    function getLikeKey(id) { return `likes_news_${id}`; }
+    function getLikedKey(id) { return `liked_news_${id}`; }
+
+    function getLikes(id) {
+      return parseInt(localStorage.getItem(getLikeKey(id)) || "0", 10);
+    }
+    function isLiked(id) {
+      return localStorage.getItem(getLikedKey(id)) === "true";
+    }
+    function setLiked(id, liked) {
+      localStorage.setItem(getLikedKey(id), liked ? "true" : "false");
+      const count = Math.max(0, getLikes(id) + (liked ? 1 : -1));
+      localStorage.setItem(getLikeKey(id), String(count));
+      return count;
+    }
+
     async function loadNews() {
       try {
         const res = await fetch("/api/news");
@@ -21,20 +60,60 @@
         newsList.innerHTML = "";
 
         if (newsItems.length === 0) {
-          newsList.innerHTML = "<li>No news available.</li>";
+          newsList.innerHTML = '<li class="post-card">No news available.</li>';
           return;
         }
 
         newsItems.forEach(item => {
+          const liked = isLiked(item._id);
+          const likeCount = getLikes(item._id);
+          const avatar = `https://i.pravatar.cc/80?u=news_${item._id}`;
+
+          const images = (item.images && item.images.length > 0)
+            ? `
+              <div class="post-images ${item.images.length === 1 ? 'single' : ''}">
+                ${item.images.map(img => `<img src="${img}" loading="lazy" decoding="async" alt="news image">`).join("")}
+              </div>
+            `
+            : "";
+
           const li = document.createElement("li");
+          li.className = "post-card";
           li.innerHTML = `
-            <h3>${item.title}</h3>
-            <p>${item.description}</p>
-            ${item.images && item.images.length > 0 ? item.images.map(img => `<img src="${img}" loading="lazy" width="200" style="margin-right:10px;">`).join("") : ""}
-            <hr>
+            <div class="post-header">
+              <img class="avatar" src="${avatar}" alt="Profile">
+              <div class="title-wrap">
+                <h3>${item.title}</h3>
+                <span class="meta">${timeAgo(item.createdAt || Date.now())}</span>
+              </div>
+            </div>
+            <div class="post-content">
+              <p>${item.description}</p>
+              ${images}
+            </div>
+            <div class="post-actions">
+              <div class="like-btn ${liked ? 'liked' : ''}" data-id="${item._id}">
+                <span>👍</span><span class="like-text">${liked ? 'Liked' : 'Like'}</span>
+              </div>
+              <div class="like-count" data-id="${item._id}">${likeCount}</div>
+            </div>
           `;
           newsList.appendChild(li);
         });
+
+        // Delegate like clicks
+        newsList.addEventListener("click", (e) => {
+          const btn = e.target.closest(".like-btn");
+          if (!btn) return;
+          const id = btn.getAttribute("data-id");
+          const currentlyLiked = isLiked(id);
+          const newCount = setLiked(id, !currentlyLiked);
+          btn.classList.toggle("liked", !currentlyLiked);
+          btn.querySelector(".like-text").textContent = !currentlyLiked ? "Liked" : "Like";
+          const countEl = newsList.querySelector(`.like-count[data-id="${id}"]`);
+          if (countEl) countEl.textContent = newCount;
+        }, { once: true });
+        // Note: 'once' ensures only one handler is added per page load.
       } catch (err) {
         console.error("Failed to load news:", err);
       }
@@ -44,8 +123,8 @@
   <script type="module">
     import { initNavbar } from './js/navbar.js';
     fetch('partials/navbar.html')
-      .then(r => r.text())
-      .then(html => { document.getElementById('navbar-placeholder').innerHTML = html; initNavbar(); })
+      .then(response => response.text())
+      .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; initNavbar(); })
       .catch(err => console.error('Failed to load navbar:', err));
   </script>
 </body>

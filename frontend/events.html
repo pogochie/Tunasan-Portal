@@ -10,49 +10,112 @@
   <div id="navbar-placeholder"></div>
 
   <h1>Upcoming Events</h1>
-  <ul id="events-list">
-    <li>No events scheduled yet.</li>
-  </ul>
+  <ul id="events-list" class="feed"></ul>
+
   <script>
-  async function loadEvents() {
-    try {
-      const res = await fetch("/api/events");
-      if (!res.ok) throw new Error("Failed to fetch events");
-      const events = await res.json();
-
-      const eventsList = document.getElementById("events-list");
-      eventsList.innerHTML = "";
-
-      if (events.length === 0) {
-        eventsList.innerHTML = "<li>No events scheduled yet.</li>";
-        return;
-      }
-
-      events.forEach(event => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <h3>${event.title}</h3>
-          <p><strong>Date:</strong> ${new Date(event.date).toLocaleDateString()}</p>
-          <p>${event.description}</p>
-          ${event.images && event.images.length > 0 ? event.images.map(img => `<img src="${img}" loading="lazy" width="200" style="margin-right:10px;">`).join("") : ""}
-          <hr>
-        `;
-        eventsList.appendChild(li);
-      });
-    } catch (err) {
-      console.error(err);
-      document.getElementById("events-list").innerHTML = "<li>Failed to load events.</li>";
+    function timeAgo(dateInput) {
+      const d = new Date(dateInput);
+      const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
+      const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+      let unit = "second", value = -Math.floor(seconds);
+      if (seconds >= 31536000) { unit = "year"; value = -Math.floor(seconds / 31536000); }
+      else if (seconds >= 2592000) { unit = "month"; value = -Math.floor(seconds / 2592000); }
+      else if (seconds >= 604800) { unit = "week"; value = -Math.floor(seconds / 604800); }
+      else if (seconds >= 86400) { unit = "day"; value = -Math.floor(seconds / 86400); }
+      else if (seconds >= 3600) { unit = "hour"; value = -Math.floor(seconds / 3600); }
+      else if (seconds >= 60) { unit = "minute"; value = -Math.floor(seconds / 60); }
+      return rtf.format(value, unit);
     }
-  }
 
-  loadEvents();
-</script>
+    function getLikeKey(id) { return `likes_evt_${id}`; }
+    function getLikedKey(id) { return `liked_evt_${id}`; }
+    function getLikes(id) { return parseInt(localStorage.getItem(getLikeKey(id)) || "0", 10); }
+    function isLiked(id) { return localStorage.getItem(getLikedKey(id)) === "true"; }
+    function setLiked(id, liked) {
+      localStorage.setItem(getLikedKey(id), liked ? "true" : "false");
+      const count = Math.max(0, getLikes(id) + (liked ? 1 : -1));
+      localStorage.setItem(getLikeKey(id), String(count));
+      return count;
+    }
+
+    async function loadEvents() {
+      try {
+        const res = await fetch("/api/events");
+        if (!res.ok) throw new Error("Failed to fetch events");
+        const events = await res.json();
+
+        const eventsList = document.getElementById("events-list");
+        eventsList.innerHTML = "";
+
+        if (events.length === 0) {
+          eventsList.innerHTML = '<li class="post-card">No events scheduled yet.</li>';
+          return;
+        }
+
+        events.forEach(event => {
+          const liked = isLiked(event._id);
+          const likeCount = getLikes(event._id);
+          const avatar = `https://i.pravatar.cc/80?u=event_${event._id}`;
+
+          const dateStr = event.date ? new Date(event.date).toLocaleDateString() : null;
+          const when = dateStr ? `Scheduled ${dateStr}` : timeAgo(event.createdAt || Date.now());
+
+          const images = (event.images && event.images.length > 0)
+            ? `
+              <div class="post-images ${event.images.length === 1 ? 'single' : ''}">
+                ${event.images.map(img => `<img src="${img}" loading="lazy" decoding="async" alt="event image">`).join("")}
+              </div>
+            ` : "";
+
+          const li = document.createElement("li");
+          li.className = "post-card";
+          li.innerHTML = `
+            <div class="post-header">
+              <img class="avatar" src="${avatar}" alt="Profile">
+              <div class="title-wrap">
+                <h3>${event.title}</h3>
+                <span class="meta">${when}</span>
+              </div>
+            </div>
+            <div class="post-content">
+              <p>${event.description}</p>
+              ${images}
+            </div>
+            <div class="post-actions">
+              <div class="like-btn ${liked ? 'liked' : ''}" data-id="${event._id}">
+                <span>👍</span><span class="like-text">${liked ? 'Liked' : 'Like'}</span>
+              </div>
+              <div class="like-count" data-id="${event._id}">${likeCount}</div>
+            </div>
+          `;
+          eventsList.appendChild(li);
+        });
+
+        eventsList.addEventListener("click", (e) => {
+          const btn = e.target.closest(".like-btn");
+          if (!btn) return;
+          const id = btn.getAttribute("data-id");
+          const currentlyLiked = isLiked(id);
+          const newCount = setLiked(id, !currentlyLiked);
+          btn.classList.toggle("liked", !currentlyLiked);
+          btn.querySelector(".like-text").textContent = !currentlyLiked ? "Liked" : "Like";
+          const countEl = eventsList.querySelector(`.like-count[data-id="${id}"]`);
+          if (countEl) countEl.textContent = newCount;
+        }, { once: true });
+      } catch (err) {
+        console.error(err);
+        document.getElementById("events-list").innerHTML = '<li class="post-card">Failed to load events.</li>';
+      }
+    }
+
+    loadEvents();
+  </script>
 
   <script type="module">
     import { initNavbar } from './js/navbar.js';
     fetch('partials/navbar.html')
-      .then(r => r.text())
-      .then(html => { document.getElementById('navbar-placeholder').innerHTML = html; initNavbar(); })
+      .then(response => response.text())
+      .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; initNavbar(); })
       .catch(err => console.error('Failed to load navbar:', err));
   </script>
 </body>

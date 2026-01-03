@@ -713,3 +713,110 @@ h1, h2 {
     overflow-y: hidden;
   }
 }
+
+/* Feed layout: Facebook-like cards */
+.feed {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+.post-card {
+  background: var(--card);
+  backdrop-filter: saturate(120%) blur(4px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 12px 14px;
+  margin: 12px 0;
+  animation: fadeInUp .35s ease both;
+}
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.post-header .avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+}
+.post-header .title-wrap {
+  display: flex;
+  flex-direction: column;
+}
+.post-header .title-wrap h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #050505;
+}
+.post-header .title-wrap .meta {
+  font-size: .85rem;
+  color: var(--muted);
+}
+
+.post-content {
+  margin: 8px 4px;
+  color: var(--text);
+}
+.post-images {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 6px;
+  margin: 8px 0;
+}
+.post-images img {
+  grid-column: span 6;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.post-images img:hover {
+  transform: scale(1.01);
+  box-shadow: var(--shadow-lg);
+}
+/* Single image: make it larger */
+.post-images.single img {
+  grid-column: 1 / -1;
+}
+
+.post-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+}
+.like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background .2s ease, color .2s ease;
+}
+.like-btn:hover {
+  background: #F0F2F5;
+}
+.like-btn.liked {
+  color: var(--primary);
+  background: rgba(24,119,242,.08);
+}
+
+/* Lists spacing */
+#news-list, #incident-list, #events-list {
+  padding-left: 0 !important;
+}
+
+/* Prevent horizontal scroll revealing drawer on mobile */
+html, body { overflow-x: hidden; }
