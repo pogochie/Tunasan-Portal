@@ -6,6 +6,13 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<script>
+  const role = localStorage.getItem("role");
+  if (role !== "admin" && role !== "official") {
+    alert("Please login first");
+    window.location.href = "admin-login.html";
+  }
+</script>
 <nav class="admin-navbar">
   <div class="container">
     <a href="admin.html" class="logo">Admin Dashboard</a>
@@ -34,5 +41,13 @@
 <div id="review-modal" style="display:none;"></div>
 
   <script type="module" src="js/admin.js"></script>
+  <script>
+    const logoutLink = document.getElementById("logout-link");
+    logoutLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      localStorage.clear();
+      window.location.href = "admin-login.html";
+    });
+  </script>
 </body>
 </html>
