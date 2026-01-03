@@ -12,6 +12,15 @@ if (!fs.existsSync(uploadsDir)) {
   console.log("Created uploads directory");
 }
 const app = express();
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Adjust for your frontend domain in production
+    methods: ["GET", "POST"]
+  }
+});
 connectDB();
 
 // Middleware
@@ -19,6 +28,18 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Socket.io connection
+io.on("connection", (socket) => {
+  console.log("New client connected: ", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected: ", socket.id);
+  });
+});
+
+// Make io accessible in routes
+app.set("io", io);
 
 // Routes
 app.use('/api/incidents', require('./routes/incidents'));

@@ -15,6 +15,10 @@ const approveBtn = document.getElementById("approveBtn");
 const rejectBtn = document.getElementById("rejectBtn");
 const backBtn = document.getElementById("backBtn");
 
+const commentsList = document.getElementById("comments-list");
+const commentForm = document.getElementById("comment-form");
+const commentText = document.getElementById("comment-text");
+
 let map, marker;
 
 async function loadIncident() {
@@ -61,6 +65,17 @@ function initMap(lat, lng) {
   marker = L.marker([lat, lng]).addTo(map);
 }
 
+async function loadComments() {
+  const res = await fetch(`/api/incidents/${incidentId}/comments`);
+  const comments = await res.json();
+  commentsList.innerHTML = "";
+  comments.forEach(c => {
+    const li = document.createElement("li");
+    li.textContent = `[${new Date(c.createdAt).toLocaleString()}] ${c.role} ${c.user}: ${c.comment}`;
+    commentsList.appendChild(li);
+  });
+}
+
 async function approveIncident() {
   if (!confirm("Approve and publish this incident as news?")) return;
   try {
@@ -89,10 +104,41 @@ async function rejectIncident() {
   }
 }
 
+commentForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const comment = commentText.value.trim();
+  if (!comment) return;
+
+  const user = localStorage.getItem("username") || "Unknown";
+  const role = localStorage.getItem("role") || "official";
+
+  const res = await fetch(`/api/incidents/${incidentId}/comments`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user, role, comment }),
+  });
+
+  if (res.ok) {
+    commentText.value = "";
+    loadComments();
+  } else {
+    alert("Failed to add comment");
+  }
+});
+
 approveBtn.addEventListener("click", approveIncident);
 rejectBtn.addEventListener("click", rejectIncident);
 backBtn.addEventListener("click", () => {
   window.location.href = "admin.html";
 });
 
+// Socket.io real-time comments
+const socket = io();
+socket.on("newComment", (data) => {
+  if (data.incidentId === incidentId) {
+    loadComments();
+  }
+});
+
 loadIncident();
+loadComments();
