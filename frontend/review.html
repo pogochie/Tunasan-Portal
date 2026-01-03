@@ -25,7 +25,7 @@
     <p><strong>Description:</strong></p>
     <p id="description"></p>
     <p><strong>Location:</strong> <span id="locationText"></span></p>
-    <div id="map"></div>
+    <div id="map" style="height: 300px;"></div>
     <div id="images"></div>
   </div>
 
@@ -33,13 +33,13 @@
   <ul id="comments-list"></ul>
 
   <form id="comment-form">
-    <textarea id="comment-text" placeholder="Add a comment..." required></textarea>
+    <textarea id="comment-text" required></textarea>
     <button type="submit">Submit Comment</button>
   </form>
 
-  <button id="approveBtn">✅ Approve → Publish News</button>
-  <button id="rejectBtn">❌ Reject</button>
-  <button id="backBtn">← Back to Dashboard</button>
+  <button id="approveBtn">Approve</button>
+  <button id="rejectBtn">Reject</button>
+  <button id="backBtn">Back</button>
 
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
   <link

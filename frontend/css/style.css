@@ -416,3 +416,355 @@ button.action-btn:hover {
     padding: 10px 0;
   }
 }
+
+/* ================================
+   Modern Facebook-like theme overrides
+   ================================ */
+:root {
+  --bg: #F0F2F5;
+  --card: #fff;
+  --text: #1C1E21;
+  --muted: #65676B;
+  --primary: #1877F2;
+  --primary-hover: #166FE5;
+  --success: #42B72A;
+  --success-hover: #36A420;
+  --danger: #E53935;
+  --danger-hover: #D32F2F;
+  --border: #E4E6EB;
+  --shadow: 0 2px 12px rgba(0,0,0,.06);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.08);
+}
+
+/* Base */
+body {
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.45;
+}
+
+/* Constrain content (optional, affects navbar containers already) */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Headings */
+h1, h2 {
+  color: var(--text);
+}
+
+/* Global buttons */
+button,
+.button,
+input[type="submit"] {
+  background: var(--primary);
+  color: #fff;
+  border: 1px solid transparent;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s ease, transform .05s ease, box-shadow .2s ease;
+  box-shadow: var(--shadow);
+}
+button:hover,
+.button:hover,
+input[type="submit"]:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-lg);
+}
+button:active,
+.button:active,
+input[type="submit"]:active {
+  transform: translateY(1px);
+}
+
+/* Semantic button variants */
+#approveBtn {
+  background: var(--success);
+}
+#approveBtn:hover {
+  background: var(--success-hover);
+}
+#rejectBtn,
+.delete-btn,
+.delete-event-btn,
+.delete-news-btn,
+[class*="delete-"] {
+  background: var(--danger);
+}
+#rejectBtn:hover,
+.delete-btn:hover,
+.delete-event-btn:hover,
+.delete-news-btn:hover,
+[class*="delete-"]:hover {
+  background: var(--danger-hover);
+}
+#backBtn {
+  background: #E4E6EB;
+  color: #050505;
+}
+#backBtn:hover {
+  background: #DADDE1;
+}
+
+/* Forms as cards */
+form#incident-form,
+form#news-form,
+form#event-form,
+form#edit-incident-form,
+#login-form,
+#register-form {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+form#incident-form input[type="text"],
+form#incident-form select,
+form#incident-form textarea,
+form#news-form input[type="text"],
+form#news-form textarea,
+form#event-form input[type="text"],
+form#event-form textarea,
+form#event-form input[type="date"],
+#login-form input,
+#register-form input,
+#register-form select,
+#edit-incident-form input[type="text"],
+#edit-incident-form textarea {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+form#incident-form input[type="text"]:focus,
+form#incident-form select:focus,
+form#incident-form textarea:focus,
+form#news-form input[type="text"]:focus,
+form#news-form textarea:focus,
+form#event-form input[type="text"]:focus,
+form#event-form textarea:focus,
+form#event-form input[type="date"]:focus,
+#login-form input:focus,
+#register-form input:focus,
+#register-form select:focus,
+#edit-incident-form input[type="text"]:focus,
+#edit-incident-form textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(24, 119, 242, .15);
+  outline: none;
+}
+
+/* Card lists (Incidents, News, Events) */
+#incident-list,
+#news-list,
+#events-list {
+  max-width: 900px;
+}
+#incident-list li,
+#news-list li,
+#events-list li {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+  animation: fadeInUp .45s ease both;
+}
+#incident-list li:hover,
+#news-list li:hover,
+#events-list li:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: #DADDE1;
+}
+
+/* Staggered animation for list items */
+#incident-list li:nth-child(1),
+#news-list li:nth-child(1),
+#events-list li:nth-child(1) { animation-delay: .02s; }
+#incident-list li:nth-child(2),
+#news-list li:nth-child(2),
+#events-list li:nth-child(2) { animation-delay: .05s; }
+#incident-list li:nth-child(3),
+#news-list li:nth-child(3),
+#events-list li:nth-child(3) { animation-delay: .08s; }
+#incident-list li:nth-child(4),
+#news-list li:nth-child(4),
+#events-list li:nth-child(4) { animation-delay: .11s; }
+#incident-list li:nth-child(5),
+#news-list li:nth-child(5),
+#events-list li:nth-child(5) { animation-delay: .14s; }
+
+/* Images in cards */
+#incident-list img,
+#news-list img,
+#events-list img,
+#images img {
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+#incident-list img:hover,
+#news-list img:hover,
+#events-list img:hover,
+#images img:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Map containers */
+#map,
+.leaflet-container {
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+/* Navbar: switch to white bar, Facebook-like */
+.navbar {
+  background: #fff;
+  color: var(--text);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.navbar .logo {
+  color: var(--primary);
+  font-weight: 700;
+}
+.nav-menu {
+  gap: 8px;
+}
+.nav-menu li a {
+  color: #050505;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 20px;
+  transition: background .2s ease, color .2s ease;
+}
+.nav-menu li a:hover {
+  background: #F0F2F5;
+}
+
+/* Make the "Register Admin/Official" look like a primary CTA */
+.navbar .container > a:last-child:not(.logo) {
+  background: var(--primary);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 20px;
+  text-decoration: none;
+  box-shadow: var(--shadow);
+  border: 1px solid transparent;
+  transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
+}
+.navbar .container > a:last-child:not(.logo):hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Mobile nav: slide-down menu and animated hamburger */
+.nav-toggle-label span,
+.nav-toggle-label span::before,
+.nav-toggle-label span::after {
+  transition: transform .25s ease, opacity .2s ease, background .25s ease;
+}
+@media (max-width: 768px) {
+  .nav-menu {
+    top: 56px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px 0 0 12px;
+    box-shadow: var(--shadow-lg);
+    animation: slideDown .25s ease both;
+  }
+  .nav-menu li a {
+    color: #050505;
+  }
+  .nav-toggle:checked + .nav-toggle-label + .nav-menu {
+    display: flex;
+  }
+  .nav-toggle-label span {
+    background: #050505;
+  }
+  .nav-toggle:checked + .nav-toggle-label span {
+    background: transparent;
+  }
+  .nav-toggle:checked + .nav-toggle-label span::before {
+    transform: translateY(8px) rotate(45deg);
+  }
+  .nav-toggle:checked + .nav-toggle-label span::after {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+}
+
+/* Admin Navbar to match theme */
+.admin-navbar {
+  background: #fff;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.admin-navbar .logo {
+  color: var(--primary);
+}
+.admin-navbar .nav-menu li a {
+  color: #050505;
+  border-radius: 20px;
+}
+.admin-navbar .nav-menu li a:hover {
+  background: #F0F2F5;
+}
+
+/* Admin tables as modern cards */
+#incident-table {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+#incident-table thead {
+  background: #fff;
+  color: #050505;
+  border-bottom: 1px solid var(--border);
+}
+#incident-table tbody tr:hover {
+  background-color: #F7F8FA;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* Tighten review page visuals */
+#incident-details p strong {
+  color: var(--muted);
+}
+#comments-list {
+  max-width: 900px;
+}
+#comments-list li {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+  animation: fadeInUp .35s ease both;
+}
