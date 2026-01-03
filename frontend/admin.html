@@ -7,13 +7,14 @@
 </head>
 <body>
 <script>
-  console.log("Stored role:", localStorage.getItem("role"));
-
-  const role = localStorage.getItem("role");
-  if (role !== "admin" && role !== "official") {
-    alert("Please login first");
-    window.location.href = "admin-login.html";
-  }
+  document.addEventListener("DOMContentLoaded", () => {
+    const role = localStorage.getItem("role");
+    console.log("Stored role on DOMContentLoaded:", role);
+    if (role !== "admin" || role !== "official") {
+      alert("Please login first");
+      window.location.href = "admin-login.html";
+    }
+  });
 </script>
 <nav class="admin-navbar">
   <div class="container">
