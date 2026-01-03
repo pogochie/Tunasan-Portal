@@ -33,10 +33,8 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Get pending officials (admin only)
-router.get("/pending", authMiddleware, async (req, res) => {
-  if (req.user.role !== "admin") return res.status(403).json({ message: "Access denied" });
-
+// Get pending officials (no auth, unprotected)
+router.get("/pending", async (req, res) => {
   try {
     const pendingUsers = await User.find({ status: "pending", role: "official" });
     res.json(pendingUsers);
@@ -45,10 +43,8 @@ router.get("/pending", authMiddleware, async (req, res) => {
   }
 });
 
-// Approve official (admin only)
-router.post("/:id/approve", authMiddleware, async (req, res) => {
-  if (req.user.role !== "admin") return res.status(403).json({ message: "Access denied" });
-
+// Approve official (no auth, unprotected)
+router.post("/:id/approve", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -61,10 +57,8 @@ router.post("/:id/approve", authMiddleware, async (req, res) => {
   }
 });
 
-// Reject official (admin only)
-router.post("/:id/reject", authMiddleware, async (req, res) => {
-  if (req.user.role !== "admin") return res.status(403).json({ message: "Access denied" });
-
+// Reject official (no auth, unprotected)
+router.post("/:id/reject", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
