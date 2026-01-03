@@ -44,6 +44,7 @@ router.post("/login", async (req, res) => {
 
     if (user.status !== "approved") {
       return res.status(403).json({ message: "Account not approved yet" });
+      console.log("User status:", user.status);
     }
 
     console.log("User status:", user.status);
