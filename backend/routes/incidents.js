@@ -175,4 +175,38 @@ router.post("/:id/comments", async (req, res) => {
   }
 });
 
+// Update incident by ID
+router.put("/:id", (req, res, next) => {
+  const upload = multer({ storage }).array("images", 3); // reuse your multer storage
+
+  upload(req, res, async (err) => {
+    if (err) {
+      console.error("Multer error:", err);
+      return res.status(400).json({ message: "Image upload failed" });
+    }
+
+    try {
+      const updateData = { ...req.body };
+
+      // If images uploaded, replace images array
+      if (req.files && req.files.length > 0) {
+        updateData.images = req.files.map(file => file.path);
+      }
+
+      // Parse location if sent as JSON string
+      if (typeof updateData.location === "string") {
+        updateData.location = JSON.parse(updateData.location);
+      }
+
+      const incident = await Incident.findByIdAndUpdate(req.params.id, updateData, { new: true });
+      if (!incident) return res.status(404).json({ message: "Incident not found" });
+
+      res.json({ message: "Incident updated successfully", incident });
+    } catch (error) {
+      console.error("Error updating incident:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+});
+
 module.exports = router;

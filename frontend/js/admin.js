@@ -20,6 +20,7 @@ async function loadIncidents() {
           <td data-label="Status">${i.status}</td>
           <td data-label="Action">
             <button class="review-btn" data-id="${i._id}">Review Report</button>
+            <button class="edit-btn" data-id="${i._id}">Edit</button>
             <button class="delete-btn" data-id="${i._id}">Delete</button>
           </td>
         </tr>
@@ -51,6 +52,9 @@ tableBody.addEventListener("click", async (e) => {
         alert("Error deleting incident: " + err.message);
       }
     }
+  } else if (e.target.classList.contains("edit-btn")) {
+    const id = e.target.getAttribute("data-id");
+    window.location.href = `admin-edit-incident.html?id=${id}`;
   }
 });
 
