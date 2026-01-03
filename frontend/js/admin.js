@@ -11,6 +11,27 @@ async function loadIncidents() {
     if (!res.ok) throw new Error("Failed to fetch incidents");
     const data = await res.json();
 
+    // Render stats summary
+    const statsEl = document.getElementById("admin-stats");
+    if (statsEl) {
+      const total = data.length;
+      const byStatus = (s) => data.filter(i => (i.status || '').toLowerCase() === s).length;
+      const pending = byStatus("pending");
+      const approved = byStatus("approved");
+      const rejected = byStatus("rejected");
+      const inProgress = byStatus("in progress");
+      const resolved = byStatus("resolved");
+      statsEl.innerHTML = `
+        <div class="stat-card"><div class="label">Total</div><div class="value">${total}</div></div>
+        <div class="stat-card"><div class="label">Pending</div><div class="value">${pending}</div></div>
+        <div class="stat-card"><div class="label">Approved</div><div class="value">${approved}</div></div>
+        <div class="stat-card"><div class="label">Rejected</div><div class="value">${rejected}</div></div>
+        <div class="stat-card"><div class="label">In Progress</div><div class="value">${inProgress}</div></div>
+        <div class="stat-card"><div class="label">Resolved</div><div class="value">${resolved}</div></div>
+      `;
+    }
+
+    const tableBody = document.querySelector("#incident-table tbody");
     tableBody.innerHTML = "";
     data.forEach(i => {
       tableBody.innerHTML += `
@@ -19,15 +40,16 @@ async function loadIncidents() {
           <td data-label="Type">${i.incidentType}</td>
           <td data-label="Status">${i.status}</td>
           <td data-label="Action">
-            <button class="review-btn" data-id="${i._id}">Review Report</button>
-            <button class="edit-btn" data-id="${i._id}">Edit</button>
-            <button class="delete-btn" data-id="${i._id}">Delete</button>
+            <button class="review-btn action-btn" data-id="${i._id}">Review</button>
+            <button class="edit-btn action-btn" data-id="${i._id}">Edit</button>
+            <button class="delete-btn action-btn" data-id="${i._id}">Delete</button>
           </td>
         </tr>
       `;
     });
   } catch (err) {
     console.error(err);
+    const tableBody = document.querySelector("#incident-table tbody");
     tableBody.innerHTML = `<tr><td colspan="4">Failed to load incidents.</td></tr>`;
   }
 }

@@ -15,16 +15,9 @@
   </style>
 </head>
 <body>
-  
   <nav class="admin-navbar">
     <div class="container">
       <a href="admin.html" class="logo">Admin Dashboard</a>
-
-      <input type="checkbox" id="nav-toggle" class="nav-toggle" />
-      <label for="nav-toggle" class="nav-toggle-label" aria-label="Open Menu">
-        <span></span>
-      </label>
-
       <ul class="nav-menu">
         <li><a href="admin.html">Incidents</a></li>
         <li><a href="admin-news.html">Add News</a></li>
@@ -32,29 +25,33 @@
         <li><a href="admin-user-approval.html">User Approvals</a></li>
         <li><a href="#" id="logout-link">Logout</a></li>
       </ul>
-
-      <div class="nav-overlay"></div>
     </div>
   </nav>
 
-  <h1>Add Event</h1>
-  <form id="event-form" enctype="multipart/form-data">
-    <input type="text" name="title" placeholder="Title" required />
-    <textarea name="description" placeholder="Description" required></textarea>
-    <input type="date" name="date" required />
+  <div class="container">
+    <h1>Add Event</h1>
+    <form id="event-form" enctype="multipart/form-data">
+      <label for="title">Title</label>
+      <input type="text" name="title" id="title" placeholder="Title" required />
+      <label for="description">Description</label>
+      <textarea name="description" id="description" placeholder="Description" required></textarea>
+      <label for="date">Date</label>
+      <input type="date" name="date" id="date" required />
 
-    <!-- Hidden inputs for location -->
-    <input type="hidden" name="location[lat]" id="lat" required />
-    <input type="hidden" name="location[lng]" id="lng" required />
+      <!-- Hidden inputs for location -->
+      <input type="hidden" name="location[lat]" id="lat" required />
+      <input type="hidden" name="location[lng]" id="lng" required />
 
-    <div id="map"></div>
+      <div id="map"></div>
 
-    <input type="file" name="images" multiple accept="image/*" />
-    <button type="submit">Submit Event</button>
-  </form>
+      <label for="images">Upload images</label>
+      <input type="file" name="images" id="images" multiple accept="image/*" />
+      <button type="submit">Submit Event</button>
+    </form>
 
-  <h2>Existing Events</h2>
-  <ul id="events-list">Loading events...</ul>
+    <h2>Existing Events</h2>
+    <ul id="events-list">Loading events...</ul>
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script>
@@ -130,7 +127,7 @@
               <h3>${event.title}</h3>
               <p>${new Date(event.date).toLocaleDateString()}</p>
               <p>${event.description}</p>
-              ${event.images && event.images.length > 0 ? event.images.map(img => `<img src="${img}" width="200" style="margin-right:10px;">`).join("") : ""}
+              ${event.images && event.images.length > 0 ? event.images.map(img => `<img src="${img}" loading="lazy" width="200" style="margin-right:10px;">`).join("") : ""}
               <br>
               <button class="delete-event-btn" data-id="${event._id}">Delete</button>
             </li>

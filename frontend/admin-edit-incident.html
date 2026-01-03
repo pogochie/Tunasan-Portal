@@ -12,12 +12,6 @@
   <nav class="admin-navbar">
     <div class="container">
       <a href="admin.html" class="logo">Admin Dashboard</a>
-
-      <input type="checkbox" id="nav-toggle" class="nav-toggle" />
-      <label for="nav-toggle" class="nav-toggle-label" aria-label="Open Menu">
-        <span></span>
-      </label>
-
       <ul class="nav-menu">
         <li><a href="admin.html">Incidents</a></li>
         <li><a href="admin-news.html">Add News</a></li>
@@ -25,27 +19,32 @@
         <li><a href="admin-user-approval.html">User Approvals</a></li>
         <li><a href="#" id="logout-link">Logout</a></li>
       </ul>
-
-      <div class="nav-overlay"></div>
     </div>
   </nav>
-  <h1>Edit Incident</h1>
-  <form id="edit-incident-form" enctype="multipart/form-data">
-    <input type="text" name="reporterName" id="reporterName" placeholder="Reporter Name" required />
-    <input type="text" name="incidentType" id="incidentType" placeholder="Incident Type" required />
-    <textarea name="description" id="description" placeholder="Description" required></textarea>
+  <div class="container">
+    <h1>Edit Incident</h1>
+    <form id="edit-incident-form" enctype="multipart/form-data">
+      <label for="reporterName">Reporter Name</label>
+      <input type="text" name="reporterName" id="reporterName" placeholder="Reporter Name" required />
 
-    <!-- Hidden inputs for location -->
-    <input type="hidden" name="location[lat]" id="lat" required />
-    <input type="hidden" name="location[lng]" id="lng" required />
+      <label for="incidentType">Incident Type</label>
+      <input type="text" name="incidentType" id="incidentType" placeholder="Incident Type" required />
 
-    <div id="map"></div>
+      <label for="description">Description</label>
+      <textarea name="description" id="description" placeholder="Description" required></textarea>
 
-    <p>Upload new images (optional):</p>
-    <input type="file" name="images" multiple accept="image/*" />
+      <!-- Hidden inputs for location -->
+      <input type="hidden" name="location[lat]" id="lat" required />
+      <input type="hidden" name="location[lng]" id="lng" required />
 
-    <button type="submit">Save Changes</button>
-  </form>
+      <div id="map" style="margin-bottom: 15px;"></div>
+
+      <label for="images">Upload new images (optional)</label>
+      <input type="file" name="images" id="images" multiple accept="image/*" />
+
+      <button type="submit">Save Changes</button>
+    </form>
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script>

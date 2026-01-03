@@ -11,12 +11,9 @@
     window.onload = () => {
       const loggedIn = localStorage.getItem("adminLoggedIn");
       const role = localStorage.getItem("role");
-      console.log("LoggedIn:", loggedIn, "Role:", role);
       if (loggedIn !== "true" || (role !== "admin" && role !== "official")) {
         alert("Please login first");
         window.location.href = "admin-login.html";
-      } else {
-        console.log("Access granted");
       }
     };
   </script>
@@ -24,13 +21,6 @@
   <nav class="admin-navbar">
     <div class="container">
       <a href="admin.html" class="logo">Admin Dashboard</a>
-
-      <!-- Mobile hamburger -->
-      <input type="checkbox" id="nav-toggle" class="nav-toggle" />
-      <label for="nav-toggle" class="nav-toggle-label" aria-label="Open Menu">
-        <span></span>
-      </label>
-
       <ul class="nav-menu">
         <li><a href="admin.html">Incidents</a></li>
         <li><a href="admin-news.html">Add News</a></li>
@@ -38,24 +28,33 @@
         <li><a href="admin-user-approval.html">User Approvals</a></li>
         <li><a href="#" id="logout-link">Logout</a></li>
       </ul>
-
-      <!-- Overlay for mobile drawer -->
-      <div class="nav-overlay"></div>
     </div>
   </nav>
 
-  <h1>Barangay Tunasan Admin Dashboard</h1>
-  <table id="incident-table">
-    <thead>
-      <tr>
-        <th>Reporter</th>
-        <th>Type</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="container">
+    <div class="admin-header">
+      <h1 class="title">Barangay Tunasan Admin Dashboard</h1>
+      <div class="actions">
+        <a href="admin-news.html" class="pill-btn secondary">New News</a>
+        <a href="admin-events.html" class="pill-btn">New Event</a>
+      </div>
+    </div>
+
+    <!-- Stats summary -->
+    <div id="admin-stats" class="admin-stats"></div>
+
+    <table id="incident-table">
+      <thead>
+        <tr>
+          <th>Reporter</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <div id="review-modal" style="display:none;"></div>
 

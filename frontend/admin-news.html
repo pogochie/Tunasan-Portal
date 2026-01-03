@@ -16,12 +16,6 @@
   <nav class="admin-navbar">
     <div class="container">
       <a href="admin.html" class="logo">Admin Dashboard</a>
-
-      <input type="checkbox" id="nav-toggle" class="nav-toggle" />
-      <label for="nav-toggle" class="nav-toggle-label" aria-label="Open Menu">
-        <span></span>
-      </label>
-
       <ul class="nav-menu">
         <li><a href="admin.html">Incidents</a></li>
         <li><a href="admin-news.html">Add News</a></li>
@@ -29,21 +23,24 @@
         <li><a href="admin-user-approval.html">User Approvals</a></li>
         <li><a href="#" id="logout-link">Logout</a></li>
       </ul>
-
-      <div class="nav-overlay"></div>
     </div>
   </nav>
 
-  <h1>Add News</h1>
-  <form id="news-form" enctype="multipart/form-data">
-    <input type="text" name="title" placeholder="Title" required />
-    <textarea name="description" placeholder="Description" required></textarea>
-    <input type="file" name="images" multiple accept="image/*" />
-    <button type="submit">Submit News</button>
-  </form>
+  <div class="container">
+    <h1>Add News</h1>
+    <form id="news-form" enctype="multipart/form-data">
+      <label for="title">Title</label>
+      <input type="text" name="title" id="title" placeholder="Title" required />
+      <label for="description">Description</label>
+      <textarea name="description" id="description" placeholder="Description" required></textarea>
+      <label for="images">Upload images</label>
+      <input type="file" name="images" id="images" multiple accept="image/*" />
+      <button type="submit">Submit News</button>
+    </form>
 
-  <h2>Existing News</h2>
-  <ul id="news-list">Loading news...</ul>
+    <h2>Existing News</h2>
+    <ul id="news-list">Loading news...</ul>
+  </div>
 
   <script>
     const form = document.getElementById("news-form");

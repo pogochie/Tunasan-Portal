@@ -1534,3 +1534,68 @@ button.action-btn:hover {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Auth wrappers (used by register/login pages) */
+.auth-wrapper {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+}
+.auth-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  backdrop-filter: saturate(120%) blur(6px);
+  padding: 22px 20px;
+  animation: fadeInUp .35s ease both;
+}
+
+/* Admin dashboard: header + stat cards */
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 10px 0 16px;
+}
+.admin-header .title {
+  margin: 0;
+}
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 12px 0 18px;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 12px;
+}
+.stat-card .label {
+  font-size: .85rem;
+  color: var(--muted);
+}
+.stat-card .value {
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: #050505;
+}
+@media (max-width: 900px) {
+  .admin-stats { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  .admin-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Improve admin nav spacing (top bar already themed) */
+.admin-navbar .nav-menu li a {
+  border-radius: 999px;
+  padding: 8px 12px;
+}
