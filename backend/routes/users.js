@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
-const authMiddleware = require("../middleware/auth"); // your auth middleware
 
 // Register new official (status = pending)
 router.post("/register", async (req, res) => {
