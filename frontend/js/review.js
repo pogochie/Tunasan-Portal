@@ -21,27 +21,65 @@ const commentText = document.getElementById("comment-text");
 
 let map, marker;
 
-async function loadIncident() {
+// Robust data loading and UI fill for review page
+(async function initReview() {
+  const params = new URLSearchParams(window.location.search);
+  const incidentId = params.get("id");
+  if (!incidentId) {
+    alert("No incident ID provided");
+    window.location.href = "admin.html";
+    return;
+  }
+
+  const reporterEl = document.getElementById("reporterName");
+  const typeEl = document.getElementById("incidentType");
+  const descEl = document.getElementById("description");
+  const locTextEl = document.getElementById("locationText");
+  const imagesEl = document.getElementById("images");
+
+  function initMap(lat, lng) {
+    map = L.map("map").setView([lat, lng], 15);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+    marker = L.marker([lat, lng]).addTo(map);
+    setTimeout(() => map.invalidateSize(), 0);
+    window.addEventListener("resize", () => map.invalidateSize());
+    window.addEventListener("drawer:toggle", () => setTimeout(() => map.invalidateSize(), 250));
+  }
+
   try {
     const res = await fetch(`/api/incidents/${incidentId}`);
     if (!res.ok) throw new Error("Incident not found");
     const incident = await res.json();
 
-    reporterNameEl.textContent = incident.reporterName;
-    incidentTypeEl.textContent = incident.incidentType;
-    descriptionEl.textContent = incident.description;
+    // Fill fields defensively
+    reporterEl.textContent = incident.reporterName || "N/A";
+    typeEl.textContent = incident.incidentType || "N/A";
+    descEl.textContent = incident.description || "No description";
 
-    if (typeof incident.location === "string") {
-      locationTextEl.textContent = incident.location;
-    } else if (incident.location && incident.location.lat && incident.location.lng) {
-      locationTextEl.textContent = `Lat: ${incident.location.lat}, Lng: ${incident.location.lng}`;
-      initMap(incident.location.lat, incident.location.lng);
+    // Location could be object or string; normalize
+    let lat = 14.4089, lng = 121.0341;
+    if (incident.location) {
+      if (typeof incident.location === "string") {
+        try {
+          const loc = JSON.parse(incident.location);
+          if (loc.lat && loc.lng) { lat = loc.lat; lng = loc.lng; }
+        } catch (_) {}
+      } else if (incident.location.lat && incident.location.lng) {
+        lat = incident.location.lat;
+        lng = incident.location.lng;
+      }
+      locTextEl.textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
     } else {
-      locationTextEl.textContent = "No location data";
+      locTextEl.textContent = "No location provided";
     }
+    initMap(lat, lng);
 
+    // Images
     imagesEl.innerHTML = "";
-    if (incident.images && incident.images.length > 0) {
+    if (Array.isArray(incident.images) && incident.images.length > 0) {
       incident.images.forEach((img) => {
         const image = document.createElement("img");
         image.src = img;
@@ -52,98 +90,86 @@ async function loadIncident() {
     } else {
       imagesEl.textContent = "No images uploaded";
     }
+
+    // Load comments
+    try {
+      const cRes = await fetch(`/api/incidents/${incidentId}/comments`);
+      const comments = cRes.ok ? await cRes.json() : [];
+      const list = document.getElementById("comments-list");
+      list.innerHTML = "";
+      if (comments.length === 0) {
+        list.innerHTML = "<li>No comments yet.</li>";
+      } else {
+        comments.forEach(c => {
+          const li = document.createElement("li");
+          li.innerHTML = `<strong>${c.user || "User"}</strong> (${c.role || "resident"})<br>${c.comment}`;
+          list.appendChild(li);
+        });
+      }
+    } catch (_) {}
+
+    // Actions
+    document.getElementById("approveBtn").addEventListener("click", async () => {
+      if (!confirm("Approve this incident and publish as news?")) return;
+      try {
+        const res = await fetch(`/api/incidents/${incidentId}/approve`, { method: "POST" });
+        const data = await res.json();
+        alert(data.message || "Approved");
+        window.location.href = "admin.html";
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+
+    document.getElementById("rejectBtn").addEventListener("click", async () => {
+      if (!confirm("Reject this incident?")) return;
+      try {
+        const res = await fetch(`/api/incidents/${incidentId}/reject`, { method: "POST" });
+        const data = await res.json();
+        alert(data.message || "Rejected");
+        window.location.href = "admin.html";
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.history.length > 1 ? window.history.back() : window.location.href = "admin.html";
+    });
+
+    // Comment form
+    const form = document.getElementById("comment-form");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const commentText = document.getElementById("comment-text").value.trim();
+      if (!commentText) return;
+      const username = localStorage.getItem("username") || "Admin";
+      const role = localStorage.getItem("role") || "admin";
+      try {
+        const res = await fetch(`/api/incidents/${incidentId}/comments`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user: username, role, comment: commentText })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert(data.message || "Comment added");
+          // Optimistic append
+          const list = document.getElementById("comments-list");
+          const li = document.createElement("li");
+          li.innerHTML = `<strong>${username}</strong> (${role})<br>${commentText}`;
+          list.prepend(li);
+          form.reset();
+        } else {
+          alert("Failed: " + (data.message || "Could not add comment"));
+        }
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+
   } catch (err) {
     alert("Failed to load incident: " + err.message);
     window.location.href = "admin.html";
   }
-}
-
-function initMap(lat, lng) {
-  map = L.map("map").setView([lat, lng], 15);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  }).addTo(map);
-  marker = L.marker([lat, lng]).addTo(map);
-  setTimeout(() => map.invalidateSize(), 0);
-  window.addEventListener("resize", () => map.invalidateSize());
-  window.addEventListener("drawer:toggle", () => setTimeout(() => map.invalidateSize(), 250));
-}
-
-async function loadComments() {
-  const res = await fetch(`/api/incidents/${incidentId}/comments`);
-  const comments = await res.json();
-  commentsList.innerHTML = "";
-  comments.forEach(c => {
-    const li = document.createElement("li");
-    li.textContent = `[${new Date(c.createdAt).toLocaleString()}] ${c.role} ${c.user}: ${c.comment}`;
-    commentsList.appendChild(li);
-  });
-}
-
-async function approveIncident() {
-  if (!confirm("Approve and publish this incident as news?")) return;
-  try {
-    const res = await fetch(`/api/incidents/${incidentId}/approve`, {
-      method: "POST",
-    });
-    if (!res.ok) throw new Error("Failed to approve");
-    alert("Incident approved and published as news");
-    window.location.href = "admin.html";
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
-}
-
-async function rejectIncident() {
-  if (!confirm("Reject this incident report?")) return;
-  try {
-    const res = await fetch(`/api/incidents/${incidentId}/reject`, {
-      method: "POST",
-    });
-    if (!res.ok) throw new Error("Failed to reject");
-    alert("Incident rejected");
-    window.location.href = "admin.html";
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
-}
-
-commentForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const comment = commentText.value.trim();
-  if (!comment) return;
-
-  const user = localStorage.getItem("username") || "Unknown";
-  const role = localStorage.getItem("role") || "official";
-
-  const res = await fetch(`/api/incidents/${incidentId}/comments`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user, role, comment }),
-  });
-
-  if (res.ok) {
-    commentText.value = "";
-    loadComments();
-  } else {
-    alert("Failed to add comment");
-  }
-});
-
-approveBtn.addEventListener("click", approveIncident);
-rejectBtn.addEventListener("click", rejectIncident);
-backBtn.addEventListener("click", () => {
-  window.location.href = "admin.html";
-});
-
-// Socket.io real-time comments
-const socket = io();
-socket.on("newComment", (data) => {
-  if (data.incidentId === incidentId) {
-    loadComments();
-  }
-});
-
-loadIncident();
-loadComments();
+})();

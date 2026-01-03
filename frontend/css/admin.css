@@ -361,3 +361,132 @@ input[type="file"]::file-selector-button:hover {
   height: clamp(220px, 35vh, 420px) !important;
   width: 100%;
 }
+
+/* Modern cards for existing News/Events lists */
+#news-list,
+#events-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#news-list li,
+#events-list li {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 12px 14px;
+  margin: 12px 0;
+  animation: fadeInUp .35s ease both;
+}
+#news-list li h3,
+#events-list li h3 {
+  margin: 0 0 6px 0;
+  font-size: 1rem;
+  color: #050505;
+}
+#news-list li p,
+#events-list li p {
+  margin: 6px 0;
+  color: var(--text);
+}
+#news-list img,
+#events-list img {
+  max-width: 160px;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  margin-right: 10px;
+  margin-bottom: 8px;
+}
+
+/* Review page styling */
+#incident-details {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin: 12px 0;
+}
+#incident-details p {
+  margin: 6px 0;
+}
+#images {
+  display: flex;
+  flex-wrap: wrap;
+}
+#comments-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#comments-list li {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+  animation: fadeInUp .35s ease both;
+}
+#comment-form {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 12px 14px;
+  margin: 12px 0;
+}
+#comment-form textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  resize: vertical;
+}
+#comment-form button {
+  margin-top: 8px;
+  background: var(--primary);
+  color: #fff;
+  border: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+#comment-form button:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Action buttons on review page */
+#approveBtn,
+#rejectBtn,
+#backBtn {
+  display: inline-block;
+  margin-right: 8px;
+  margin-top: 8px;
+  background: #E4E6EB;
+  color: #050505;
+  border: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
+}
+#approveBtn { background: #42B72A; color: #fff; }
+#approveBtn:hover { background: #36A420; box-shadow: var(--shadow-lg); }
+#rejectBtn { background: #E53935; color: #fff; }
+#rejectBtn:hover { background: #D32F2F; box-shadow: var(--shadow-lg); }
+#backBtn:hover { background: #DADDE1; box-shadow: var(--shadow-lg); }
+
+/* Animation reused */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
