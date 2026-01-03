@@ -46,6 +46,8 @@ router.post("/login", async (req, res) => {
       return res.status(403).json({ message: "Account not approved yet" });
     }
 
+    console.log("User status:", user.status);
+
     // Return user info without token
     res.json({ username: user.username, role: user.role });
   } catch (err) {
