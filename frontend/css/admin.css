@@ -369,79 +369,171 @@ input[type="file"]::file-selector-button:hover {
 #events-list {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 auto 20px;
   max-width: 720px;
 }
+
 #news-list li,
 #events-list li {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: var(--shadow);
-  padding: 12px 14px;
-  margin: 12px 0;
+  padding: 16px 20px;
+  margin: 16px 0;
   animation: fadeInUp .35s ease both;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  transition: box-shadow 0.3s ease;
+  cursor: default;
 }
+
+#news-list li:hover,
+#events-list li:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
 #news-list li h3,
 #events-list li h3 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   color: #050505;
   font-weight: 700;
+  line-height: 1.2;
 }
+
 #news-list li p,
 #events-list li p {
   margin: 0;
   color: var(--text);
   white-space: pre-wrap;
-  line-height: 1.4;
-}
-#news-list img,
-#events-list img {
-  max-width: 160px;
-  width: 100%;
-  height: auto;
-  border-radius: 10px;
-  box-shadow: var(--shadow);
-  margin-right: 10px;
-  margin-bottom: 8px;
-  align-self: start;
-  transition: transform .2s ease;
-  cursor: pointer;
-}
-#news-list img:hover,
-#events-list img:hover {
-  transform: scale(1.05);
+  line-height: 1.5;
+  font-size: 1rem;
 }
 
-/* Container for images to display inline */
+/* Post header with avatar and title */
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.post-header .avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+}
+
+.post-header .title-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-header .title-wrap h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #050505;
+}
+
+.post-header .title-wrap .meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+  user-select: none;
+}
+
+/* Images container */
 .post-images {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  margin-top: 8px;
 }
 
-/* Delete buttons styling */
+.post-images.single img {
+  max-width: 100%;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.post-images img {
+  max-width: 160px;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.post-images img:hover {
+  transform: scale(1.05);
+}
+
+/* Post actions: like button and count */
+.post-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  user-select: none;
+}
+
+.like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #F0F2F5;
+  color: #65676B;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+  user-select: none;
+}
+
+.like-btn:hover {
+  background: #E4E6EB;
+  color: var(--primary);
+}
+
+.like-btn.liked {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(24,119,242,0.4);
+}
+
+.like-count {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Delete button styled as pill */
 #news-list button.delete-news-btn,
 #events-list button.delete-event-btn {
   align-self: flex-start;
-  background: var(--danger);
+  background: #E53935;
   color: #fff;
   border: none;
-  padding: 8px 14px;
-  border-radius: 10px;
+  padding: 8px 16px;
+  border-radius: 999px;
   cursor: pointer;
   font-weight: 700;
   box-shadow: var(--shadow);
-  transition: background .2s ease;
+  transition: background 0.3s ease;
+  user-select: none;
 }
 
 #news-list button.delete-news-btn:hover,
 #events-list button.delete-event-btn:hover {
-  background: var(--danger-hover);
+  background: #D32F2F;
 }
 
 /* Review page styling */
