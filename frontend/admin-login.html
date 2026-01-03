@@ -30,12 +30,11 @@
         });
         const data = await res.json();
         if (res.ok) {
+          localStorage.setItem("adminLoggedIn", "true");  // <-- Add this
           localStorage.setItem("username", data.username);
-          localStorage.setItem("role", data.role);  // Make sure data.role exists
-          setTimeout(() => {
-          window.location.href = "admin.html?ts=" + new Date().getTime();
-          window.location.reload(true); // force reload ignoring cache
-      }, 100);
+          localStorage.setItem("role", data.role);
+          alert("Login successful");
+          window.location.href = "admin.html";
         } else {
           alert("Login failed: " + data.message);
         }
