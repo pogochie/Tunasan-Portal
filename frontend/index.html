@@ -13,38 +13,37 @@
   <h2>Scan QR Code to Access the Portal</h2>
   <canvas id="qr-code"></canvas>
 
- <h2>Report an Incident</h2>
-<form id="incident-form" enctype="multipart/form-data">
-  <input type="text" name="reporterName" placeholder="Your Name" required>
-  <input type="text" name="incidentType" placeholder="Incident Type" required>
-  <textarea name="description" placeholder="Description" required></textarea>
+  <h2>Report an Incident</h2>
+  <form id="incident-form" enctype="multipart/form-data">
+    <input type="text" name="reporterName" placeholder="Your Name" required>
+    <input type="text" name="incidentType" placeholder="Incident Type" required>
+    <textarea name="description" placeholder="Description" required></textarea>
 
-  <!-- Hidden inputs for lat/lng -->
-  <input type="hidden" name="location[lat]" id="lat" required>
-  <input type="hidden" name="location[lng]" id="lng" required>
+    <!-- Hidden inputs for lat/lng -->
+    <input type="hidden" name="location[lat]" id="lat" required>
+    <input type="hidden" name="location[lng]" id="lng" required>
 
-  <!-- Map container -->
-  <div id="map" style="margin-bottom: 15px;"></div>
+    <!-- Map container (responsive height via CSS) -->
+    <div id="map" style="margin-bottom: 15px;"></div>
 
-  <input type="file" name="images" multiple accept="image/*">
-  <button type="submit">Submit Report</button>
-</form>
+    <input type="file" name="images" multiple accept="image/*">
+    <button type="submit">Submit Report</button>
+  </form>
 
-<!-- Leaflet CSS & JS -->
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-/>
-<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 
-<script src="js/main.js"></script>
-<script>
-  fetch('partials/navbar.html')
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('navbar-placeholder').innerHTML = data;
-    })
-    .catch(err => console.error('Failed to load navbar:', err));
-</script>
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { initNavbar } from './js/navbar.js';
+    fetch('partials/navbar.html')
+      .then(r => r.text())
+      .then(html => {
+        document.getElementById('navbar-placeholder').innerHTML = html;
+        initNavbar();
+      })
+      .catch(err => console.error('Failed to load navbar:', err));
+  </script>
 </body>
 </html>

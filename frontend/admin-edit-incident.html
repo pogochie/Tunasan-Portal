@@ -9,6 +9,26 @@
   <style>#map { margin-bottom: 15px; }</style>
 </head>
 <body>
+  <nav class="admin-navbar">
+    <div class="container">
+      <a href="admin.html" class="logo">Admin Dashboard</a>
+
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" />
+      <label for="nav-toggle" class="nav-toggle-label" aria-label="Open Menu">
+        <span></span>
+      </label>
+
+      <ul class="nav-menu">
+        <li><a href="admin.html">Incidents</a></li>
+        <li><a href="admin-news.html">Add News</a></li>
+        <li><a href="admin-events.html">Add Events</a></li>
+        <li><a href="admin-user-approval.html">User Approvals</a></li>
+        <li><a href="#" id="logout-link">Logout</a></li>
+      </ul>
+
+      <div class="nav-overlay"></div>
+    </div>
+  </nav>
   <h1>Edit Incident</h1>
   <form id="edit-incident-form" enctype="multipart/form-data">
     <input type="text" name="reporterName" id="reporterName" placeholder="Reporter Name" required />
@@ -85,6 +105,11 @@
 
       setTimeout(() => map.invalidateSize(), 0);
       window.addEventListener("resize", () => map.invalidateSize());
+
+      const navToggle = document.getElementById("nav-toggle");
+      if (navToggle) {
+        navToggle.addEventListener("change", () => setTimeout(() => map.invalidateSize(), 250));
+      }
     }
 
     form.addEventListener("submit", async (e) => {

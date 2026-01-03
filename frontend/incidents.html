@@ -46,13 +46,12 @@
 
     loadIncidents();
   </script>
-  <script>
-  fetch('partials/navbar.html')
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('navbar-placeholder').innerHTML = data;
-    })
-    .catch(err => console.error('Failed to load navbar:', err));
-</script>
+  <script type="module">
+    import { initNavbar } from './js/navbar.js';
+    fetch('partials/navbar.html')
+      .then(r => r.text())
+      .then(html => { document.getElementById('navbar-placeholder').innerHTML = html; initNavbar(); })
+      .catch(err => console.error('Failed to load navbar:', err));
+  </script>
 </body>
 </html>

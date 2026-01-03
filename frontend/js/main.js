@@ -2,14 +2,16 @@ const form = document.getElementById("incident-form");
 
 // Initialize Leaflet map centered on Barangay Tunasan (example coords)
 const map = L.map("map").setView([14.4089, 121.0341], 15); // Tunasan coords
-// Ensure proper sizing after render and on resize
-setTimeout(() => map.invalidateSize(), 0);
-window.addEventListener("resize", () => map.invalidateSize());
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
+
+// Ensure proper sizing after render and on resize / drawer toggles
+setTimeout(() => map.invalidateSize(), 0);
+window.addEventListener("resize", () => map.invalidateSize());
+window.addEventListener("drawer:toggle", () => setTimeout(() => map.invalidateSize(), 250));
 
 let marker;
 

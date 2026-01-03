@@ -1,10 +1,13 @@
 <nav class="navbar">
   <div class="container">
     <a href="index.html" class="logo">Barangay Tunasan Portal</a>
+
+    <!-- Mobile hamburger -->
     <input type="checkbox" id="nav-toggle" class="nav-toggle" />
-    <label for="nav-toggle" class="nav-toggle-label">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Open Menu">
       <span></span>
     </label>
+
     <ul class="nav-menu">
       <li><a href="index.html">Home</a></li>
       <li><a href="news.html">News</a></li>
@@ -12,7 +15,13 @@
       <li><a href="events.html">Events</a></li>
       <li><a href="admin.html" id="admin-link">Admin Dashboard</a></li>
       <li><a href="#" id="logout-link" style="display:none;">Logout</a></li>
+      <li class="mobile-only"><a href="register.html">Register Admin/Official</a></li>
     </ul>
-    <a href="register.html">Register Admin/Official</a>
+
+    <!-- Desktop CTA -->
+    <a href="register.html" class="desktop-only desktop-cta">Register Admin/Official</a>
+
+    <!-- Mobile overlay -->
+    <div class="nav-overlay"></div>
   </div>
 </nav>

@@ -65,9 +65,9 @@ function initMap(lat, lng) {
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map);
   marker = L.marker([lat, lng]).addTo(map);
-  // Ensure proper sizing after render and on resize
   setTimeout(() => map.invalidateSize(), 0);
   window.addEventListener("resize", () => map.invalidateSize());
+  window.addEventListener("drawer:toggle", () => setTimeout(() => map.invalidateSize(), 250));
 }
 
 async function loadComments() {
