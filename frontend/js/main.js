@@ -61,3 +61,43 @@ form.addEventListener("submit", async (e) => {
     alert("Network error: " + err.message);
   }
 });
+
+async function registerServiceWorker() {
+  if ('serviceWorker' in navigator && 'PushManager' in window) {
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      console.log('Service Worker registered');
+
+      const subscription = await registration.pushManager.getSubscription() ||
+        await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array('BJyVEl1sk0MNoWxlxdP7a3oCSVJ_UVB0HgQxBUpUSMu4xT1Mwha194nxqYiDUfnSuk4mj8Ud-cNJwUCDB6Pu_3o')
+        });
+
+      // Send subscription to backend to save
+      await fetch('/api/notifications/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(subscription)
+      });
+
+      console.log('User subscribed for push notifications');
+    } catch (error) {
+      console.error('Service Worker registration or subscription failed:', error);
+    }
+  } else {
+    console.warn('Push messaging is not supported');
+  }
+}
+
+// Utility to convert VAPID key
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, '+')
+    .replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+}
+
+registerServiceWorker();

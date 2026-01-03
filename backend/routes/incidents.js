@@ -4,6 +4,7 @@ const router = express.Router();
 const Incident = require("../models/Incident");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const { sendNotification } = require('../notifications');
 const multer = require("multer");
 const path = require("path");
 const News = require("../models/News");
@@ -53,6 +54,13 @@ router.post("/", (req, res, next) => {
 
       // Emit event to notify admins/officials
       io.emit("newIncident", incident);
+
+      // After saving new incident
+      sendNotification({
+        title: "New Incident Reported",
+        body: `Type: ${incident.incidentType}`,
+        url: "/incidents.html"
+      });
 
       res.json({ message: "Report submitted for review" });
     } catch (error) {
@@ -108,6 +116,13 @@ router.post("/:id/approve", async (req, res) => {
     // Emit event to notify residents about status update
     io.emit("incidentStatusUpdated", { id: incident._id, status: incident.status });
 
+    // After incident status update
+    sendNotification({
+      title: "Incident Status Updated",
+      body: `Incident ${incident.incidentType} is now ${incident.status}`,
+      url: `/review.html?id=${incident._id}`
+    });
+
     res.json({ message: "Incident approved and news published" });
   } catch (err) {
     console.error(err);
@@ -123,6 +138,13 @@ router.post("/:id/reject", async (req, res) => {
 
     incident.status = "Rejected";
     await incident.save();
+
+    // After incident status update
+    sendNotification({
+      title: "Incident Status Updated",
+      body: `Incident ${incident.incidentType} is now ${incident.status}`,
+      url: `/review.html?id=${incident._id}`
+    });
 
     res.json({ message: "Incident rejected" });
   } catch (err) {
@@ -200,6 +222,13 @@ router.put("/:id", (req, res, next) => {
 
       const incident = await Incident.findByIdAndUpdate(req.params.id, updateData, { new: true });
       if (!incident) return res.status(404).json({ message: "Incident not found" });
+
+      // After incident status update
+      sendNotification({
+        title: "Incident Status Updated",
+        body: `Incident ${incident.incidentType} is now ${incident.status}`,
+        url: `/review.html?id=${incident._id}`
+      });
 
       res.json({ message: "Incident updated successfully", incident });
     } catch (error) {
