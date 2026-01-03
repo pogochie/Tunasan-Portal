@@ -31,7 +31,7 @@
         const data = await res.json();
         if (res.ok) {
           localStorage.setItem("username", data.username);
-          localStorage.setItem("role", data.role);
+          localStorage.setItem("role", data.role);  // Make sure data.role exists
           alert("Login successful");
           window.location.href = "admin.html";
         } else {
