@@ -45,6 +45,8 @@ async function loadIncident() {
       incident.images.forEach((img) => {
         const image = document.createElement("img");
         image.src = img;
+        image.loading = "lazy";
+        image.decoding = "async";
         imagesEl.appendChild(image);
       });
     } else {
@@ -63,6 +65,9 @@ function initMap(lat, lng) {
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map);
   marker = L.marker([lat, lng]).addTo(map);
+  // Ensure proper sizing after render and on resize
+  setTimeout(() => map.invalidateSize(), 0);
+  window.addEventListener("resize", () => map.invalidateSize());
 }
 
 async function loadComments() {

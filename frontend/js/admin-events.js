@@ -12,7 +12,7 @@ async function loadEvents() {
         <li>
           <h3>${event.title}</h3>
           <p>${new Date(event.date).toLocaleDateString()}</p>
-          ${event.images && event.images.length > 0 ? event.images.map(img => `<img src="${img}" width="200" style="margin-right:10px;">`).join("") : ""}
+          ${event.images && event.images.length > 0 ? event.images.map(img => `<img src="${img}" loading="lazy" width="200" style="margin-right:10px;">`).join("") : ""}
           <br>
           <button class="delete-event-btn" data-id="${event._id}">Delete</button>
         </li>

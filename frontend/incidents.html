@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Barangay Tunasan Incidents</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -33,7 +34,7 @@
             <h3>${incident.incidentType}</h3>
             <p><strong>Reported by:</strong> ${incident.reporterName}</p>
             <p>${incident.description}</p>
-            ${incident.images && incident.images.length > 0 ? incident.images.map(img => `<img src="${img}" width="200" style="margin-right:10px;">`).join("") : ""}
+            ${incident.images && incident.images.length > 0 ? incident.images.map(img => `<img src="${img}" loading="lazy" width="200" style="margin-right:10px;">`).join("") : ""}
             <hr>
           `;
           incidentList.appendChild(li);

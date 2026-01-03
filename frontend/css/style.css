@@ -440,12 +440,12 @@ button.action-btn:hover {
 body {
   background: var(--bg);
   color: var(--text);
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 /* Constrain content (optional, affects navbar containers already) */
 .container {
-  max-width: 1100px;
+  max-width: 1120px;
   margin: 0 auto;
 }
 
@@ -561,7 +561,7 @@ form#event-form input[type="date"]:focus,
 #incident-list,
 #news-list,
 #events-list {
-  max-width: 900px;
+  max-width: 920px;
 }
 #incident-list li,
 #news-list li,
@@ -583,31 +583,17 @@ form#event-form input[type="date"]:focus,
   border-color: #DADDE1;
 }
 
-/* Staggered animation for list items */
-#incident-list li:nth-child(1),
-#news-list li:nth-child(1),
-#events-list li:nth-child(1) { animation-delay: .02s; }
-#incident-list li:nth-child(2),
-#news-list li:nth-child(2),
-#events-list li:nth-child(2) { animation-delay: .05s; }
-#incident-list li:nth-child(3),
-#news-list li:nth-child(3),
-#events-list li:nth-child(3) { animation-delay: .08s; }
-#incident-list li:nth-child(4),
-#news-list li:nth-child(4),
-#events-list li:nth-child(4) { animation-delay: .11s; }
-#incident-list li:nth-child(5),
-#news-list li:nth-child(5),
-#events-list li:nth-child(5) { animation-delay: .14s; }
-
 /* Images in cards */
 #incident-list img,
 #news-list img,
 #events-list img,
 #images img {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
   border-radius: 10px;
   box-shadow: var(--shadow);
-  transition: transform .2s ease, box-shadow .2s ease;
+  transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
 }
 #incident-list img:hover,
 #news-list img:hover,
@@ -623,6 +609,8 @@ form#event-form input[type="date"]:focus,
   border-radius: 12px;
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
+  height: clamp(220px, 35vh, 420px) !important; /* override inline heights */
+  width: 100%;
 }
 
 /* Navbar: switch to white bar, Facebook-like */
@@ -737,6 +725,20 @@ form#event-form input[type="date"]:focus,
   background-color: #F7F8FA;
 }
 
+/* Comments list on review page */
+#comments-list {
+  max-width: 920px;
+}
+#comments-list li {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+  animation: fadeInUp .35s ease both;
+}
+
 /* Animations */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(8px); }
@@ -767,4 +769,15 @@ form#event-form input[type="date"]:focus,
   margin-bottom: 8px;
   box-shadow: var(--shadow);
   animation: fadeInUp .35s ease both;
+}
+
+/* Mobile tweaks */
+@media (max-width: 600px) {
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  form#incident-form,
+  form#news-form,
+  form#event-form,
+  #login-form,
+  #register-form { padding: 16px; }
 }

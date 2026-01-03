@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Edit Incident</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-  <style>#map { height: 300px; margin-bottom: 15px; }</style>
+  <style>#map { margin-bottom: 15px; }</style>
 </head>
 <body>
   <h1>Edit Incident</h1>
@@ -81,6 +82,9 @@
         latInput.value = pos.lat;
         lngInput.value = pos.lng;
       });
+
+      setTimeout(() => map.invalidateSize(), 0);
+      window.addEventListener("resize", () => map.invalidateSize());
     }
 
     form.addEventListener("submit", async (e) => {

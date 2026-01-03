@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin - Add News</title>
   <link rel="stylesheet" href="css/style.css" />
   <style>
@@ -84,7 +85,7 @@
             <li>
               <h3>${item.title}</h3>
               <p>${item.description}</p>
-              ${item.images && item.images.length > 0 ? item.images.map(img => `<img src="${img}" width="200" style="margin-right:10px;">`).join("") : ""}
+              ${item.images && item.images.length > 0 ? item.images.map(img => `<img src="${img}" loading="lazy" width="200" style="margin-right:10px;">`).join("") : ""}
               <br>
               <button class="delete-news-btn" data-id="${item._id}">Delete</button>
             </li>

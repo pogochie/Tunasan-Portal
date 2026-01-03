@@ -12,7 +12,7 @@ async function loadNews() {
         <li>
           <h3>${item.title}</h3>
           <p>${item.description}</p>
-          ${item.images && item.images.length > 0 ? item.images.map(img => `<img src="${img}" width="200" style="margin-right:10px;">`).join("") : ""}
+          ${item.images && item.images.length > 0 ? item.images.map(img => `<img src="${img}" loading="lazy" width="200" style="margin-right:10px;">`).join("") : ""}
           <br>
           <button class="delete-news-btn" data-id="${item._id}">Delete</button>
         </li>
