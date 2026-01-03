@@ -227,6 +227,8 @@ button.action-btn:hover {
   --muted: #65676B;
   --primary: #1877F2;
   --primary-hover: #166FE5;
+  --danger: #E53935;
+  --danger-hover: #D32F2F;
   --border: #E4E6EB;
   --shadow: 0 2px 12px rgba(0,0,0,.06);
   --shadow-lg: 0 8px 24px rgba(0,0,0,.08);
@@ -368,6 +370,7 @@ input[type="file"]::file-selector-button:hover {
   list-style: none;
   padding: 0;
   margin: 0;
+  max-width: 720px;
 }
 #news-list li,
 #events-list li {
@@ -378,17 +381,23 @@ input[type="file"]::file-selector-button:hover {
   padding: 12px 14px;
   margin: 12px 0;
   animation: fadeInUp .35s ease both;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 #news-list li h3,
 #events-list li h3 {
-  margin: 0 0 6px 0;
-  font-size: 1rem;
+  margin: 0;
+  font-size: 1.1rem;
   color: #050505;
+  font-weight: 700;
 }
 #news-list li p,
 #events-list li p {
-  margin: 6px 0;
+  margin: 0;
   color: var(--text);
+  white-space: pre-wrap;
+  line-height: 1.4;
 }
 #news-list img,
 #events-list img {
@@ -399,6 +408,40 @@ input[type="file"]::file-selector-button:hover {
   box-shadow: var(--shadow);
   margin-right: 10px;
   margin-bottom: 8px;
+  align-self: start;
+  transition: transform .2s ease;
+  cursor: pointer;
+}
+#news-list img:hover,
+#events-list img:hover {
+  transform: scale(1.05);
+}
+
+/* Container for images to display inline */
+.post-images {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Delete buttons styling */
+#news-list button.delete-news-btn,
+#events-list button.delete-event-btn {
+  align-self: flex-start;
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+  transition: background .2s ease;
+}
+
+#news-list button.delete-news-btn:hover,
+#events-list button.delete-event-btn:hover {
+  background: var(--danger-hover);
 }
 
 /* Review page styling */
