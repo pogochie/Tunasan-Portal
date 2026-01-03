@@ -32,8 +32,10 @@
         if (res.ok) {
           localStorage.setItem("username", data.username);
           localStorage.setItem("role", data.role);  // Make sure data.role exists
-          alert("Login successful");
-          window.location.href = "admin.html";
+          setTimeout(() => {
+          window.location.href = "admin.html?ts=" + new Date().getTime();
+          window.location.reload(true); // force reload ignoring cache
+      }, 100);
         } else {
           alert("Login failed: " + data.message);
         }

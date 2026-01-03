@@ -26,6 +26,10 @@ app.use('/api/news', require('./routes/news'));
 app.use('/api/events', require('./routes/events'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/auth', require('./routes/auth')); // Make sure this line is present
+app.use('/admin.html', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  next();
+});
 
 // Fallback for SPA
 app.get('*', (req, res) => {
