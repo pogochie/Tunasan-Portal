@@ -43,11 +43,11 @@ router.post("/login", async (req, res) => {
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
     if (user.status !== "approved") {
-      return res.status(403).json({ message: "Account not approved yet" });
       console.log("User status:", user.status);
+      return res.status(403).json({ message: "Account not approved yet" });
     }
 
-    console.log("User status:", user.status);
+    
 
     // Return user info without token
     res.json({ username: user.username, role: user.role });
