@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- Added viewport for mobile -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Barangay Tunasan Portal</title>
   <link rel="stylesheet" href="css/style.css">
@@ -30,18 +31,174 @@
     <button type="submit">Submit Report</button>
   </form>
 
+  <!-- New: Community Feed (Top 3 mixed items) -->
+  <h2>Community Feed</h2>
+  <ul id="home-feed" class="feed"></ul>
+
   <!-- Leaflet CSS & JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+  />
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 
   <script src="js/main.js"></script>
-  <script type="module">
-    import { initNavbar } from './js/navbar.js';
+
+  <!-- Mini feed loader -->
+  <script>
+    function timeAgo(dateInput) {
+      const d = new Date(dateInput);
+      const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
+      const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+      let unit = "second", value = -Math.floor(seconds);
+      if (seconds >= 31536000) { unit = "year"; value = -Math.floor(seconds / 31536000); }
+      else if (seconds >= 2592000) { unit = "month"; value = -Math.floor(seconds / 2592000); }
+      else if (seconds >= 604800) { unit = "week"; value = -Math.floor(seconds / 604800); }
+      else if (seconds >= 86400) { unit = "day"; value = -Math.floor(seconds / 86400); }
+      else if (seconds >= 3600) { unit = "hour"; value = -Math.floor(seconds / 3600); }
+      else if (seconds >= 60) { unit = "minute"; value = -Math.floor(seconds / 60); }
+      return rtf.format(value, unit);
+    }
+
+    function typePrefix(type) {
+      return type === "news" ? "news" : type === "incident" ? "inc" : "evt";
+    }
+    function likeKey(type, id) { return `likes_${typePrefix(type)}_${id}`; }
+    function likedKey(type, id) { return `liked_${typePrefix(type)}_${id}`; }
+    function getLikes(type, id) { return parseInt(localStorage.getItem(likeKey(type, id)) || "0", 10); }
+    function isLiked(type, id) { return localStorage.getItem(likedKey(type, id)) === "true"; }
+    function setLiked(type, id, liked) {
+      localStorage.setItem(likedKey(type, id), liked ? "true" : "false");
+      const count = Math.max(0, getLikes(type, id) + (liked ? 1 : -1));
+      localStorage.setItem(likeKey(type, id), String(count));
+      return count;
+    }
+
+    async function loadHomeFeed() {
+      try {
+        const [newsRes, incRes, evtRes] = await Promise.all([
+          fetch("/api/news"),
+          fetch("/api/incidents"),
+          fetch("/api/events")
+        ]);
+        const [newsItems, incidentsAll, events] = await Promise.all([
+          newsRes.json(),
+          incRes.json(),
+          evtRes.json()
+        ]);
+
+        const incidents = incidentsAll
+          .filter(i => (i.status || "").toLowerCase() === "approved")
+          .map(i => ({
+            type: "incident",
+            id: i._id,
+            title: i.incidentType,
+            description: i.description || "",
+            images: Array.isArray(i.images) ? i.images : [],
+            time: i.createdAt || Date.now(),
+            meta: `Reported by ${i.reporterName}`
+          }));
+
+        const news = newsItems.map(n => ({
+          type: "news",
+          id: n._id,
+          title: n.title,
+          description: n.description || "",
+          images: Array.isArray(n.images) ? n.images : [],
+          time: n.createdAt || Date.now(),
+          meta: "Official News"
+        }));
+
+        const evts = events.map(e => ({
+          type: "event",
+          id: e._id,
+          title: e.title,
+          description: e.description || "",
+          images: Array.isArray(e.images) ? e.images : [],
+          time: e.date || e.createdAt || Date.now(),
+          meta: e.date ? `Scheduled ${new Date(e.date).toLocaleDateString()}` : "Event"
+        }));
+
+        const combined = [...news, ...incidents, ...evts]
+          .sort((a, b) => new Date(b.time) - new Date(a.time))
+          .slice(0, 3);
+
+        const feed = document.getElementById("home-feed");
+        feed.innerHTML = "";
+
+        if (combined.length === 0) {
+          feed.innerHTML = '<li class="post-card">No recent updates.</li>';
+          return;
+        }
+
+        combined.forEach(item => {
+          const liked = isLiked(item.type, item.id);
+          const likeCount = getLikes(item.type, item.id);
+          const avatar = `https://i.pravatar.cc/80?u=${item.type}_${item.id}`;
+
+          const images = item.images && item.images.length > 0
+            ? `
+              <div class="post-images ${item.images.length === 1 ? 'single' : ''}">
+                ${item.images.map(img => `<img src="${img}" loading="lazy" decoding="async" alt="${item.type} image">`).join("")}
+              </div>
+            ` : "";
+
+          const li = document.createElement("li");
+          li.className = "post-card";
+          li.innerHTML = `
+            <div class="post-header">
+              <img class="avatar" src="${avatar}" alt="Profile">
+              <div class="title-wrap">
+                <h3>${item.title} <span class="type-badge">${item.type.charAt(0).toUpperCase() + item.type.slice(1)}</span></h3>
+                <span class="meta">${item.meta} • ${timeAgo(item.time)}</span>
+              </div>
+            </div>
+            <div class="post-content">
+              <p>${item.description}</p>
+              ${images}
+            </div>
+            <div class="post-actions">
+              <div class="like-btn ${liked ? 'liked' : ''}" data-type="${item.type}" data-id="${item.id}">
+                <span>👍</span><span class="like-text">${liked ? 'Liked' : 'Like'}</span>
+              </div>
+              <div class="like-count" data-type="${item.type}" data-id="${item.id}">${likeCount}</div>
+            </div>
+          `;
+          feed.appendChild(li);
+        });
+
+        // Delegate like handling (bind once)
+        feed.addEventListener("click", (e) => {
+          const btn = e.target.closest(".like-btn");
+          if (!btn) return;
+          const type = btn.getAttribute("data-type");
+          const id = btn.getAttribute("data-id");
+          const currentlyLiked = isLiked(type, id);
+          const newCount = setLiked(type, id, !currentlyLiked);
+          btn.classList.toggle("liked", !currentlyLiked);
+          btn.querySelector(".like-text").textContent = !currentlyLiked ? "Liked" : "Like";
+          const countEl = feed.querySelector(`.like-count[data-type="${type}"][data-id="${id}"]`);
+          if (countEl) countEl.textContent = newCount;
+        }, { once: true });
+      } catch (err) {
+        console.error("Failed to load home feed:", err);
+        document.getElementById("home-feed").innerHTML = '<li class="post-card">Failed to load feed.</li>';
+      }
+    }
+
+    loadHomeFeed();
+  </script>
+
+  <!-- Load navbar partial and then its logic -->
+  <script>
     fetch('partials/navbar.html')
-      .then(r => r.text())
+      .then(response => response.text())
       .then(html => {
         document.getElementById('navbar-placeholder').innerHTML = html;
-        initNavbar();
+        // Load navbar logic after injecting partial
+        const s = document.createElement('script');
+        s.src = 'js/navbar.js';
+        document.body.appendChild(s);
       })
       .catch(err => console.error('Failed to load navbar:', err));
   </script>
