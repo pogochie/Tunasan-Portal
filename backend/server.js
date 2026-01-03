@@ -24,9 +24,13 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/incidents', require('./routes/incidents'));
 app.use('/api/news', require('./routes/news'));
 app.use('/api/events', require('./routes/events'));
-app.use("/api/users", require("./routes/users"));
-app.use(express.static(path.join(__dirname, '../frontend')));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/auth', require('./routes/auth')); // Make sure this line is present
 
+// Fallback for SPA
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
 
 // Start server
 const PORT = process.env.PORT || 5000;

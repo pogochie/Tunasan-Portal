@@ -32,7 +32,6 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Login route (no token, just user info)
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
@@ -47,8 +46,10 @@ router.post("/login", async (req, res) => {
       return res.status(403).json({ message: "Account not approved yet" });
     }
 
+    // Return user info without token
     res.json({ username: user.username, role: user.role });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
