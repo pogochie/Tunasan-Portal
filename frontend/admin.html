@@ -7,6 +7,19 @@
   <link rel="stylesheet" href="css/admin.css">
   <!-- Chart.js for statistics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .loading-state {
+      text-align: center;
+      padding: 20px;
+    }
+    .error-state {
+      color: #dc3545;
+      background: #f8d7da;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+    }
+  </style>
 </head>
 <body class="admin-body">
   <nav class="admin-navbar">
@@ -122,6 +135,27 @@
       window.location.href = 'admin-login.html';
     }
 
+    // Show loading state
+    function showLoading() {
+      document.getElementById('recent-activity').innerHTML = `
+        <tr>
+          <td colspan="5" class="loading-state">Loading data...</td>
+        </tr>
+      `;
+      document.querySelectorAll('.value').forEach(el => {
+        el.textContent = '--';
+      });
+    }
+
+    // Show error state
+    function showError(message) {
+      document.getElementById('recent-activity').innerHTML = `
+        <tr>
+          <td colspan="5" class="error-state">${message}</td>
+        </tr>
+      `;
+    }
+
     // Logout functionality
     document.getElementById('logout-link').addEventListener('click', (e) => {
       e.preventDefault();
@@ -131,47 +165,93 @@
 
     // Load dashboard data
     async function loadDashboardData() {
+      showLoading();
+      
       try {
         const response = await fetch('/api/admin/dashboard');
+        
+        if (!response.ok) {
+          throw new Error(`Server returned ${response.status}`);
+        }
+        
         const data = await response.json();
         
-        // Update stats cards
-        document.getElementById('total-incidents').textContent = data.incidents.total;
-        document.getElementById('pending-incidents').textContent = data.incidents.pending;
-        document.getElementById('total-news').textContent = data.news.total;
-        document.getElementById('upcoming-events').textContent = data.events.upcoming;
-        document.getElementById('new-users').textContent = data.users.new;
-        document.getElementById('resolved-cases').textContent = data.incidents.resolved;
+        // Check if data structure is valid
+        if (!data || typeof data !== 'object') {
+          throw new Error('Invalid data format received');
+        }
 
-        // Update recent activity
+        // Update stats cards with fallback values
+        document.getElementById('total-incidents').textContent = 
+          data.incidents?.total ?? 0;
+        document.getElementById('pending-incidents').textContent = 
+          data.incidents?.pending ?? 0;
+        document.getElementById('total-news').textContent = 
+          data.news?.total ?? 0;
+        document.getElementById('upcoming-events').textContent = 
+          data.events?.upcoming ?? 0;
+        document.getElementById('new-users').textContent = 
+          data.users?.new ?? 0;
+        document.getElementById('resolved-cases').textContent = 
+          data.incidents?.resolved ?? 0;
+
+        // Update recent activity with fallback
         const activityTable = document.getElementById('recent-activity');
-        activityTable.innerHTML = data.recentActivity.map(item => `
-          <tr>
-            <td>${item.type}</td>
-            <td>${item.description}</td>
-            <td>${item.user}</td>
-            <td>${new Date(item.timestamp).toLocaleString()}</td>
-            <td><a href="${item.link}" class="btn-secondary">View</a></td>
-          </tr>
-        `).join('');
+        if (data.recentActivity?.length > 0) {
+          activityTable.innerHTML = data.recentActivity.map(item => `
+            <tr>
+              <td>${item.type || 'N/A'}</td>
+              <td>${item.description || 'No description'}</td>
+              <td>${item.user || 'System'}</td>
+              <td>${item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'}</td>
+              <td><a href="${item.link || '#'}" class="btn-secondary">View</a></td>
+            </tr>
+          `).join('');
+        } else {
+          activityTable.innerHTML = `
+            <tr>
+              <td colspan="5">No recent activity found</td>
+            </tr>
+          `;
+        }
 
-        // Initialize charts
-        initCharts(data.charts);
+        // Initialize charts if data exists
+        if (data.charts) {
+          initCharts(data.charts);
+        } else {
+          console.warn('No chart data received');
+        }
+        
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
+        showError(`Failed to load data: ${error.message}`);
+        
+        // Initialize empty charts
+        initCharts({
+          incidentsOverTime: { labels: [], data: [] },
+          statusDistribution: { labels: [], data: [] }
+        });
       }
     }
 
     function initCharts(chartData) {
+      // Destroy existing charts if they exist
+      if (window.incidentsChart) {
+        window.incidentsChart.destroy();
+      }
+      if (window.statusChart) {
+        window.statusChart.destroy();
+      }
+
       // Incidents over time chart
       const incidentsCtx = document.getElementById('incidents-chart').getContext('2d');
-      new Chart(incidentsCtx, {
+      window.incidentsChart = new Chart(incidentsCtx, {
         type: 'line',
         data: {
-          labels: chartData.incidentsOverTime.labels,
+          labels: chartData.incidentsOverTime?.labels || [],
           datasets: [{
             label: 'Incidents Reported',
-            data: chartData.incidentsOverTime.data,
+            data: chartData.incidentsOverTime?.data || [],
             borderColor: '#0d6efd',
             backgroundColor: 'rgba(13, 110, 253, 0.1)',
             tension: 0.1,
@@ -188,18 +268,14 @@
 
       // Status distribution chart
       const statusCtx = document.getElementById('status-chart').getContext('2d');
-      new Chart(statusCtx, {
+      window.statusChart = new Chart(statusCtx, {
         type: 'doughnut',
         data: {
-          labels: chartData.statusDistribution.labels,
+          labels: chartData.statusDistribution?.labels || ['No Data'],
           datasets: [{
-            data: chartData.statusDistribution.data,
+            data: chartData.statusDistribution?.data || [1],
             backgroundColor: [
-              '#0d6efd', // Pending - blue
-              '#198754', // Approved - green
-              '#ffc107', // In Progress - yellow
-              '#dc3545', // Rejected - red
-              '#6c757d'  // Resolved - gray
+              '#0d6efd', '#198754', '#ffc107', '#dc3545', '#6c757d'
             ]
           }]
         },
@@ -214,7 +290,6 @@
 
     // Time period selector
     document.getElementById('time-period').addEventListener('change', (e) => {
-      // Reload data with new time period
       loadDashboardData();
     });
 

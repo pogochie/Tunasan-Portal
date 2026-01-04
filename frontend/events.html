@@ -3,14 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Barangay Tunasan Events</title>
+  <title>Barangay Tunasan News</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <div id="navbar-placeholder"></div>
 
-  <h1>Upcoming Events</h1>
-  <ul id="events-list" class="feed"></ul>
+  <div class="container">
+    <h1>Community News</h1>
+    
+    <div class="content-filter">
+      <button class="filter-btn active">All</button>
+      <button class="filter-btn">Announcements</button>
+      <button class="filter-btn">Updates</button>
+    </div>
+
+    <section class="feed-section">
+      <ul id="news-list" class="feed"></ul>
+      <button id="load-more" class="load-more-btn">Load More</button>
+    </section>
+  </div>
 
   <script>
     function timeAgo(dateInput) {
@@ -44,7 +56,7 @@
         if (!res.ok) throw new Error("Failed to fetch events");
         const events = await res.json();
 
-        const eventsList = document.getElementById("events-list");
+        const eventsList = document.getElementById("news-list");
         eventsList.innerHTML = "";
 
         if (events.length === 0) {
@@ -104,7 +116,7 @@
         }, { once: true });
       } catch (err) {
         console.error(err);
-        document.getElementById("events-list").innerHTML = '<li class="post-card">Failed to load events.</li>';
+        document.getElementById("news-list").innerHTML = '<li class="post-card">Failed to load events.</li>';
       }
     }
 
@@ -113,10 +125,21 @@
 
   <script type="module">
     import { initNavbar } from './js/navbar.js';
+    // Load navbar and initialize
     fetch('partials/navbar.html')
       .then(response => response.text())
-      .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; initNavbar(); })
-      .catch(err => console.error('Failed to load navbar:', err));
+      .then(html => {
+        document.getElementById('navbar-placeholder').innerHTML = html;
+        initNavbar();
+        
+        // Set active nav link
+        const currentPath = window.location.pathname.split('/').pop();
+        document.querySelectorAll('.nav-link, .tab-link').forEach(link => {
+          if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+          }
+        });
+      });
   </script>
 </body>
 </html>

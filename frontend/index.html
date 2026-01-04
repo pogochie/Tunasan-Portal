@@ -6,35 +6,73 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Barangay Tunasan Portal</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .hero {
+      text-align: center;
+      padding: 40px 20px;
+      margin-bottom: 30px;
+    }
+    .hero h1 {
+      font-size: 2rem;
+      margin-bottom: 15px;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+    .feature-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
   <div id="navbar-placeholder"></div>
-  <h1>Smart Barangay Tunasan Portal</h1>
 
-  <h2>Scan QR Code to Access the Portal</h2>
-  <canvas id="qr-code"></canvas>
+  <main class="container">
+    <section class="hero">
+      <h1>Welcome to Barangay Tunasan</h1>
+      <p>A connected community portal</p>
+      <div class="qr-container"></div>
+    </section>
 
-  <h2>Report an Incident</h2>
-  <form id="incident-form" enctype="multipart/form-data">
-    <input type="text" name="reporterName" placeholder="Your Name" required>
-    <input type="text" name="incidentType" placeholder="Incident Type" required>
-    <textarea name="description" placeholder="Description" required></textarea>
+    <section class="features">
+      <div class="feature-card">
+        <h3>Report Issues</h3>
+        <p>Quickly report community incidents</p>
+      </div>
+      <!-- More feature cards -->
+    </section>
 
-    <!-- Hidden inputs for lat/lng -->
-    <input type="hidden" name="location[lat]" id="lat" required>
-    <input type="hidden" name="location[lng]" id="lng" required>
+    <section class="community-updates">
+      <h2>Recent Community Activity</h2>
+      <ul id="home-feed" class="feed"></ul>
+    </section>
 
-    <!-- Map container (responsive height via CSS) -->
-    <div id="map" style="margin-bottom: 15px;"></div>
+    <section class="report-section">
+      <h2>Report an Incident</h2>
+      <form id="incident-form" enctype="multipart/form-data">
+        <input type="text" name="reporterName" placeholder="Your Name" required>
+        <input type="text" name="incidentType" placeholder="Incident Type" required>
+        <textarea name="description" placeholder="Description" required></textarea>
 
-    <input type="file" name="images" multiple accept="image/*">
-    <br>
-    <button type="submit">Submit Report</button>
-  </form>
+        <!-- Hidden inputs for lat/lng -->
+        <input type="hidden" name="location[lat]" id="lat" required>
+        <input type="hidden" name="location[lng]" id="lng" required>
 
-  <!-- New: Community Feed (Top 3 mixed items) -->
-  <h2>Community Feed</h2>
-  <ul id="home-feed" class="feed"></ul>
+        <!-- Map container (responsive height via CSS) -->
+        <div id="map" style="margin-bottom: 15px;"></div>
+
+        <input type="file" name="images" multiple accept="image/*">
+        <br>
+        <button type="submit">Submit Report</button>
+      </form>
+    </section>
+  </main>
 
   <!-- Leaflet CSS & JS -->
   <link
