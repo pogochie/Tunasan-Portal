@@ -47,6 +47,28 @@ export function initNavbar() {
     });
   }
 
+  // Theme toggle
+  const themeBtn = document.getElementById("theme-toggle");
+  const applyTheme = (theme) => {
+    document.documentElement.classList.toggle("theme-dark", theme === "dark");
+    // swap icon groups
+    const sun = themeBtn?.querySelector(".ico-sun");
+    const moon = themeBtn?.querySelector(".ico-moon");
+    if (sun && moon) {
+      sun.style.display = theme === "dark" ? "none" : "block";
+      moon.style.display = theme === "dark" ? "block" : "none";
+    }
+  };
+  const savedTheme = localStorage.getItem("theme") || "light";
+  applyTheme(savedTheme);
+  if (themeBtn) {
+    themeBtn.addEventListener("click", () => {
+      const next = document.documentElement.classList.contains("theme-dark") ? "light" : "dark";
+      localStorage.setItem("theme", next);
+      applyTheme(next);
+    });
+  }
+
   // --- Global search wiring ---
   const searchInput = document.querySelector(".search-input");
   const searchBtn = document.querySelector(".search-btn");
