@@ -1,4 +1,4 @@
-const VERSION = "v1";
+const VERSION = "v2"; // increment version to force cache update
 const STATIC_CACHE = `static-${VERSION}`;
 const RUNTIME_CACHE = `runtime-${VERSION}`;
 const STATIC_ASSETS = [
