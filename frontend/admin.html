@@ -1,72 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Admin Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Removed style.css to avoid conflicts -->
-  <link rel="stylesheet" href="css/admin.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Dashboard - Barangay Tunasan</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <!-- Chart.js for statistics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-  <script>
-    window.onload = () => {
-      const loggedIn = localStorage.getItem("adminLoggedIn");
-      const role = localStorage.getItem("role");
-      if (loggedIn !== "true" || (role !== "admin" && role !== "official")) {
-        alert("Please login first");
-        window.location.href = "admin-login.html";
-      }
-    };
-  </script>
-
+<body class="admin-body">
   <nav class="admin-navbar">
-    <div class="container">
-      <a href="admin.html" class="logo">Admin Dashboard</a>
-      <ul class="nav-menu">
-        <li><a href="admin.html">Incidents</a></li>
-        <li><a href="admin-news.html">Add News</a></li>
-        <li><a href="admin-events.html">Add Events</a></li>
-        <li><a href="admin-user-approval.html">User Approvals</a></li>
+    <div class="admin-container">
+      <a href="admin.html" class="logo">Barangay Tunasan Admin</a>
+      <ul class="admin-nav-menu">
+        <li><a href="admin.html">Dashboard</a></li>
+        <li><a href="admin-incidents.html">Incidents</a></li>
+        <li><a href="admin-news.html">News</a></li>
+        <li><a href="admin-events.html">Events</a></li>
+        <li><a href="admin-user-approval.html">Users</a></li>
         <li><a href="#" id="logout-link">Logout</a></li>
       </ul>
     </div>
   </nav>
 
-  <div class="container">
-    <div class="admin-header">
-      <h1 class="title">Barangay Tunasan Admin Dashboard</h1>
-      <div class="actions">
-        <a href="admin-news.html" class="pill-btn secondary">New News</a>
-        <a href="admin-events.html" class="pill-btn">New Event</a>
+  <main class="admin-container">
+    <h1>Dashboard Overview</h1>
+    
+    <!-- Stats Cards -->
+    <div class="admin-stats-grid">
+      <div class="stat-card">
+        <div class="label">Total Incidents</div>
+        <div class="value" id="total-incidents">0</div>
+        <div class="trend" id="incident-trend"></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Pending Approval</div>
+        <div class="value" id="pending-incidents">0</div>
+        <a href="admin-incidents.html?filter=pending">View All</a>
+      </div>
+      <div class="stat-card">
+        <div class="label">Active News</div>
+        <div class="value" id="total-news">0</div>
+        <a href="admin-news.html">Manage</a>
+      </div>
+      <div class="stat-card">
+        <div class="label">Upcoming Events</div>
+        <div class="value" id="upcoming-events">0</div>
+        <a href="admin-events.html">View All</a>
+      </div>
+      <div class="stat-card">
+        <div class="label">New Users</div>
+        <div class="value" id="new-users">0</div>
+        <a href="admin-user-approval.html">Approve</a>
+      </div>
+      <div class="stat-card">
+        <div class="label">Resolved Cases</div>
+        <div class="value" id="resolved-cases">0</div>
+        <div class="trend" id="resolved-trend"></div>
       </div>
     </div>
 
-    <!-- Stats summary -->
-    <div id="admin-stats" class="admin-stats"></div>
+    <!-- Charts Row -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h2 class="admin-card-title">Monthly Statistics</h2>
+        <select id="time-period" class="admin-select">
+          <option value="30">Last 30 Days</option>
+          <option value="90">Last 90 Days</option>
+          <option value="365">Last Year</option>
+        </select>
+      </div>
+      <div class="chart-row">
+        <div class="chart-container">
+          <canvas id="incidents-chart"></canvas>
+        </div>
+        <div class="chart-container">
+          <canvas id="status-chart"></canvas>
+        </div>
+      </div>
+    </div>
 
-    <table id="incident-table">
-      <thead>
-        <tr>
-          <th>Reporter</th>
-          <th>Type</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+    <!-- Recent Activity -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h2 class="admin-card-title">Recent Activity</h2>
+        <a href="#" class="btn-secondary">View All</a>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>User</th>
+            <th>Time</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="recent-activity">
+          <!-- Will be populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
 
-  <div id="review-modal" style="display:none;"></div>
+    <!-- Quick Actions -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h2 class="admin-card-title">Quick Actions</h2>
+      </div>
+      <div class="quick-actions">
+        <a href="admin-news.html?action=create" class="btn-primary">Create News Post</a>
+        <a href="admin-events.html?action=create" class="btn-primary">Create Event</a>
+        <a href="admin-incidents.html" class="btn-secondary">Review Incidents</a>
+        <a href="admin-user-approval.html" class="btn-secondary">Approve Users</a>
+      </div>
+    </div>
+  </main>
 
-  <script type="module" src="js/admin.js"></script>
   <script>
-    const logoutLink = document.getElementById("logout-link");
-    logoutLink.addEventListener("click", (e) => {
+    // Check admin login status
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+      window.location.href = 'admin-login.html';
+    }
+
+    // Logout functionality
+    document.getElementById('logout-link').addEventListener('click', (e) => {
       e.preventDefault();
-      localStorage.clear();
-      window.location.href = "admin-login.html";
+      localStorage.removeItem('adminLoggedIn');
+      window.location.href = 'admin-login.html';
     });
+
+    // Load dashboard data
+    async function loadDashboardData() {
+      try {
+        const response = await fetch('/api/admin/dashboard');
+        const data = await response.json();
+        
+        // Update stats cards
+        document.getElementById('total-incidents').textContent = data.incidents.total;
+        document.getElementById('pending-incidents').textContent = data.incidents.pending;
+        document.getElementById('total-news').textContent = data.news.total;
+        document.getElementById('upcoming-events').textContent = data.events.upcoming;
+        document.getElementById('new-users').textContent = data.users.new;
+        document.getElementById('resolved-cases').textContent = data.incidents.resolved;
+
+        // Update recent activity
+        const activityTable = document.getElementById('recent-activity');
+        activityTable.innerHTML = data.recentActivity.map(item => `
+          <tr>
+            <td>${item.type}</td>
+            <td>${item.description}</td>
+            <td>${item.user}</td>
+            <td>${new Date(item.timestamp).toLocaleString()}</td>
+            <td><a href="${item.link}" class="btn-secondary">View</a></td>
+          </tr>
+        `).join('');
+
+        // Initialize charts
+        initCharts(data.charts);
+      } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+      }
+    }
+
+    function initCharts(chartData) {
+      // Incidents over time chart
+      const incidentsCtx = document.getElementById('incidents-chart').getContext('2d');
+      new Chart(incidentsCtx, {
+        type: 'line',
+        data: {
+          labels: chartData.incidentsOverTime.labels,
+          datasets: [{
+            label: 'Incidents Reported',
+            data: chartData.incidentsOverTime.data,
+            borderColor: '#0d6efd',
+            backgroundColor: 'rgba(13, 110, 253, 0.1)',
+            tension: 0.1,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+
+      // Status distribution chart
+      const statusCtx = document.getElementById('status-chart').getContext('2d');
+      new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+          labels: chartData.statusDistribution.labels,
+          datasets: [{
+            data: chartData.statusDistribution.data,
+            backgroundColor: [
+              '#0d6efd', // Pending - blue
+              '#198754', // Approved - green
+              '#ffc107', // In Progress - yellow
+              '#dc3545', // Rejected - red
+              '#6c757d'  // Resolved - gray
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+    }
+
+    // Time period selector
+    document.getElementById('time-period').addEventListener('change', (e) => {
+      // Reload data with new time period
+      loadDashboardData();
+    });
+
+    // Initial load
+    loadDashboardData();
   </script>
 </body>
 </html>

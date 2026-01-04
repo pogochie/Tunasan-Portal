@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Portal - Barangay Tunasan</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+  <nav class="admin-navbar">
+    <div class="admin-container">
+      <a href="admin.html" class="logo">Barangay Tunasan Admin</a>
+      <ul class="admin-nav-menu">
+        <li><a href="admin.html">Dashboard</a></li>
+        <li><a href="admin-incidents.html">Incidents</a></li>
+        <li><a href="admin-news.html">News</a></li>
+        <li><a href="admin-events.html">Events</a></li>
+        <li><a href="admin-user-approval.html">Users</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="admin-container">
+    <!-- Page-specific content will go here -->
+    <div id="admin-content"></div>
+  </main>
+
+  <script>
+    // Highlight active nav link
+    const currentPage = window.location.pathname.split('/').pop() || 'admin.html';
+    document.querySelectorAll('.admin-nav-menu li a').forEach(link => {
+      if (link.getAttribute('href') === currentPage) {
+        link.classList.add('active');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -10,14 +10,23 @@
   <div id="navbar-placeholder"></div>
 
   <h1>Recent Incidents</h1>
-  <ul id="incident-list" class="feed"></ul>
+  <ul id="incidents-list" class="feed"></ul>
 
   <script>
     function timeAgo(dateInput) {
       const d = new Date(dateInput);
       const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
       const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
-      let unit = "second", value = -Math.floor(seconds);
+      const intervals = [
+        { s: 60, unit: "second" },
+        { s: 3600, unit: "minute" },
+        { s: 86400, unit: "hour" },
+        { s: 604800, unit: "day" },
+        { s: 2592000, unit: "week" },
+        { s: 31536000, unit: "month" },
+      ];
+      let value = -Math.floor(seconds);
+      let unit = "second";
       if (seconds >= 31536000) { unit = "year"; value = -Math.floor(seconds / 31536000); }
       else if (seconds >= 2592000) { unit = "month"; value = -Math.floor(seconds / 2592000); }
       else if (seconds >= 604800) { unit = "week"; value = -Math.floor(seconds / 604800); }
@@ -29,8 +38,13 @@
 
     function getLikeKey(id) { return `likes_inc_${id}`; }
     function getLikedKey(id) { return `liked_inc_${id}`; }
-    function getLikes(id) { return parseInt(localStorage.getItem(getLikeKey(id)) || "0", 10); }
-    function isLiked(id) { return localStorage.getItem(getLikedKey(id)) === "true"; }
+
+    function getLikes(id) {
+      return parseInt(localStorage.getItem(getLikeKey(id)) || "0", 10);
+    }
+    function isLiked(id) {
+      return localStorage.getItem(getLikedKey(id)) === "true";
+    }
     function setLiked(id, liked) {
       localStorage.setItem(getLikedKey(id), liked ? "true" : "false");
       const count = Math.max(0, getLikes(id) + (liked ? 1 : -1));
@@ -42,28 +56,27 @@
       try {
         const res = await fetch("/api/incidents");
         const incidents = await res.json();
-        const incidentList = document.getElementById("incident-list");
-        incidentList.innerHTML = "";
-
-        // Only approved incidents
         const approvedIncidents = incidents.filter(i => (i.status || "").toLowerCase() === "approved");
+        const incidentsList = document.getElementById("incidents-list");
+        incidentsList.innerHTML = "";
 
         if (approvedIncidents.length === 0) {
-          incidentList.innerHTML = '<li class="post-card">No approved incidents available.</li>';
+          incidentsList.innerHTML = '<li class="post-card">No recent incidents reported.</li>';
           return;
         }
 
         approvedIncidents.forEach(incident => {
           const liked = isLiked(incident._id);
           const likeCount = getLikes(incident._id);
-          const avatar = `https://i.pravatar.cc/80?u=incident_${incident._id}`;
+          const avatar = `https://i.pravatar.cc/80?u=inc_${incident._id}`;
 
           const images = (incident.images && incident.images.length > 0)
             ? `
               <div class="post-images ${incident.images.length === 1 ? 'single' : ''}">
                 ${incident.images.map(img => `<img src="${img}" loading="lazy" decoding="async" alt="incident image">`).join("")}
               </div>
-            ` : "";
+            `
+            : "";
 
           const li = document.createElement("li");
           li.className = "post-card";
@@ -78,6 +91,7 @@
             <div class="post-content">
               <p>${incident.description}</p>
               ${images}
+              <p class="location"><small>📍 ${incident.location ? `${incident.location.lat?.toFixed(4)}, ${incident.location.lng?.toFixed(4)}` : 'Location not specified'}</small></p>
             </div>
             <div class="post-actions">
               <div class="like-btn ${liked ? 'liked' : ''}" data-id="${incident._id}">
@@ -86,10 +100,11 @@
               <div class="like-count" data-id="${incident._id}">${likeCount}</div>
             </div>
           `;
-          incidentList.appendChild(li);
+          incidentsList.appendChild(li);
         });
 
-        incidentList.addEventListener("click", (e) => {
+        // Delegate like clicks
+        incidentsList.addEventListener("click", (e) => {
           const btn = e.target.closest(".like-btn");
           if (!btn) return;
           const id = btn.getAttribute("data-id");
@@ -97,14 +112,13 @@
           const newCount = setLiked(id, !currentlyLiked);
           btn.classList.toggle("liked", !currentlyLiked);
           btn.querySelector(".like-text").textContent = !currentlyLiked ? "Liked" : "Like";
-          const countEl = incidentList.querySelector(`.like-count[data-id="${id}"]`);
+          const countEl = incidentsList.querySelector(`.like-count[data-id="${id}"]`);
           if (countEl) countEl.textContent = newCount;
         }, { once: true });
       } catch (err) {
         console.error("Failed to load incidents:", err);
       }
     }
-
     loadIncidents();
   </script>
   <script type="module">
