@@ -35,9 +35,12 @@
 
   <main class="container">
     <section class="hero">
-      <h1>Welcome to Barangay Tunasan</h1>
-      <p>A connected community portal</p>
-      <div class="qr-container"></div>
+      <h1 data-i18n="home.title">Welcome to Barangay Tunasan</h1>
+      <p data-i18n="home.subtitle">A connected community portal</p>
+      <div class="qr-container">
+        <canvas id="qr-code" width="160" height="160" aria-label="QR code to open portal"></canvas>
+        <p><small data-i18n="home.qrNote">Scan to open on mobile</small></p>
+      </div>
     </section>
 
     <section class="features">
@@ -53,12 +56,12 @@
       <ul id="home-feed" class="feed"></ul>
     </section>
 
-    <section class="report-section">
-      <h2>Report an Incident</h2>
+    <section class="report-section" id="report-section">
+      <h2 data-i18n="home.reportTitle">Report an Incident</h2>
       <form id="incident-form" enctype="multipart/form-data">
-        <input type="text" name="reporterName" placeholder="Your Name" required>
-        <input type="text" name="incidentType" placeholder="Incident Type" required>
-        <textarea name="description" placeholder="Description" required></textarea>
+        <input type="text" name="reporterName" placeholder="Your Name" required data-i18n-placeholder="form.name">
+        <input type="text" name="incidentType" placeholder="Incident Type" required data-i18n-placeholder="form.type">
+        <textarea name="description" placeholder="Description" required data-i18n-placeholder="form.description"></textarea>
 
         <!-- Hidden inputs for lat/lng -->
         <input type="hidden" name="location[lat]" id="lat" required>
@@ -67,9 +70,9 @@
         <!-- Map container (responsive height via CSS) -->
         <div id="map" style="margin-bottom: 15px;"></div>
 
-        <input type="file" name="images" multiple accept="image/*">
+        <input type="file" name="images" multiple accept="image/*" data-i18n-attr="aria-label:form.images">
         <br>
-        <button type="submit">Submit Report</button>
+        <button type="submit" data-i18n="form.submit">Submit Report</button>
       </form>
     </section>
   </main>
@@ -232,16 +235,42 @@
     loadHomeFeed();
   </script>
   <!-- Load navbar partial and then its logic -->
-  <script type="module">
-    import { initNavbar } from './js/navbar.js';
+  <script>
     fetch('partials/navbar.html')
       .then(response => response.text())
       .then(html => {
         document.getElementById('navbar-placeholder').innerHTML = html;
-        initNavbar();
+        const s = document.createElement('script');
+        s.src = 'js/navbar.js';
+        document.body.appendChild(s);
+        // Load i18n after navbar
+        const i18n = document.createElement('script');
+        i18n.src = 'js/i18n.js';
+        document.body.appendChild(i18n);
       })
       .catch(err => console.error('Failed to load navbar:', err));
   </script>
   <script src="js/ui.js"></script>
+  <!-- QR library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  <script>
+    // Generate QR to open with prefilled "Report Incident" context
+    (function generateQR() {
+      try {
+        const url = new URL(window.location.origin + "/index.html");
+        // Pre-fill context: action=report and optional focus on type
+        url.searchParams.set("action", "report");
+        url.hash = "report-section";
+        new QRious({
+          element: document.getElementById("qr-code"),
+          value: url.toString(),
+          size: 160,
+          level: "H",
+          background: "#fff",
+          foreground: "#1877F2"
+        });
+      } catch (e) {}
+    })();
+  </script>
 </body>
 </html>

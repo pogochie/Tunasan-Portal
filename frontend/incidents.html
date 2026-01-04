@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Barangay Tunasan Incidents</title>
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
 </head>
 <body>
   <div id="navbar-placeholder"></div>
 
-  <h1>Recent Incidents</h1>
+  <h1 data-i18n="incidents.title">Recent Incidents</h1>
+  <!-- Heatmap container -->
+  <div id="heatmap" style="margin: 10px 0; height: 320px;"></div>
+
   <ul id="incidents-list" class="feed"></ul>
 
   <script>
@@ -59,6 +63,56 @@
         const approvedIncidents = incidents.filter(i => (i.status || "").toLowerCase() === "approved");
         const incidentsList = document.getElementById("incidents-list");
         incidentsList.innerHTML = "";
+
+        // Geofence banner: find nearby incidents (1 km)
+        let userLoc = null;
+        if ("geolocation" in navigator) {
+          try {
+            userLoc = await new Promise((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(
+                pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                reject,
+                { enableHighAccuracy: true, timeout: 5000 }
+              );
+            });
+          } catch (_) {}
+        }
+        if (userLoc) {
+          const R = 6371e3, toRad = d => (d * Math.PI) / 180;
+          const dist = (a, b) => {
+            const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
+            const lat1 = toRad(a.lat), lat2 = toRad(b.lat);
+            const h = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
+            return 2 * R * Math.asin(Math.sqrt(h));
+          };
+          const nearby = approvedIncidents.filter(i => i.location?.lat && i.location?.lng)
+            .map(i => ({ i, d: dist(userLoc, i.location) }))
+            .filter(x => x.d <= 1000);
+          if (nearby.length > 0) {
+            const banner = document.createElement("div");
+            banner.className = "post-card";
+            banner.innerHTML = `
+              <strong data-i18n="incidents.nearbyTitle">Incidents near you</strong>
+              <p>${nearby.length} <span data-i18n="incidents.within">incident(s) within 1 km.</span></p>
+            `;
+            incidentsList.parentNode.insertBefore(banner, incidentsList);
+          }
+        }
+
+        // Heatmap: plot approved incidents
+        try {
+          // init map
+          const map = L.map("heatmap").setView([14.4089, 121.0341], 13);
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '&copy; OpenStreetMap contributors',
+          }).addTo(map);
+          const pts = approvedIncidents
+            .filter(i => i.location?.lat && i.location?.lng)
+            .map(i => [i.location.lat, i.location.lng, 0.6]); // intensity
+          if (pts.length > 0 && window.L && L.heatLayer) {
+            L.heatLayer(pts, { radius: 25, blur: 18, maxZoom: 17 }).addTo(map);
+          }
+        } catch (e) { console.warn("Heatmap init failed:", e); }
 
         if (approvedIncidents.length === 0) {
           incidentsList.innerHTML = '<li class="post-card">No recent incidents reported.</li>';
@@ -123,6 +177,8 @@
     }
     loadIncidents();
   </script>
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
   <script type="module">
     import { initNavbar } from './js/navbar.js';
     fetch('partials/navbar.html')
@@ -130,5 +186,7 @@
       .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; initNavbar(); })
       .catch(err => console.error('Failed to load navbar:', err));
   </script>
+  <script src="js/i18n.js"></script>
+  <script src="js/ui.js"></script>
 </body>
 </html>

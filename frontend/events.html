@@ -9,114 +9,123 @@
 <body>
   <div id="navbar-placeholder"></div>
 
-  <h1>Upcoming Events</h1>
+  <h1 data-i18n="events.title">Upcoming Events</h1>
+  <div id="calendar" class="post-card" style="padding:12px;"></div>
   <ul id="events-list" class="feed"></ul>
 
   <script>
-    function timeAgo(dateInput) {
-      const d = new Date(dateInput);
-      const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
-      const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
-      let unit = "second", value = -Math.floor(seconds);
-      if (seconds >= 31536000) { unit = "year"; value = -Math.floor(seconds / 31536000); }
-      else if (seconds >= 2592000) { unit = "month"; value = -Math.floor(seconds / 2592000); }
-      else if (seconds >= 604800) { unit = "week"; value = -Math.floor(seconds / 604800); }
-      else if (seconds >= 86400) { unit = "day"; value = -Math.floor(seconds / 86400); }
-      else if (seconds >= 3600) { unit = "hour"; value = -Math.floor(seconds / 3600); }
-      else if (seconds >= 60) { unit = "minute"; value = -Math.floor(seconds / 60); }
-      return rtf.format(value, unit);
+    function buildCalendar(date = new Date()) {
+      const year = date.getFullYear(), month = date.getMonth();
+      const first = new Date(year, month, 1);
+      const startDay = first.getDay(); // 0=Sun
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const grid = document.createElement("div");
+      grid.style.display = "grid";
+      grid.style.gridTemplateColumns = "repeat(7, 1fr)";
+      grid.style.gap = "6px";
+      const labels = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+      labels.forEach(l => {
+        const lbl = document.createElement("div");
+        lbl.style.fontWeight = "700";
+        lbl.textContent = l;
+        grid.appendChild(lbl);
+      });
+      for (let i = 0; i < startDay; i++) grid.appendChild(document.createElement("div"));
+      for (let d = 1; d <= daysInMonth; d++) {
+        const cell = document.createElement("div");
+        cell.style.minHeight = "60px";
+        cell.style.border = "1px solid var(--border)";
+        cell.style.borderRadius = "8px";
+        cell.style.padding = "6px";
+        cell.innerHTML = `<strong>${d}</strong><div class="evt-slot"></div>`;
+        grid.appendChild(cell);
+      }
+      return grid;
     }
 
-    function getLikeKey(id) { return `likes_evt_${id}`; }
-    function getLikedKey(id) { return `liked_evt_${id}`; }
-    function getLikes(id) { return parseInt(localStorage.getItem(getLikeKey(id)) || "0", 10); }
-    function isLiked(id) { return localStorage.getItem(getLikedKey(id)) === "true"; }
-    function setLiked(id, liked) {
-      localStorage.setItem(getLikedKey(id), liked ? "true" : "false");
-      const count = Math.max(0, getLikes(id) + (liked ? 1 : -1));
-      localStorage.setItem(getLikeKey(id), String(count));
-      return count;
+    function toICS(evt) {
+      const dt = new Date(evt.date || Date.now());
+      const pad = n => String(n).padStart(2, "0");
+      const fmt = (d) => `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
+      const start = fmt(dt), end = fmt(new Date(dt.getTime()+60*60*1000));
+      const lines = [
+        "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Tunasan Portal//EN","BEGIN:VEVENT",
+        `UID:${evt._id || Date.now()}@tunasan`,
+        `DTSTAMP:${fmt(new Date())}`,
+        `DTSTART:${start}`,`DTEND:${end}`,
+        `SUMMARY:${evt.title}`,`DESCRIPTION:${(evt.description||"").replace(/\n/g," ")}`,
+        "END:VEVENT","END:VCALENDAR"
+      ].join("\r\n");
+      const blob = new Blob([lines], { type: "text/calendar;charset=utf-8" });
+      return URL.createObjectURL(blob);
     }
 
     async function loadEvents() {
       try {
         const res = await fetch("/api/events");
-        if (!res.ok) throw new Error("Failed to fetch events");
         const events = await res.json();
 
-        const eventsList = document.getElementById("events-list");
-        eventsList.innerHTML = "";
+        const cal = document.getElementById("calendar");
+        cal.innerHTML = `<h3 style="margin:6px 0;">${new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</h3>`;
+        const grid = buildCalendar();
+        cal.appendChild(grid);
 
-        if (events.length === 0) {
-          eventsList.innerHTML = '<li class="post-card">No events scheduled yet.</li>';
-          return;
-        }
+        // Place event titles into calendar slots
+        const firstOfMonth = new Date(); firstOfMonth.setDate(1);
+        const startDay = firstOfMonth.getDay();
+        const slots = cal.querySelectorAll(".evt-slot");
+        events.forEach(evt => {
+          const d = new Date(evt.date);
+          if (d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear()) {
+            const idx = startDay + d.getDate() - 1;
+            const slot = slots[idx];
+            if (slot) {
+              const badge = document.createElement("div");
+              badge.style.marginTop = "4px";
+              badge.style.background = "rgba(24,119,242,.08)";
+              badge.style.border = "1px solid var(--border)";
+              badge.style.borderRadius = "6px";
+              badge.style.padding = "2px 4px";
+              badge.textContent = evt.title;
+              slot.appendChild(badge);
+            }
+          }
+        });
 
-        events.forEach(event => {
-          const liked = isLiked(event._id);
-          const likeCount = getLikes(event._id);
-          const avatar = `https://i.pravatar.cc/80?u=event_${event._id}`;
-
-          const dateStr = event.date ? new Date(event.date).toLocaleDateString() : null;
-          const when = dateStr ? `Scheduled ${dateStr}` : timeAgo(event.createdAt || Date.now());
-
-          const images = (event.images && event.images.length > 0)
-            ? `
-              <div class="post-images ${event.images.length === 1 ? 'single' : ''}">
-                ${event.images.map(img => `<img src="${img}" loading="lazy" decoding="async" alt="event image">`).join("")}
-              </div>
-            ` : "";
-
+        // List view with ICS export
+        const list = document.getElementById("events-list");
+        list.innerHTML = "";
+        events.forEach(evt => {
           const li = document.createElement("li");
           li.className = "post-card";
           li.innerHTML = `
             <div class="post-header">
-              <img class="avatar" src="${avatar}" alt="Profile">
               <div class="title-wrap">
-                <h3>${event.title}</h3>
-                <span class="meta">${when}</span>
+                <h3>${evt.title}</h3>
+                <span class="meta">${new Date(evt.date).toLocaleString()}</span>
               </div>
             </div>
-            <div class="post-content">
-              <p>${event.description}</p>
-              ${images}
-            </div>
+            <div class="post-content"><p>${evt.description||""}</p></div>
             <div class="post-actions">
-              <div class="like-btn ${liked ? 'liked' : ''}" data-id="${event._id}">
-                <span>👍</span><span class="like-text">${liked ? 'Liked' : 'Like'}</span>
-              </div>
-              <div class="like-count" data-id="${event._id}">${likeCount}</div>
+              <a class="pill-btn" href="${toICS(evt)}" download="${(evt.title||'event').replace(/\s+/g,'_')}.ics">Add to Calendar</a>
             </div>
           `;
-          eventsList.appendChild(li);
+          list.appendChild(li);
         });
-
-        eventsList.addEventListener("click", (e) => {
-          const btn = e.target.closest(".like-btn");
-          if (!btn) return;
-          const id = btn.getAttribute("data-id");
-          const currentlyLiked = isLiked(id);
-          const newCount = setLiked(id, !currentlyLiked);
-          btn.classList.toggle("liked", !currentlyLiked);
-          btn.querySelector(".like-text").textContent = !currentlyLiked ? "Liked" : "Like";
-          const countEl = eventsList.querySelector(`.like-count[data-id="${id}"]`);
-          if (countEl) countEl.textContent = newCount;
-        }, { once: true });
       } catch (err) {
-        console.error(err);
-        document.getElementById("events-list").innerHTML = '<li class="post-card">Failed to load events.</li>';
+        console.error("Failed to load events:", err);
       }
     }
-
     loadEvents();
   </script>
-
   <script type="module">
     import { initNavbar } from './js/navbar.js';
     fetch('partials/navbar.html')
-      .then(response => response.text())
-      .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; initNavbar(); })
+      .then(r => r.text())
+      .then(html => { document.getElementById('navbar-placeholder').innerHTML = html; initNavbar(); })
       .catch(err => console.error('Failed to load navbar:', err));
   </script>
+  <script src="js/i18n.js"></script>
+  <script src="js/ui.js"></script>
 </body>
 </html>

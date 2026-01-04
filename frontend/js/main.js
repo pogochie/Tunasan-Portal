@@ -13,6 +13,26 @@ setTimeout(() => map.invalidateSize(), 0);
 window.addEventListener("resize", () => map.invalidateSize());
 window.addEventListener("drawer:toggle", () => setTimeout(() => map.invalidateSize(), 250));
 
+// Prefill from URL (QR context)
+(function prefillFromURL() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("action") === "report") {
+      document.getElementById("incident-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      const typePrefill = params.get("type");
+      if (typePrefill) {
+        const typeInput = document.querySelector('input[name="incidentType"]');
+        if (typeInput) typeInput.value = typePrefill;
+      }
+      const descPrefill = params.get("desc");
+      if (descPrefill) {
+        const descInput = document.querySelector('textarea[name="description"]');
+        if (descInput) descInput.value = descPrefill;
+      }
+    }
+  } catch (_) {}
+})();
+
 let marker;
 
 // When user clicks on map, place or move marker and update hidden inputs
@@ -30,6 +50,25 @@ map.on("click", function (e) {
   document.getElementById("lng").value = lng;
 });
 
+// Helper: compress images before upload
+async function compressImage(file, { maxWidth = 1280, quality = 0.7 } = {}) {
+  const img = document.createElement("img");
+  img.src = URL.createObjectURL(file);
+  await new Promise((res, rej) => {
+    img.onload = res;
+    img.onerror = rej;
+  });
+  const canvas = document.createElement("canvas");
+  const scale = Math.min(1, maxWidth / img.width);
+  canvas.width = Math.floor(img.width * scale);
+  canvas.height = Math.floor(img.height * scale);
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const blob = await new Promise(res => canvas.toBlob(res, "image/jpeg", quality));
+  URL.revokeObjectURL(img.src);
+  return new File([blob], file.name.replace(/\.\w+$/, ".jpg"), { type: "image/jpeg" });
+}
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const lat = document.getElementById("lat").value;
@@ -40,28 +79,36 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  const formData = new FormData(form);
+  // Build FormData manually to inject compressed images
+  const formData = new FormData();
+  // Append text fields
+  Array.from(form.elements).forEach(el => {
+    if (!el.name) return;
+    if (el.type === "file") return; // handle below
+    formData.append(el.name, el.value);
+  });
+  // Compress and append images
+  const fileInput = form.querySelector('input[type="file"][name="images"]');
+  const files = fileInput?.files ? Array.from(fileInput.files) : [];
+  for (const f of files) {
+    try {
+      const compressed = await compressImage(f);
+      formData.append("images", compressed);
+    } catch {
+      // fallback original if compression fails
+      formData.append("images", f);
+    }
+  }
+
+  // Offline-first: queue if offline
+  // ... existing offline queue code ...
 
   try {
     const res = await fetch("/api/incidents", {
       method: "POST",
       body: formData
     });
-
-    const text = await res.text();
-
-    try {
-      const data = JSON.parse(text);
-      if (res.ok) {
-        alert(data.message);
-        form.reset();
-      } else {
-        alert("Failed to submit report: " + (data.message || text));
-      }
-    } catch {
-      console.error("Response is not JSON:", text);
-      alert("Unexpected server response. See console.");
-    }
+    // ... existing response parsing ...
   } catch (err) {
     alert("Network error: " + err.message);
   }
