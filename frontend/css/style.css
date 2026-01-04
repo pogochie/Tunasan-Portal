@@ -410,19 +410,24 @@ input[type="file"]::file-selector-button:hover {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(255,255,255,.92);
+  background-color: rgba(255, 0, 0, 0.1); /* light red */
   backdrop-filter: saturate(120%) blur(8px);
   border-bottom: 1px solid var(--border);
   box-shadow: 0 2px 8px rgba(0,0,0,.04);
   padding: 18px 32px; /* further increased padding */
 }
 
+.fb-navbar .container {
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+
 .fb-nav-inner {
-  display: flex;
+  min-height: 56px;
   align-items: center;
+  display: flex;
   justify-content: space-between;
-  min-height: 56px; /* set a minimum height for better vertical spacing */
-  gap: 20px; /* increased gap */
+  gap: 16px;
   max-width: 1120px; /* constrain width to container max */
   margin: 0 auto; /* center horizontally */
   width: 100%;
