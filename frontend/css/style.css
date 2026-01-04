@@ -226,6 +226,7 @@ form#incident-form button:hover {
   --border: #E4E6EB;
   --shadow: 0 2px 12px rgba(0,0,0,0.06);
   --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+  --nav-height: 56px; /* default desktop nav height */
 }
 
 /* Background image with blur (add your image at /frontend/images/tunasan-bg.jpg) */
@@ -233,6 +234,7 @@ body {
   position: relative;
   min-height: 100vh;
   background-color: #F0F2F5;
+  padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
 }
 body::before {
   content: "";
@@ -267,22 +269,7 @@ body::before {
   --border: #E4E6EB;
   --shadow: 0 2px 12px rgba(0,0,0,.06);
   --shadow-lg: 0 8px 24px rgba(0,0,0,.08);
-}
-
-/* Design tokens for spacing/radii/duration/easing */
-:root {
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-
-  --dur-fast: .15s;
-  --dur-med: .25s;
-  --ease-smooth: cubic-bezier(.2, .6, .2, 1); /* smoother than ease */
+  --nav-height: 56px; /* default desktop nav height */
 }
 
 /* Prefer-reduced-motion accessibility */
@@ -366,7 +353,7 @@ input[type="file"]::file-selector-button:hover {
   background: rgba(255,255,255,.9);
   color: var(--text);
   padding: 10px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: none; /* remove legacy border line */
   box-shadow: 0 2px 8px rgba(0,0,0,.04);
   backdrop-filter: saturate(120%) blur(6px);
 }
@@ -524,6 +511,9 @@ h1, h2 {
   body:has(#nav-toggle:checked) {
     overflow-y: hidden;
   }
+
+  /* Mobile nav height adjustment */
+  :root { --nav-height: 52px; }
 }
 
 /* Feed layout: Facebook-like cards */
@@ -642,12 +632,14 @@ h1, h2 {
 
 /* Facebook-like top nav (desktop/tablet) + mobile bottom tabbar */
 .fb-navbar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
   background: rgba(255,255,255,.92);
   backdrop-filter: saturate(120%) blur(8px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: none; /* remove top border line */
   box-shadow: 0 2px 8px rgba(0,0,0,.04);
 }
 .fb-nav-inner {
@@ -655,6 +647,7 @@ h1, h2 {
   align-items: center;
   justify-content: space-between; /* left and right pinned */
   gap: 10px;
+  min-height: var(--nav-height);
 }
 .nav-left { flex: 0 0 auto; display: flex; align-items: center; }
 .nav-center { flex: 1 1 auto; display: flex; justify-content: center; min-width: 0; }
@@ -845,6 +838,7 @@ h1, h2 {
   --border: #E4E6EB;
   --shadow: 0 2px 12px rgba(0,0,0,.06);
   --shadow-lg: 0 8px 24px rgba(0,0,0,.08);
+  --nav-height: 56px; /* default desktop nav height */
 }
 
 /* Base + background */
@@ -857,6 +851,7 @@ body {
   color: var(--text);
   line-height: 1.5;
   position: relative;
+  padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
 }
 body::before {
   content: "";
@@ -1129,7 +1124,7 @@ input[type="file"]::file-selector-button:hover {
   background: rgba(255,255,255,.9);
   color: var(--text);
   padding: 10px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: none; /* remove legacy border line */
   box-shadow: 0 2px 8px rgba(0,0,0,.04);
   backdrop-filter: saturate(120%) blur(6px);
 }
