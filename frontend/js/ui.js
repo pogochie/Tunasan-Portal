@@ -3,7 +3,7 @@
   const overlay = document.createElement("div");
   overlay.className = "lightbox-overlay";
   overlay.innerHTML = `
-    <button class="lightbox-close" aria-label="Close">Close ✕</button>
+    <button class="lightbox-close" aria-label="Close">✕</button>
     <div class="lightbox-content"><img alt="Expanded image"></div>
   `;
   document.addEventListener("DOMContentLoaded", () => {
@@ -14,10 +14,12 @@
     const open = (src) => {
       imgEl.src = src;
       overlay.classList.add("open");
+      document.body.style.overflow = "hidden"; // prevent background scroll
     };
     const close = () => {
       overlay.classList.remove("open");
       imgEl.src = "";
+      document.body.style.overflow = ""; // restore scroll
     };
 
     // Click on post images to open
@@ -30,8 +32,8 @@
     });
 
     overlay.addEventListener("click", (e) => {
-      // close when clicking outside image
-      if (!e.target.closest(".lightbox-content")) close();
+      // close when clicking outside image or on close button
+      if (!e.target.closest(".lightbox-content") || e.target === closeBtn) close();
     });
     closeBtn.addEventListener("click", close);
     window.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
