@@ -239,8 +239,6 @@ body {
   color: var(--text);
   line-height: 1.5;
   position: relative;
-  padding-top: calc(var(--nav-height) + env(safe-area-inset-top)); /* keep content clear of fixed nav */
-}
 body::before {
   content: "";
   position: fixed;
@@ -357,7 +355,8 @@ input[type="file"]::file-selector-button:hover {
 .fb-navbar {
   position: fixed;
   top: 0; left: 0; right: 0;
-  z-index: 1000;
+  height: var(--nav-height);
+  z-index: 2000;
   background: #fff; /* solid background to avoid transparency */
   border: none;
   box-shadow: none;
@@ -887,6 +886,11 @@ body::after {
   background: rgba(255,255,255,0.55); /* light wash to improve legibility */
   pointer-events: none;
 }
+
+main {
+  padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
+}
+
 .container { max-width: 1120px; margin: 0 auto; }
 
 /* Headings readability chips */
