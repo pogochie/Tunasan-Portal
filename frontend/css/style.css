@@ -801,8 +801,7 @@ h1, h2 {
 
 /* Cleaned and consolidated styles (Facebook-like theme + blurred background)
    - Removed duplicated blocks and unused legacy styles
-   - Kept support for current pages: forms, old .navbar (for safety), new .fb-navbar, feed cards, maps, images
-*/
+   - Kept support for current pages: forms, old .navbar (for safety), new .fb-navbar, feed cards, maps, images */
 
 /* Theme tokens */
 :root {
@@ -1385,4 +1384,35 @@ html.theme-dark .notif-panel { background: var(--card); border-color: var(--bord
   outline: none;
   box-shadow: 0 0 0 3px rgba(24,119,242,.18);
   border-radius: 12px;
+}
+
+/* Heatmap controls panel */
+.map-controls {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 10px 12px;
+  margin: 8px 0 10px;
+}
+.map-controls .col-span-3 { grid-column: span 3; }
+.map-controls .col-span-4 { grid-column: span 4; }
+.map-controls .col-span-6 { grid-column: span 6; }
+.map-controls .col-span-12 { grid-column: 1 / -1; }
+
+.map-controls label {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.map-controls input[type="range"] {
+  width: 100%;
+}
+.map-controls .toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }

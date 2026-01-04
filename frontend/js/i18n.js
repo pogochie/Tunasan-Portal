@@ -2,6 +2,7 @@
 window.applyLocale = function(locale = "en") {
   const dict = {
     en: {
+      "nav.search": "Search...",
       "nav.home": "Home",
       "nav.news": "News",
       "nav.incidents": "Incidents",
@@ -22,9 +23,16 @@ window.applyLocale = function(locale = "en") {
       "incidents.title": "Recent Incidents",
       "incidents.nearbyTitle": "Incidents near you",
       "incidents.within": "incident(s) within 1 km.",
+      "incidents.heatmapTitle": "Heatmap Controls",
+      "incidents.showHeatmap": "Show heatmap",
+      "incidents.radius": "Radius",
+      "incidents.blur": "Blur",
+      "incidents.max": "Max intensity",
+      "incidents.fit": "Fit to incidents",
       "events.title": "Upcoming Events"
     },
     fil: {
+      "nav.search": "Maghanap...",
       "nav.home": "Home",
       "nav.news": "Balita",
       "nav.incidents": "Insidente",
@@ -45,6 +53,12 @@ window.applyLocale = function(locale = "en") {
       "incidents.title": "Mga Kamakailang Insidente",
       "incidents.nearbyTitle": "Mga insidente malapit sa iyo",
       "incidents.within": "insidente sa loob ng 1 km.",
+      "incidents.heatmapTitle": "Mga Kontrol ng Heatmap",
+      "incidents.showHeatmap": "Ipakita ang heatmap",
+      "incidents.radius": "Radius",
+      "incidents.blur": "Blur",
+      "incidents.max": "Maks na tindi",
+      "incidents.fit": "I-fit sa mga insidente",
       "events.title": "Paparating na mga Kaganapan"
     }
   };
