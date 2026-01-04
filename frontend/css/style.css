@@ -326,10 +326,11 @@ input[type="file"]::file-selector-button:hover {
 
 /* Map containers responsive */
 #map,
+#heatmap,
 .leaflet-container {
   border-radius: 12px;
   box-shadow: var(--shadow);
-  border: 1px solid #E4E6EB;
+  border: 1px solid var(--border);
   height: clamp(220px, 35vh, 420px) !important;
   width: 100%;
 }
@@ -1001,6 +1002,7 @@ input[type="file"]::file-selector-button:hover {
 
 /* Map containers responsive */
 #map,
+#heatmap,
 .leaflet-container {
   border-radius: 12px;
   box-shadow: var(--shadow);

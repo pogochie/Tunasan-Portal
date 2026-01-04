@@ -96,6 +96,13 @@
         const list = document.getElementById("events-list");
         list.innerHTML = "";
         events.forEach(evt => {
+          const images = Array.isArray(evt.images) && evt.images.length > 0
+            ? `
+              <div class="post-images ${evt.images.length === 1 ? 'single' : ''}">
+                ${evt.images.map(img => `<img src="${img}" loading="lazy" decoding="async" alt="event image">`).join("")}
+              </div>
+            `
+            : "";
           const li = document.createElement("li");
           li.className = "post-card";
           li.innerHTML = `
@@ -105,7 +112,10 @@
                 <span class="meta">${new Date(evt.date).toLocaleString()}</span>
               </div>
             </div>
-            <div class="post-content"><p>${evt.description||""}</p></div>
+            <div class="post-content">
+              <p>${evt.description || ""}</p>
+              ${images}
+            </div>
             <div class="post-actions">
               <a class="pill-btn" href="${toICS(evt)}" download="${(evt.title||'event').replace(/\s+/g,'_')}.ics">Add to Calendar</a>
             </div>

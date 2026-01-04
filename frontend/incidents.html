@@ -41,6 +41,10 @@
 
   <ul id="incidents-list" class="feed"></ul>
 
+  <!-- Ensure Leaflet JS and heat plugin load BEFORE using L in the script below -->
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
   <script>
     function timeAgo(dateInput) {
       const d = new Date(dateInput);
@@ -162,7 +166,14 @@
               max: parseFloat(maxEl.value),
             });
             if (toggleEl.checked) heat.addTo(map);
+          } else {
+            // Fallback: show simple markers if heat plugin not available
+            ptsLatLng.forEach(([lat, lng]) => L.circleMarker([lat, lng], { radius: 6 }).addTo(map));
           }
+
+          // Invalidate size after render and when drawer toggles to avoid hidden/zero-size map
+          setTimeout(() => { try { map.invalidateSize(); } catch(_) {} }, 0);
+          window.addEventListener("drawer:toggle", () => { try { map.invalidateSize(); } catch(_) {} });
 
           function updateLabels() {
             document.getElementById("hm-radius-val").textContent = radiusEl.value;
@@ -249,10 +260,10 @@
         console.error("Failed to load incidents:", err);
       }
     }
-    loadIncidents();
+    // Run after Leaflet is available
+    if (window.L) loadIncidents();
+    else window.addEventListener("load", loadIncidents);
   </script>
-  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
   <script type="module">
     import { initNavbar } from './js/navbar.js';
     fetch('partials/navbar.html')
