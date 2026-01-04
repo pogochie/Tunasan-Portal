@@ -230,11 +230,16 @@ form#incident-form button:hover {
 }
 
 /* Background image with blur (add your image at /frontend/images/tunasan-bg.jpg) */
+html, body { overflow-x: hidden; margin: 0; padding: 0; }
 body {
-  position: relative;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0; /* no outer spacing */
   min-height: 100vh;
-  background-color: #F0F2F5;
-  padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  position: relative;
+  padding-top: calc(var(--nav-height) + env(safe-area-inset-top)); /* keep content clear of fixed nav */
 }
 body::before {
   content: "";
@@ -349,20 +354,30 @@ input[type="file"]::file-selector-button:hover {
 }
 
 /* Desktop navbar */
-.navbar {
-  background: rgba(255,255,255,.9);
-  color: var(--text);
-  padding: 10px 0;
-  border-bottom: none; /* remove legacy border line */
+.fb-navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: saturate(120%) blur(8px);
+  border-bottom: none; /* remove bottom border line */
   box-shadow: 0 2px 8px rgba(0,0,0,.04);
-  backdrop-filter: saturate(120%) blur(6px);
 }
-.navbar .container {
+.fb-nav-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-height: var(--nav-height);
+  gap: 10px;
+  padding: 0; /* ensure no inner spacing */
 }
-.navbar .logo { color: var(--primary); font-weight: 700; font-size: 1.2rem; }
+.fb-navbar .container {
+  max-width: none; /* full bleed nav */
+  width: 100%;
+  margin: 0;       /* remove side margins */
+  padding: 0;      /* remove side padding */
+}
+.fb-navbar .logo { color: var(--primary); font-weight: 700; font-size: 1.2rem; }
 
 /* Desktop menu items */
 .nav-menu {
