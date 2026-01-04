@@ -828,7 +828,7 @@ body::after {
   background: rgba(255,255,255,0.55); /* light wash to improve legibility */
   pointer-events: none;
 }
-.container { max-width: 1120px; margin: 0 auto; }
+.container { max-width: 2020px; margin: 0 auto; }
 
 /* Headings readability chips */
 h1, h2 {
