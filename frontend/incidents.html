@@ -11,6 +11,29 @@
   <div id="navbar-placeholder"></div>
 
   <h1 data-i18n="incidents.title">Recent Incidents</h1>
+
+  <!-- Filters -->
+  <section class="filter-controls post-card" role="region" aria-label="Incident filters">
+    <div class="filters-grid">
+      <label>
+        <span>Type</span>
+        <select id="filter-type">
+          <option value="">All</option>
+          <!-- populated dynamically -->
+        </select>
+      </label>
+      <label>
+        <span>From</span>
+        <input type="date" id="filter-from">
+      </label>
+      <label>
+        <span>To</span>
+        <input type="date" id="filter-to">
+      </label>
+      <button id="filter-clear" class="pill-btn" type="button">Clear</button>
+    </div>
+  </section>
+
   <!-- Heatmap controls -->
   <section class="map-controls" role="region" aria-label="Heatmap controls">
     <div class="col-span-12">
@@ -46,6 +69,8 @@
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
   <script>
+    let INCIDENTS = []; // cache approved incidents for filtering
+
     function timeAgo(dateInput) {
       const d = new Date(dateInput);
       const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
@@ -85,6 +110,88 @@
       return count;
     }
 
+    function applyFilters() {
+      const type = document.getElementById("filter-type").value;
+      const from = document.getElementById("filter-from").value;
+      const to = document.getElementById("filter-to").value;
+      const fromTs = from ? new Date(from).getTime() : null;
+      const toTs = to ? new Date(to).getTime() + 86400000 - 1 : null; // end of day
+      return INCIDENTS.filter(i => {
+        const okType = !type || (i.incidentType || "").toLowerCase() === type.toLowerCase();
+        const ts = new Date(i.createdAt || Date.now()).getTime();
+        const okFrom = !fromTs || ts >= fromTs;
+        const okTo = !toTs || ts <= toTs;
+        return okType && okFrom && okTo;
+      });
+    }
+
+    function renderIncidents(list) {
+      const container = document.getElementById("incidents-list");
+      container.innerHTML = "";
+      if (list.length === 0) {
+        container.innerHTML = '<li class="post-card">No matching incidents.</li>';
+        return;
+      }
+      list.forEach(incident => {
+        const liked = isLiked(incident._id);
+        const likeCount = getLikes(incident._id);
+        const avatar = `https://i.pravatar.cc/80?u=inc_${incident._id}`;
+        const saved = localStorage.getItem(`saved_inc_${incident._id}`) === "true";
+        const images = (incident.images && incident.images.length > 0)
+          ? `
+            <div class="post-images ${incident.images.length === 1 ? 'single' : ''}">
+              ${incident.images.map(img => `<img src="${img}" loading="lazy" decoding="async" alt="incident image">`).join("")}
+            </div>
+          ` : "";
+        const li = document.createElement("li");
+        li.className = "post-card";
+        const link = `${location.origin}/incidents.html#${incident._id}`;
+        li.innerHTML = `
+          <div class="post-header">
+            <img class="avatar" src="${avatar}" alt="Profile">
+            <div class="title-wrap">
+              <h3>${incident.incidentType}</h3>
+              <span class="meta">Reported by ${incident.reporterName} • ${timeAgo(incident.createdAt || Date.now())}</span>
+            </div>
+          </div>
+          <div class="post-content">
+            <p>${incident.description}</p>
+            ${images}
+            <p class="location"><small>📍 ${incident.location ? `${incident.location.lat?.toFixed(4)}, ${incident.location.lng?.toFixed(4)}` : 'Location not specified'}</small></p>
+          </div>
+          <div class="post-actions">
+            <div class="action-group">
+              <button class="icon-btn save-btn ${saved ? 'active' : ''}" data-id="${incident._id}" title="Save">⭐</button>
+              <button class="icon-btn share-btn" data-link="${link}" title="Share">🔗</button>
+            </div>
+            <div class="like-btn ${liked ? 'liked' : ''}" data-id="${incident._id}">
+              <span>👍</span><span class="like-text">${liked ? 'Liked' : 'Like'}</span>
+            </div>
+            <div class="like-count" data-id="${incident._id}">${likeCount}</div>
+          </div>
+        `;
+        container.appendChild(li);
+      });
+    }
+
+    function initFilterUI(types) {
+      const select = document.getElementById("filter-type");
+      const unique = Array.from(new Set(types.map(t => (t || "").trim()).filter(Boolean))).sort();
+      unique.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t; opt.textContent = t;
+        select.appendChild(opt);
+      });
+      const rerender = () => renderIncidents(applyFilters());
+      select.addEventListener("change", rerender);
+      document.getElementById("filter-from").addEventListener("change", rerender);
+      document.getElementById("filter-to").addEventListener("change", rerender);
+      document.getElementById("filter-clear").addEventListener("click", () => {
+        select.value = ""; document.getElementById("filter-from").value = "";
+        document.getElementById("filter-to").value = ""; rerender();
+      });
+    }
+
     async function loadIncidents() {
       try {
         const res = await fetch("/api/incidents");
@@ -92,6 +199,9 @@
         const approvedIncidents = incidents.filter(i => (i.status || "").toLowerCase() === "approved");
         const incidentsList = document.getElementById("incidents-list");
         incidentsList.innerHTML = "";
+        INCIDENTS = approvedIncidents;
+        initFilterUI(approvedIncidents.map(i => i.incidentType));
+        renderIncidents(approvedIncidents);
 
         // Geofence banner: find nearby incidents (1 km)
         let userLoc = null;
@@ -205,47 +315,33 @@
           updateLabels();
         } catch (e) { console.warn("Heatmap init failed:", e); }
 
-        approvedIncidents.forEach(incident => {
-          const liked = isLiked(incident._id);
-          const likeCount = getLikes(incident._id);
-          const avatar = `https://i.pravatar.cc/80?u=inc_${incident._id}`;
-
-          const images = (incident.images && incident.images.length > 0)
-            ? `
-              <div class="post-images ${incident.images.length === 1 ? 'single' : ''}">
-                ${incident.images.map(img => `<img src="${img}" loading="lazy" decoding="async" alt="incident image">`).join("")}
-              </div>
-            `
-            : "";
-
-          const li = document.createElement("li");
-          li.className = "post-card";
-          li.innerHTML = `
-            <div class="post-header">
-              <img class="avatar" src="${avatar}" alt="Profile">
-              <div class="title-wrap">
-                <h3>${incident.incidentType}</h3>
-                <span class="meta">Reported by ${incident.reporterName} • ${timeAgo(incident.createdAt || Date.now())}</span>
-              </div>
-            </div>
-            <div class="post-content">
-              <p>${incident.description}</p>
-              ${images}
-              <p class="location"><small>📍 ${incident.location ? `${incident.location.lat?.toFixed(4)}, ${incident.location.lng?.toFixed(4)}` : 'Location not specified'}</small></p>
-            </div>
-            <div class="post-actions">
-              <div class="like-btn ${liked ? 'liked' : ''}" data-id="${incident._id}">
-                <span>👍</span><span class="like-text">${liked ? 'Liked' : 'Like'}</span>
-              </div>
-              <div class="like-count" data-id="${incident._id}">${likeCount}</div>
-            </div>
-          `;
-          incidentsList.appendChild(li);
-        });
-
         incidentsList.addEventListener("click", (e) => {
           const btn = e.target.closest(".like-btn");
-          if (!btn) return;
+          if (!btn) {
+            // saved/bookmark
+            const saveBtn = e.target.closest(".save-btn");
+            if (saveBtn) {
+              const id = saveBtn.getAttribute("data-id");
+              const curr = localStorage.getItem(`saved_inc_${id}`) === "true";
+              localStorage.setItem(`saved_inc_${id}`, (!curr).toString());
+              saveBtn.classList.toggle("active", !curr);
+              return;
+            }
+            // share
+            const shareBtn = e.target.closest(".share-btn");
+            if (shareBtn) {
+              const link = shareBtn.getAttribute("data-link");
+              if (navigator.share) {
+                navigator.share({ title: "Incident", url: link }).catch(()=>{});
+              } else {
+                navigator.clipboard?.writeText(link);
+                shareBtn.textContent = "✅";
+                setTimeout(() => shareBtn.textContent = "🔗", 1200);
+              }
+              return;
+            }
+            return;
+          }
           const id = btn.getAttribute("data-id");
           const currentlyLiked = isLiked(id);
           const newCount = setLiked(id, !currentlyLiked);

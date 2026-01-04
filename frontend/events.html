@@ -113,14 +113,39 @@
               </div>
             </div>
             <div class="post-content">
-              <p>${evt.description || ""}</p>
+              <p>${evt.description||""}</p>
               ${images}
             </div>
             <div class="post-actions">
+              <div class="action-group">
+                <button class="icon-btn save-btn ${localStorage.getItem(`saved_evt_${evt._id}`)==="true"?'active':''}" data-id="${evt._id}" title="Save">⭐</button>
+                <button class="icon-btn share-btn" data-link="${location.origin}/events.html#${evt._id}" title="Share">🔗</button>
+              </div>
               <a class="pill-btn" href="${toICS(evt)}" download="${(evt.title||'event').replace(/\s+/g,'_')}.ics">Add to Calendar</a>
             </div>
           `;
           list.appendChild(li);
+        });
+        // Save/share interactions
+        list.addEventListener("click", (e) => {
+          const saveBtn = e.target.closest(".save-btn");
+          if (saveBtn) {
+            const id = saveBtn.getAttribute("data-id");
+            const curr = localStorage.getItem(`saved_evt_${id}`) === "true";
+            localStorage.setItem(`saved_evt_${id}`, (!curr).toString());
+            saveBtn.classList.toggle("active", !curr);
+            return;
+          }
+          const shareBtn = e.target.closest(".share-btn");
+          if (shareBtn) {
+            const link = shareBtn.getAttribute("data-link");
+            if (navigator.share) navigator.share({ title: "Event", url: link }).catch(()=>{});
+            else {
+              navigator.clipboard?.writeText(link);
+              shareBtn.textContent = "✅";
+              setTimeout(() => shareBtn.textContent = "🔗", 1200);
+            }
+          }
         });
       } catch (err) {
         console.error("Failed to load events:", err);

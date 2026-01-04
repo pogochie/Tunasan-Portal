@@ -50,6 +50,25 @@ map.on("click", function (e) {
   document.getElementById("lng").value = lng;
 });
 
+// Geolocate and set marker/hidden inputs
+document.getElementById("geo-btn")?.addEventListener("click", async () => {
+  if (!("geolocation" in navigator)) return alert("Geolocation not supported.");
+  try {
+    const pos = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 8000 });
+    });
+    const { latitude: lat, longitude: lng } = pos.coords;
+    if (marker) marker.remove();
+    marker = L.marker([lat, lng]).addTo(map);
+    document.getElementById("lat").value = lat;
+    document.getElementById("lng").value = lng;
+    map.setView([lat, lng], 17);
+    setTimeout(() => map.invalidateSize(), 0);
+  } catch (e) {
+    alert("Failed to get location.");
+  }
+});
+
 // Helper: compress images before upload
 async function compressImage(file, { maxWidth = 1280, quality = 0.7 } = {}) {
   const img = document.createElement("img");

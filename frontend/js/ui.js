@@ -37,3 +37,11 @@
     window.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
   });
 })();
+
+
+// Register Service Worker (shared across pages)
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(err => console.warn("SW registration failed:", err));
+  });
+}

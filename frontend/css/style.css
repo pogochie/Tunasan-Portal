@@ -1418,3 +1418,29 @@ html.theme-dark .notif-panel { background: var(--card); border-color: var(--bord
   align-items: center;
   gap: 8px;
 }
+
+/* Filters UI */
+.filter-controls .filters-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 8px;
+}
+.filter-controls label { grid-column: span 3; display: flex; flex-direction: column; gap: 4px; }
+.filter-controls #filter-clear { grid-column: span 3; justify-self: end; }
+
+/* Post actions group (save/share) */
+.post-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+}
+.action-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.save-btn.active { background: rgba(255, 215, 0, .18); border-color: var(--border); }
