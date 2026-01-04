@@ -57,12 +57,18 @@ export function initNavbar() {
       if (!href) return;
       if (href === path || (path === '' && href === 'index.html')) {
         a.classList.add('active');
+        a.setAttribute('aria-current', 'page');
       }
     });
   } catch (_) {}
 })();
 
-// Auto-init if partial is already on page and module loaded late
-if (document.querySelector(".navbar")) {
+// Expose for non-module usage if needed
+if (typeof window !== "undefined") {
+  window.initNavbar = initNavbar;
+}
+
+// Auto-init if partial is already on page
+if (document.querySelector(".fb-navbar")) {
   try { initNavbar(); } catch (e) {}
 }

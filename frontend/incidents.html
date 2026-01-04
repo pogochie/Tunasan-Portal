@@ -54,10 +54,33 @@
 
     async function loadIncidents() {
       try {
+        const incidentsList = document.getElementById("incidents-list");
+
+        // Skeleton placeholders
+        incidentsList.innerHTML = Array.from({ length: 3 }).map(() => `
+          <li class="post-card skeleton">
+            <div class="skeleton-header">
+              <div class="skeleton-avatar"></div>
+              <div class="skeleton-lines">
+                <div class="skeleton-line long"></div>
+                <div class="skeleton-line medium"></div>
+              </div>
+            </div>
+            <div class="skeleton-lines">
+              <div class="skeleton-line long"></div>
+              <div class="skeleton-line long"></div>
+              <div class="skeleton-line medium"></div>
+            </div>
+            <div class="skeleton-images">
+              <div class="skeleton-img"></div>
+              <div class="skeleton-img"></div>
+            </div>
+          </li>
+        `).join("");
+
         const res = await fetch("/api/incidents");
         const incidents = await res.json();
         const approvedIncidents = incidents.filter(i => (i.status || "").toLowerCase() === "approved");
-        const incidentsList = document.getElementById("incidents-list");
         incidentsList.innerHTML = "";
 
         if (approvedIncidents.length === 0) {
@@ -117,6 +140,8 @@
         }, { once: true });
       } catch (err) {
         console.error("Failed to load incidents:", err);
+        const incidentsList = document.getElementById("incidents-list");
+        incidentsList.innerHTML = '<li class="post-card">Failed to load incidents.</li>';
       }
     }
     loadIncidents();
