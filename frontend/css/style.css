@@ -414,36 +414,43 @@ input[type="file"]::file-selector-button:hover {
   backdrop-filter: saturate(120%) blur(8px);
   border-bottom: 1px solid var(--border);
   box-shadow: 0 2px 8px rgba(0,0,0,.04);
-  padding: 18px 32px; /* further increased padding */
-}
-
-.fb-navbar .container {
-  padding-top: 18px;
-  padding-bottom: 18px;
-}
-
-.fb-nav-inner {
-  min-height: 56px;
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  max-width: 1120px; /* constrain width to container max */
-  margin: 0 auto; /* center horizontally */
-  width: 100%;
+  padding: 20px 40px; /* ample padding */
+  height: 72px; /* fixed height */
   box-sizing: border-box;
 }
 
-/* Adjust nav-left, nav-center, nav-right flex basis for better spacing */
+.fb-navbar .container {
+  padding-top: 0;  /* remove extra padding to avoid double */
+  padding-bottom: 0;
+  max-width: 1120px;
+  margin: 0 auto;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.fb-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  gap: 24px;
+  box-sizing: border-box;
+}
+
+.fb-navbar .logo {
+  font-size: 1.4rem;
+  padding-right: 16px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
 .nav-left,
 .nav-center,
 .nav-right {
   display: flex;
   align-items: center;
-}
-
-.nav-left {
-  flex: 0 0 auto;
+  height: 100%;
 }
 
 .nav-center {
@@ -451,23 +458,23 @@ input[type="file"]::file-selector-button:hover {
   justify-content: center;
 }
 
-.nav-right {
-  flex: 0 0 auto;
-  gap: 12px;
-}
-
-/* Increase clickable area of nav links */
 .nav-link {
-  padding: 10px 16px;
+  padding: 12px 20px;
   font-weight: 600;
   border-radius: 999px;
   transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
-/* Increase size of logo container for better balance */
-.fb-navbar .logo {
-  font-size: 1.3rem;
-  padding-right: 12px;
+.nav-link:hover {
+  background: #F0F2F5;
+}
+
+.nav-right {
+  flex: 0 0 auto;
+  gap: 16px;
 }
 
 /* Center nav items */
