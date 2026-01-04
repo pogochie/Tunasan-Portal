@@ -8,7 +8,6 @@ body {
 
 h1, h2 {
   color: #2c3e50;
-  text-align: center; /* Center titles */
 }
 
 h1 {
@@ -23,12 +22,10 @@ h2 {
 /* Form styles */
 form#incident-form {
   background: #fff;
-  padding: 24px;
+  padding: 20px;
   border-radius: 8px;
   max-width: 500px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  margin: 0 auto 30px; /* Center form horizontally and add bottom margin */
-  display: block;
 }
 
 form#incident-form label {
@@ -41,16 +38,13 @@ form#incident-form input[type="text"],
 form#incident-form select,
 form#incident-form textarea {
   width: 100%;
-  max-width: 100%; /* Ensure inputs do not exceed container width */
-  box-sizing: border-box; /* Include padding and border in width */
   padding: 8px 10px;
   margin-bottom: 15px;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1rem;
+  box-sizing: border-box;
   transition: border-color 0.3s ease;
-  word-wrap: break-word; /* Break long words if needed */
-  overflow-wrap: break-word;
 }
 
 form#incident-form input[type="text"]:focus,
@@ -69,7 +63,6 @@ form#incident-form button {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  width: 100%;
 }
 
 form#incident-form button:hover {
@@ -79,11 +72,9 @@ form#incident-form button:hover {
 /* QR code canvas */
 #qr-code {
   display: block;
-  margin: 20px auto;
+  margin: 10px 0 30px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  width: 200px;
-  height: 200px;
 }
 
 /* Incident list (for real-time display) */
@@ -109,13 +100,6 @@ form#incident-form button:hover {
     width: 100%;
     max-width: 100%;
   }
-
-  form#incident-form input[type="text"],
-  form#incident-form select,
-  form#incident-form textarea {
-    font-size: 1rem;
-    padding: 10px 12px;
-  }
 }
 
 /* Navbar styles */
@@ -135,23 +119,10 @@ form#incident-form button:hover {
 }
 
 .navbar .logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   font-weight: 700;
   font-size: 1.2rem;
   color: white;
   text-decoration: none;
-}
-
-.logo-img {
-  width: 32px;
-  height: 32px;
-}
-
-.logo-text {
-  font-weight: 700;
-  font-size: 1.2rem;
 }
 
 .nav-menu {
@@ -300,13 +271,7 @@ body::before {
 
 /* Base + container */
 body { background: var(--bg); color: var(--text); line-height: 1.5; }
-.container {
-  max-width: 1120px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+.container { max-width: 1120px; margin: 0 auto; }
 
 /* Cards and forms */
 form#incident-form,
@@ -364,10 +329,9 @@ input[type="file"]::file-selector-button:hover {
 .leaflet-container {
   border-radius: 12px;
   box-shadow: var(--shadow);
-  border: 1px solid var(--border);
+  border: 1px solid #E4E6EB;
   height: clamp(220px, 35vh, 420px) !important;
   width: 100%;
-  margin: 15px 0;
 }
 
 /* Desktop navbar */
@@ -548,15 +512,15 @@ h1, h2 {
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: var(--shadow);
-  padding: 16px;
-  margin-bottom: 20px;
+  padding: 12px 14px;
+  margin: 12px 0;
   animation: fadeInUp .35s ease both;
 }
 .post-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 .post-header .avatar {
   width: 44px;
@@ -581,12 +545,12 @@ h1, h2 {
 }
 .type-badge {
   display: inline-block;
-  font-size: 0.7rem;
+  font-size: .75rem;
   color: var(--primary);
   background: rgba(24,119,242,.08);
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 3px 8px;
+  padding: 2px 8px;
   margin-left: 6px;
 }
 
@@ -594,23 +558,17 @@ h1, h2 {
   margin: 8px 4px;
   color: var(--text);
 }
-.post-content p {
-  margin: 0 0 12px;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
 .post-images {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  gap: 8px;
-  margin: 12px 0;
-  border-radius: 12px;
+  gap: 6px;
+  margin: 8px 0;
 }
 .post-images img {
   grid-column: span 6;
   width: 100%;
   height: auto;
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: var(--shadow);
   transition: transform .2s ease, box-shadow .2s ease;
 }
@@ -637,7 +595,7 @@ h1, h2 {
   gap: 6px;
   cursor: pointer;
   user-select: none;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 8px;
   transition: background .2s ease, color .2s ease;
 }
@@ -646,7 +604,7 @@ h1, h2 {
 }
 .like-btn.liked {
   color: var(--primary);
-  background: rgba(24, 119, 242, 0.15);
+  background: rgba(24,119,242,.08);
 }
 
 /* Subtle entrance animation */
@@ -888,7 +846,7 @@ h2 { margin-top: 24px; margin-bottom: 12px; }
 /* QR code canvas */
 #qr-code {
   display: block;
-  margin: 20px auto;
+  margin: 10px 0 30px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: #fff;
@@ -904,7 +862,7 @@ form#edit-incident-form,
 #register-form {
   background: var(--card);
   backdrop-filter: saturate(120%) blur(4px);
-  padding: 24px;
+  padding: 20px;
   border-radius: 12px;
   max-width: 700px;
   box-shadow: var(--shadow);
@@ -933,9 +891,7 @@ form#event-form input[type="date"],
 #edit-incident-form input[type="text"],
 #edit-incident-form textarea {
   width: 100%;
-  max-width: 100%; /* Ensure inputs do not exceed container width */
-  box-sizing: border-box; /* Include padding and border in width */
-  padding: 8px 10px;
+  padding: 12px 14px;
   margin-bottom: 15px;
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -943,8 +899,6 @@ form#event-form input[type="date"],
   box-sizing: border-box;
   background: #fff;
   transition: border-color .2s ease, box-shadow .2s ease;
-  word-wrap: break-word; /* Break long words if needed */
-  overflow-wrap: break-word;
 }
 form#incident-form input[type="text"]:focus,
 form#incident-form select:focus,
@@ -1032,7 +986,6 @@ input[type="file"]::file-selector-button:hover {
   border: 1px solid var(--border);
   height: clamp(220px, 35vh, 420px) !important;
   width: 100%;
-  margin: 15px 0;
 }
 
 /* Feed layout: Facebook-like cards for News/Incidents/Events */
@@ -1048,7 +1001,7 @@ input[type="file"]::file-selector-button:hover {
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: var(--shadow);
-  padding: 16px;
+  padding: 12px 14px;
   margin: 12px 0;
   animation: fadeInUp .35s ease both;
 }
@@ -1056,7 +1009,7 @@ input[type="file"]::file-selector-button:hover {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 .post-header .avatar {
   width: 44px;
@@ -1075,7 +1028,7 @@ input[type="file"]::file-selector-button:hover {
 }
 .type-badge {
   display: inline-block;
-  font-size: 0.7rem;
+  font-size: .75rem;
   color: var(--primary);
   background: rgba(24,119,242,.08);
   border: 1px solid var(--border);
@@ -1084,23 +1037,17 @@ input[type="file"]::file-selector-button:hover {
   margin-left: 6px;
 }
 .post-content { margin: 8px 4px; color: var(--text); }
-.post-content p {
-  margin: 0 0 12px;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
 .post-images {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  gap: 8px;
-  margin: 12px 0;
-  border-radius: 12px;
+  gap: 6px;
+  margin: 8px 0;
 }
 .post-images img {
   grid-column: span 6;
   width: 100%;
   height: auto;
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: var(--shadow);
   transition: transform .2s ease, box-shadow .2s ease;
 }
@@ -1121,12 +1068,12 @@ input[type="file"]::file-selector-button:hover {
   gap: 6px;
   cursor: pointer;
   user-select: none;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 8px;
   transition: background .2s ease, color .2s ease;
 }
 .like-btn:hover { background: #F0F2F5; }
-.like-btn.liked { color: var(--primary); background: rgba(24, 119, 242, 0.15); }
+.like-btn.liked { color: var(--primary); background: rgba(24,119,242,.08); }
 
 /* Legacy navbar (kept for compatibility with existing partial until replaced) */
 .navbar {
