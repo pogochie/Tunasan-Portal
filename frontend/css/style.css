@@ -624,12 +624,12 @@ h1, h2 {
   box-shadow: 0 2px 8px rgba(0,0,0,.04);
 }
 .fb-nav-inner {
+  padding: 16px 32px;
+  min-height: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: var(--nav-height);
   gap: 10px;
-  padding: 0 24px; /* added horizontal padding */
 }
 
 .fb-navbar .logo {
