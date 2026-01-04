@@ -219,9 +219,13 @@
           const countEl = feed.querySelector(`.like-count[data-type="${type}"][data-id="${id}"]`);
           if (countEl) countEl.textContent = newCount;
         }, { once: true });
+
+        // Notify global search to apply query after feed renders
+        window.dispatchEvent(new CustomEvent('feed:loaded', { detail: { page: 'home', count: combined.length } }));
       } catch (err) {
         console.error("Failed to load home feed:", err);
         document.getElementById("home-feed").innerHTML = '<li class="post-card">Failed to load feed.</li>';
+        window.dispatchEvent(new CustomEvent('feed:loaded', { detail: { page: 'home', count: 0 } }));
       }
     }
 

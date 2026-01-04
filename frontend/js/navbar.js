@@ -46,6 +46,73 @@ export function initNavbar() {
       }
     });
   }
+
+  // --- Global search wiring ---
+  const searchInput = document.querySelector(".search-input");
+  const searchBtn = document.querySelector(".search-btn");
+
+  function applyQuery(q) {
+    const query = (q || "").trim().toLowerCase();
+    const lists = [
+      document.querySelector("#home-feed"),
+      document.querySelector("#news-list"),
+      document.querySelector("#incidents-list")
+    ].filter(Boolean);
+
+    lists.forEach(list => {
+      const cards = list.querySelectorAll(".post-card");
+      let shown = 0;
+
+      cards.forEach(card => {
+        // Skip placeholder skeletons or "no results" messages
+        if (card.classList.contains("skeleton") || card.classList.contains("no-results")) return;
+        const txt = card.textContent.toLowerCase();
+        const show = !query || txt.includes(query);
+        card.style.display = show ? "" : "none";
+        if (show) shown++;
+      });
+
+      // No results message per list
+      const noMsg = list.querySelector(".no-results");
+      if (query && shown === 0) {
+        if (!noMsg) {
+          const msg = document.createElement("li");
+          msg.className = "post-card no-results";
+          msg.textContent = "No matching results.";
+          list.appendChild(msg);
+        }
+      } else if (noMsg) {
+        noMsg.remove();
+      }
+    });
+
+    // Reflect query in URL without page reload
+    const url = new URL(window.location.href);
+    if (query) url.searchParams.set("q", query);
+    else url.searchParams.delete("q");
+    window.history.replaceState({}, "", url);
+  }
+
+  const runSearch = () => applyQuery(searchInput?.value || "");
+
+  if (searchInput) {
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); runSearch(); }
+      else if (e.key === "Escape") { searchInput.value = ""; runSearch(); }
+    });
+  }
+  if (searchBtn && searchInput) {
+    searchBtn.addEventListener("click", (e) => { e.preventDefault(); runSearch(); });
+  }
+
+  // Apply ?q=... on load and once feeds finish loading
+  const paramQ = new URLSearchParams(window.location.search).get("q");
+  if (paramQ && searchInput) {
+    searchInput.value = paramQ;
+    // Try immediately and also after feeds render
+    setTimeout(runSearch, 0);
+    window.addEventListener("feed:loaded", () => setTimeout(runSearch, 0), { once: true });
+  }
 }
 
 (function enhanceNav() {
@@ -68,7 +135,7 @@ if (typeof window !== "undefined") {
   window.initNavbar = initNavbar;
 }
 
-// Auto-init if partial is already on page
-if (document.querySelector(".fb-navbar")) {
+// Auto-init if partial is already on page and module loaded late
+if (document.querySelector(".navbar")) {
   try { initNavbar(); } catch (e) {}
 }

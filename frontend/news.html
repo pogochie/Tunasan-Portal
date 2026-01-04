@@ -54,36 +54,15 @@
 
     async function loadNews() {
       try {
-        const newsList = document.getElementById("news-list");
-
-        // Skeleton placeholders
-        newsList.innerHTML = Array.from({ length: 3 }).map(() => `
-          <li class="post-card skeleton">
-            <div class="skeleton-header">
-              <div class="skeleton-avatar"></div>
-              <div class="skeleton-lines">
-                <div class="skeleton-line long"></div>
-                <div class="skeleton-line medium"></div>
-              </div>
-            </div>
-            <div class="skeleton-lines">
-              <div class="skeleton-line long"></div>
-              <div class="skeleton-line long"></div>
-              <div class="skeleton-line medium"></div>
-            </div>
-            <div class="skeleton-images">
-              <div class="skeleton-img"></div>
-              <div class="skeleton-img"></div>
-            </div>
-          </li>
-        `).join("");
-
         const res = await fetch("/api/news");
         const newsItems = await res.json();
+        const newsList = document.getElementById("news-list");
         newsList.innerHTML = "";
 
         if (newsItems.length === 0) {
           newsList.innerHTML = '<li class="post-card">No news available.</li>';
+          // Notify search to run after feed renders
+          window.dispatchEvent(new CustomEvent('feed:loaded', { detail: { page: 'news', count: 0 } }));
           return;
         }
 
@@ -124,7 +103,6 @@
           newsList.appendChild(li);
         });
 
-        // Delegate like clicks
         newsList.addEventListener("click", (e) => {
           const btn = e.target.closest(".like-btn");
           if (!btn) return;
@@ -136,11 +114,11 @@
           const countEl = newsList.querySelector(`.like-count[data-id="${id}"]`);
           if (countEl) countEl.textContent = newCount;
         }, { once: true });
-        // Note: 'once' ensures only one handler is added per page load.
+        
+        // Notify global search to apply query after feed renders
+        window.dispatchEvent(new CustomEvent('feed:loaded', { detail: { page: 'news', count: newsItems.length } }));
       } catch (err) {
         console.error("Failed to load news:", err);
-        const newsList = document.getElementById("news-list");
-        newsList.innerHTML = '<li class="post-card">Failed to load news.</li>';
       }
     }
     loadNews();
