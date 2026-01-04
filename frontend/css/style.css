@@ -414,14 +414,14 @@ input[type="file"]::file-selector-button:hover {
   backdrop-filter: saturate(120%) blur(8px);
   border-bottom: 1px solid var(--border);
   box-shadow: 0 2px 8px rgba(0,0,0,.04);
-  padding: 10px 20px;
+  padding: 14px 24px;
 }
 .fb-nav-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   min-height: auto;
-  gap: 10px;
+  gap: 16px;
 }
 
 .fb-navbar .logo {
