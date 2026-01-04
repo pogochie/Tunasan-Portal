@@ -1,7 +1,7 @@
 /* General styles */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0; /* remove margin to allow navbar to touch edges */
+  margin: 20px;
   background-color: #f9f9f9;
   color: #333;
 }
@@ -213,8 +213,8 @@ form#incident-form button:hover {
    Modern Facebook-like theme overrides
    ================================ */
 :root {
-  --bg: rgba(240, 242, 245, .75);       /* translucent to let bg image glow through */
-  --card: rgba(255, 255, 255, .88);
+  --bg: #F0F2F5;
+  --card: #fff;
   --text: #1C1E21;
   --muted: #65676B;
   --primary: #1877F2;
@@ -224,22 +224,15 @@ form#incident-form button:hover {
   --danger: #E53935;
   --danger-hover: #D32F2F;
   --border: #E4E6EB;
-  --shadow: 0 2px 12px rgba(0,0,0,.06);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,.08);
-  --nav-height: 56px; /* default desktop nav height */
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
 }
 
 /* Background image with blur (add your image at /frontend/images/tunasan-bg.jpg) */
-html, body { overflow-x: hidden; margin: 0; padding: 0; }
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 20px;
-  min-height: 100vh;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
   position: relative;
-  padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
+  min-height: 100vh;
+  background-color: #F0F2F5;
 }
 body::before {
   content: "";
@@ -259,14 +252,21 @@ body::before {
   .desktop-only { display: none !important; }
 }
 
-/* Prefer-reduced-motion accessibility */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation: none !important;
-    transition: none !important;
-    scroll-behavior: auto !important;
-  }
-  .post-images img:hover { transform: none !important; }
+/* Modern theme tokens */
+:root {
+  --bg: rgba(240, 242, 253, .75); /* translucent to let bg image glow through */
+  --card: rgba(255, 255, 255, .88);
+  --text: #1C1E21;
+  --muted: #65676B;
+  --primary: #1877F2;
+  --primary-hover: #166FE5;
+  --success: #42B72A;
+  --success-hover: #36A420;
+  --danger: #E53935;
+  --danger-hover: #D32F2F;
+  --border: #E4E6EB;
+  --shadow: 0 2px 12px rgba(0,0,0,.06);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.08);
 }
 
 /* Base + container */
@@ -326,42 +326,29 @@ input[type="file"]::file-selector-button:hover {
 
 /* Map containers responsive */
 #map,
-#heatmap,
 .leaflet-container {
   border-radius: 12px;
   box-shadow: var(--shadow);
-  border: 1px solid var(--border);
+  border: 1px solid #E4E6EB;
   height: clamp(220px, 35vh, 420px) !important;
   width: 100%;
 }
 
 /* Desktop navbar */
-.fb-navbar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 1000;
-  background: rgba(255,255,255,.92);
-  backdrop-filter: saturate(120%) blur(8px);
-  border-bottom: none; /* remove bottom border line */
+.navbar {
+  background: rgba(255,255,255,.9);
+  color: var(--text);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
   box-shadow: 0 2px 8px rgba(0,0,0,.04);
-  margin: 0;
-  padding: 10px 20px;
+  backdrop-filter: saturate(120%) blur(6px);
 }
-.fb-nav-inner {
+.navbar .container {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: var(--nav-height);
-  gap: 10px;
-  padding: 0; /* ensure no inner spacing */
 }
-.fb-navbar .container {
-  max-width: none; /* full bleed nav */
-  width: 100%;
-  margin: 0;       /* remove side margins */
-  padding: 0;      /* remove side padding */
-}
-.fb-navbar .logo { color: var(--primary); font-weight: 700; font-size: 1.2rem; }
+.navbar .logo { color: var(--primary); font-weight: 700; font-size: 1.2rem; }
 
 /* Desktop menu items */
 .nav-menu {
@@ -510,9 +497,6 @@ h1, h2 {
   body:has(#nav-toggle:checked) {
     overflow-y: hidden;
   }
-
-  /* Mobile nav height adjustment */
-  :root { --nav-height: 52px; }
 }
 
 /* Feed layout: Facebook-like cards */
@@ -531,13 +515,6 @@ h1, h2 {
   padding: 12px 14px;
   margin: 12px 0;
   animation: fadeInUp .35s ease both;
-  border-radius: var(--radius-md);
-  transition: box-shadow var(--dur-med) var(--ease-smooth), transform var(--dur-med) var(--ease-smooth), border-color var(--dur-med);
-  will-change: transform, box-shadow;
-}
-.post-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(0,0,0,.12);
 }
 .post-header {
   display: flex;
@@ -638,88 +615,62 @@ h1, h2 {
 
 /* Facebook-like top nav (desktop/tablet) + mobile bottom tabbar */
 .fb-navbar {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   z-index: 1000;
   background: rgba(255,255,255,.92);
   backdrop-filter: saturate(120%) blur(8px);
-  border-bottom: none; /* remove top border line */
+  border-bottom: 1px solid var(--border);
   box-shadow: 0 2px 8px rgba(0,0,0,.04);
 }
 .fb-nav-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* left and right pinned */
-  gap: 10px;
+  justify-content: space-between;
   min-height: var(--nav-height);
+  gap: 10px;
+  padding: 0 24px; /* added horizontal padding */
 }
-.nav-left { flex: 0 0 auto; display: flex; align-items: center; }
-.nav-center { flex: 1 1 auto; display: flex; justify-content: center; min-width: 0; }
-.nav-right { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; margin-left: auto; }
 
 .fb-navbar .logo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: rgba(24,119,242,.08);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-}
-.fb-navbar .brand-icon {
-  display: block;
-  width: 24px;
-  height: 24px;
+  color: var(--primary);
+  font-weight: 800;
+  text-decoration: none;
+  font-size: 1.15rem;
+  letter-spacing: .2px;
+  white-space: nowrap;
 }
 
-.fb-navbar .nav-items,
-.fb-navbar .nav-items li {
-  list-style: none !important;
+/* Center nav items */
+.nav-center .nav-items {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
   margin: 0;
   padding: 0;
 }
-.fb-navbar a,
-.fb-navbar .nav-link,
-.mobile-tabbar .tab-link {
-  text-decoration: none !important;  /* kill default underline */
-  border-bottom: 0 !important;       /* ensure no bottom border effect */
-}
-.fb-navbar .nav-link:visited,
-.mobile-tabbar .tab-link:visited {
-  color: inherit;
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: #050505;
   text-decoration: none;
+  font-weight: 600;
+  transition: background .2s ease, color .2s ease, box-shadow .2s ease;
 }
-
-.fb-nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.nav-left { flex: 0 0 auto; display: flex; align-items: center; }
-.nav-center { flex: 1 1 auto; display: flex; justify-content: center; min-width: 0; }
-.nav-right { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; margin-left: auto; }
-.nav-center .nav-items { display: flex; align-items: center; gap: 6px; }
-
-.nav-link svg.ico,
-.mobile-tabbar .tab-link svg.ico {
-  width: 20px;
-  height: 20px;
-  fill: currentColor;
-  flex-shrink: 0;
+.nav-link:hover {
+  background: #F0F2F5;
 }
-.nav-link { display: inline-flex; align-items: center; gap: 8px; }
-
-/* Accessible focus without underline */
-.fb-navbar .nav-link:focus-visible,
-.mobile-tabbar .tab-link:focus-visible,
-.fb-navbar .logo:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(24,119,242,.18);
-  border-radius: 12px;
+.nav-link.active {
+  background: rgba(24,119,242,.1);
+  color: var(--primary);
+  box-shadow: 0 2px 10px rgba(24,119,242,.12);
 }
-
-/* Tap highlight off (mobile) */
-.fb-navbar a, .mobile-tabbar a { -webkit-tap-highlight-color: transparent; }
+.nav-link .ico { font-size: 1rem; }
+.nav-link .txt { display: inline-block; }
 
 /* Right side: search and action pills */
 .nav-right {
@@ -790,6 +741,8 @@ h1, h2 {
 
   /* Mobile tab bar fixed at bottom */
   .mobile-tabbar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 0;
@@ -827,7 +780,79 @@ h1, h2 {
 
 /* Cleaned and consolidated styles (Facebook-like theme + blurred background)
    - Removed duplicated blocks and unused legacy styles
-   - Kept support for current pages: forms, old .navbar (for safety), new .fb-navbar, feed cards, maps, images */
+   - Kept support for current pages: forms, old .navbar (for safety), new .fb-navbar, feed cards, maps, images
+*/
+
+/* Theme tokens */
+:root {
+  --bg: rgba(240, 242, 245, .75);       /* translucent to let bg image glow through */
+  --card: rgba(255, 255, 255, .88);
+  --text: #1C1E21;
+  --muted: #65676B;
+  --primary: #1877F2;
+  --primary-hover: #166FE5;
+  --success: #42B72A;
+  --success-hover: #36A420;
+  --danger: #E53935;
+  --danger-hover: #D32F2F;
+  --border: #E4E6EB;
+  --shadow: 0 2px 12px rgba(0,0,0,.06);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.08);
+}
+
+/* Base + background */
+html, body { overflow-x: hidden; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 20px;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  position: relative;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: url('/images/tunasan-bg.jpg') center/cover no-repeat;
+  filter: blur(10px) brightness(0.85);
+  transform: scale(1.05); /* reduce edge blur clipping */
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(255,255,255,0.55); /* light wash to improve legibility */
+  pointer-events: none;
+}
+.container { max-width: 1120px; margin: 0 auto; }
+
+/* Headings readability chips */
+h1, h2 {
+  color: #050505;
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: saturate(120%) blur(4px);
+}
+h1 { margin-bottom: 12px; }
+h2 { margin-top: 24px; margin-bottom: 12px; }
+
+/* QR code canvas */
+#qr-code {
+  display: block;
+  margin: 10px 0 30px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
 
 /* Forms as cards */
 form#incident-form,
@@ -917,6 +942,30 @@ form#event-form button:hover,
   box-shadow: var(--shadow-lg);
 }
 
+/* File input styled as button */
+input[type="file"] {
+  border: 1px dashed var(--border);
+  padding: 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.7);
+}
+input[type="file"]::file-selector-button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  margin-right: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
+  box-shadow: var(--shadow);
+}
+input[type="file"]::file-selector-button:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-lg);
+}
+
 /* Responsive images */
 #incident-list img,
 #news-list img,
@@ -932,7 +981,6 @@ form#event-form button:hover,
 
 /* Map containers responsive */
 #map,
-#heatmap,
 .leaflet-container {
   border-radius: 12px;
   box-shadow: var(--shadow);
@@ -1033,7 +1081,7 @@ form#event-form button:hover,
   background: rgba(255,255,255,.9);
   color: var(--text);
   padding: 10px 0;
-  border-bottom: none; /* remove legacy border line */
+  border-bottom: 1px solid var(--border);
   box-shadow: 0 2px 8px rgba(0,0,0,.04);
   backdrop-filter: saturate(120%) blur(6px);
 }
@@ -1088,445 +1136,4 @@ form#event-form button:hover,
   backdrop-filter: saturate(120%) blur(6px);
   padding: 22px 20px;
   animation: fadeInUp .35s ease both;
-}
-
-/* Skeleton loading for feed cards */
-.post-card.skeleton {
-  position: relative;
-  overflow: hidden;
-}
-.skeleton-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-.skeleton-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #E4E6EB;
-}
-.skeleton-lines {
-  flex: 1;
-}
-.skeleton-line {
-  height: 12px;
-  border-radius: 6px;
-  background: #E4E6EB;
-  margin: 6px 0;
-}
-.skeleton-line.short { width: 40%; }
-.skeleton-line.medium { width: 70%; }
-.skeleton-line.long { width: 90%; }
-
-.skeleton-images {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 6px;
-  margin: 8px 0;
-}
-.skeleton-img {
-  grid-column: span 6;
-  height: 120px;
-  border-radius: 10px;
-  background: #E4E6EB;
-}
-
-/* Shimmer effect */
-.post-card.skeleton::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.5) 50%, rgba(255,255,255,0) 100%);
-  transform: translateX(-100%);
-  animation: shimmer 1.4s infinite;
-}
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-/* Icon-only button (theme toggle) */
-.icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: #F0F2F5;
-  color: #050505;
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
-}
-.icon-btn:hover { background: #EDEFF2; box-shadow: var(--shadow-lg); }
-.icon-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(24,119,242,.18); }
-
-/* Dark theme variables override (applies when html has .theme-dark) */
-html.theme-dark {
-  --bg: #0F1115;
-  --card: #151922;
-  --text: #E6E8EE;
-  --muted: #8B8FA3;
-  --primary: #5B8DEF;
-  --primary-hover: #4A78D1;
-  --success: #46C56B;
-  --success-hover: #3BA65A;
-  --danger: #FF6B6B;
-  --danger-hover: #E85A5A;
-  --border: #1F2430;
-  --shadow: 0 2px 12px rgba(0,0,0,.45);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,.5);
-}
-html.theme-dark body::after { background: rgba(0,0,0,0.35); }
-html.theme-dark .fb-navbar { background: rgba(21,25,34,.92); border-bottom-color: var(--border); }
-html.theme-dark .nav-link { color: var(--text); }
-html.theme-dark .mobile-tabbar { background: rgba(21,25,34,.94); border-top-color: var(--border); }
-html.theme-dark .search-input { background: #1A1F2B; color: var(--text); border-color: var(--border); }
-html.theme-dark .pill-btn { background: #1A1F2B; color: var(--text); }
-html.theme-dark .pill-btn.secondary { background: var(--primary); color: #fff; }
-
-/* Light/dark transition for smooth theme change */
-html { transition: background-color .2s ease, color .2s ease; }
-body, .post-card, .fb-navbar, .mobile-tabbar, .pill-btn, .search-input { transition: background-color .25s ease, color .25s ease, border-color .25s ease; }
-
-/* Lightbox */
-.lightbox-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.7);
-  backdrop-filter: blur(2px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-}
-.lightbox-overlay.open { display: flex; }
-.lightbox-content {
-  max-width: min(92vw, 1080px);
-  max-height: 86vh;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border);
-}
-.lightbox-content img {
-  width: 100%;
-  height: auto;
-  display: block;
-  background: #000;
-}
-.lightbox-close {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  background: rgba(255,255,255,.9);
-  color: #050505;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 8px 12px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-}
-html.theme-dark .lightbox-close { background: rgba(21,25,34,.92); color: var(--text); }
-
-/* Icon-only button + notification panel */
-.icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: #F0F2F5;
-  color: #050505;
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
-}
-.icon-btn:hover { background: #EDEFF2; box-shadow: var(--shadow-lg); }
-.icon-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(24,119,242,.18); }
-
-/* Notification dropdown */
-.notif-panel {
-  position: absolute;
-  right: 12px;
-  top: 56px;
-  width: 280px;
-  max-height: 60vh;
-  overflow: auto;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: var(--shadow-lg);
-  display: none;
-  z-index: 1002;
-}
-.notif-panel.open { display: block; }
-.notif-panel .notif-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--border);
-}
-.notif-panel ul {
-  list-style: none;
-  margin: 0;
-  padding: 8px;
-}
-.notif-panel li {
-  padding: 8px;
-  border-radius: 8px;
-  transition: background .2s ease;
-}
-.notif-panel li:hover { background: #F0F2F5; }
-
-.notif-count {
-  position: absolute;
-  transform: translate(10px, -10px);
-  background: var(--danger);
-  color: #fff;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  padding: 0 6px;
-  min-width: 18px;
-  text-align: center;
-}
-
-/* Heatmap map container */
-#heatmap, .leaflet-container {
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
-}
-
-/* Dark theme overrides (already present) ensure panel colors adapt */
-html.theme-dark .notif-panel { background: var(--card); border-color: var(--border); }
-
-/* Focus states for accessibility across navbar links */
-.fb-navbar .nav-link:focus-visible,
-.mobile-tabbar .tab-link:focus-visible,
-.fb-navbar .logo:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(24,119,242,.18);
-  border-radius: 12px;
-}
-
-/* Heatmap controls panel */
-.map-controls {
-  display: grid;
-  gap: 8px;
-  grid-template-columns: repeat(12, 1fr);
-  align-items: center;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  padding: 10px 12px;
-  margin: 8px 0 10px;
-}
-.map-controls .col-span-3 { grid-column: span 3; }
-.map-controls .col-span-4 { grid-column: span 4; }
-.map-controls .col-span-6 { grid-column: span 6; }
-.map-controls .col-span-12 { grid-column: 1 / -1; }
-
-.map-controls label {
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-.map-controls input[type="range"] {
-  width: 100%;
-}
-.map-controls .toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Filters UI */
-.filter-controls .filters-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 8px;
-}
-.filter-controls label { grid-column: span 3; display: flex; flex-direction: column; gap: 4px; }
-.filter-controls #filter-clear { grid-column: span 3; justify-self: end; }
-
-/* Post actions group (save/share) */
-.post-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
-  color: var(--muted);
-}
-.action-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.save-btn.active { background: rgba(255, 215, 0, .18); border-color: var(--border); }
-
-/* Navbar: modern active indicator (no underline) */
-.fb-navbar .nav-link {
-  position: relative;
-  border-radius: 999px;
-}
-.fb-navbar .nav-link::after {
-  content: "";
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 4px;
-  height: 3px;
-  border-radius: 3px;
-  background: linear-gradient(90deg, #5B8DEF 0%, #00D4FF 50%, #8A5CF6 100%);
-  opacity: 0;
-  transform: scaleX(0.5);
-  transform-origin: center;
-  transition: transform var(--dur-med) var(--ease-smooth), opacity var(--dur-fast);
-}
-.fb-navbar .nav-link:hover::after { opacity: .35; transform: scaleX(1); }
-.fb-navbar .nav-link.active::after { opacity: 1; transform: scaleX(1); }
-
-/* Mobile tabbar: subtle top indicator and pressed state */
-.mobile-tabbar .tab-link {
-  position: relative;
-  transition: background var(--dur-fast), transform var(--dur-fast);
-}
-.mobile-tabbar .tab-link.active::before {
-  content: "";
-  position: absolute;
-  top: 3px;
-  width: 18px;
-  height: 3px;
-  border-radius: 3px;
-  background: linear-gradient(90deg, #5B8DEF 0%, #00D4FF 50%, #8A5CF6 100%);
-}
-.mobile-tabbar .tab-link:active { transform: translateY(1px); }
-
-/* Cards: elevate on hover with subtle lift */
-.post-card {
-  border-radius: var(--radius-md);
-  transition: box-shadow var(--dur-med) var(--ease-smooth), transform var(--dur-med) var(--ease-smooth), border-color var(--dur-med);
-  will-change: transform, box-shadow;
-}
-.post-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(0,0,0,.12);
-}
-
-/* Like button: micro interaction */
-.like-btn {
-  border: 1px solid transparent;
-  transition: background var(--dur-fast), color var(--dur-fast), transform var(--dur-fast);
-}
-.like-btn:active { transform: scale(0.98); }
-.like-btn.liked {
-  background: rgba(24,119,242,.12);
-  color: var(--primary);
-  box-shadow: 0 4px 14px rgba(24,119,242,.18);
-  border-color: rgba(24,119,242,.15);
-}
-
-/* Icon + pill buttons: rounded and feedback */
-.icon-btn, .pill-btn {
-  border-radius: var(--radius-sm);
-  transition: background var(--dur-fast), box-shadow var(--dur-fast), transform var(--dur-fast);
-}
-.icon-btn:active, .pill-btn:active { transform: translateY(1px); }
-
-/* Search input: refined visuals */
- 
- 
-.search-input {
-  background: #F5F7FA;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  transition: border-color var(--dur-fast), box-shadow var(--dur-fast), background var(--dur-fast);
-}
-.search-input:hover { background: #fff; }
-.search-input:focus {
-  background: #fff;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(24,119,242,.15);
-}
-
-/* Heatmap controls: modern sliders */
-.map-controls {
-  backdrop-filter: saturate(120%) blur(6px);
-}
-.map-controls input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 4px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #5B8DEF 0%, #00D4FF 50%, #8A5CF6 100%);
-  outline: none;
-}
-.map-controls input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  background: #fff;
-  border: 2px solid var(--border);
-  border-radius: 50%;
-  box-shadow: 0 3px 8px rgba(0,0,0,.12);
-  cursor: pointer;
-}
-.map-controls input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  background: #fff;
-  border: 2px solid var(--border);
-  border-radius: 50%;
-  box-shadow: 0 3px 8px rgba(0,0,0,.12);
-  cursor: pointer;
-}
-
-/* Post images: softer hover and shadow */
-.post-images img {
-  transition: transform var(--dur-med) var(--ease-smooth), box-shadow var(--dur-med) var(--ease-smooth), opacity var(--dur-fast);
-}
-.post-images img:hover {
-  transform: scale(1.015);
-  box-shadow: 0 12px 28px rgba(0,0,0,.12);
-}
-
-/* Focus states (keyboard) unified */
-:where(a, button, .nav-link, .tab-link, .icon-btn, .pill-btn):focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(24,119,242,.18);
-}
-
-/* Toast (optional use by ui.js later) */
-.toast {
-  position: fixed;
-  left: 50%;
-  bottom: calc(20px + env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  background: var(--card);
-  color: var(--text);
-  border: 1px solid var(--border);
-  padding: 10px 14px;
-  border-radius: 999px;
-  box-shadow: var(--shadow-lg);
-  z-index: 2000;
-}
-
-/* Brand icon: subtle glow in light, soften in dark */
-.fb-navbar .brand-icon {
-  filter: drop-shadow(0 2px 6px rgba(91,141,239,.25));
-}
-html.theme-dark .fb-navbar .brand-icon {
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
 }
