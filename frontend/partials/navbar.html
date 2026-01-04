@@ -2,8 +2,26 @@
   <div class="container fb-nav-inner">
     <div class="nav-left">
       <a href="index.html" class="logo" aria-label="Barangay Tunasan Portal">
-        <img src="/images/tunasan-logo.png" alt="" aria-hidden="true" class="logo-img">
-        <span class="logo-text">Tunasan</span>
+        <!-- Modern AI-themed icon-only logo -->
+        <svg class="brand-icon" aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#5B8DEF"/>
+              <stop offset="0.5" stop-color="#00D4FF"/>
+              <stop offset="1" stop-color="#8A5CF6"/>
+            </linearGradient>
+          </defs>
+          <!-- Outer ring -->
+          <circle cx="12" cy="12" r="9" fill="none" stroke="url(#brandGrad)" stroke-width="2"/>
+          <!-- Subtle chip background -->
+          <rect x="8" y="8" width="8" height="8" rx="2" fill="url(#brandGrad)" opacity="0.15"/>
+          <!-- Plus/circuit cross -->
+          <path d="M10 12h4M12 10v4" stroke="url(#brandGrad)" stroke-width="1.6" stroke-linecap="round"/>
+          <!-- Left/right nodes -->
+          <circle cx="6" cy="12" r="1.4" fill="url(#brandGrad)"/>
+          <circle cx="18" cy="12" r="1.4" fill="url(#brandGrad)"/>
+          <path d="M7.6 12H9.6M14.4 12H16.4" stroke="url(#brandGrad)" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
       </a>
     </div>
 
