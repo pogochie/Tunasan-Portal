@@ -931,14 +931,17 @@ h1, h2 {
   }
 }
 
-/* Add lightbox overlay styles for expandable images */
+/* Fix lightbox overlay positioning and stacking */
 .lightbox-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  background: rgba(0,0,0,0.85) !important;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -948,13 +951,19 @@ h1, h2 {
   opacity: 1;
   pointer-events: auto;
 }
-.lightbox-content img {
+.lightbox-content {
   max-width: 90vw;
   max-height: 90vh;
+  overflow: hidden;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+.lightbox-content img {
+  width: 100%;
+  height: auto;
   user-select: none;
   cursor: zoom-out;
+  display: block;
   transition: transform 0.3s ease;
 }
 .lightbox-close {
