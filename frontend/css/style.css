@@ -1704,3 +1704,37 @@ p {
     height: 280px !important;
   }
 }
+
+/* Ensure the floating Report Incident button is visible on mobile */
+
+/* Override any styles hiding the button */
+#report-btn {
+  display: inline-block !important;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1100;
+  padding: 14px 20px;
+  font-size: 1rem;
+  border-radius: 9999px;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+#report-btn:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+  #report-btn {
+    bottom: 16px;
+    right: 16px;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+  }
+}
