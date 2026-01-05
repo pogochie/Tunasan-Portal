@@ -299,11 +299,11 @@ form#incident-form button:hover {
 
 /* Fix Report Incident modal on laptop/desktop: top-align and let modal scroll */
 #report-modal {
-  align-items: flex-start;                 /* avoid vertical centering trap */
+  align-items: flex-start !important;      /* avoid vertical centering trap and override inline */
   justify-content: center !important;          /* center horizontally */
   min-height: 100vh !important;                /* full viewport */
   height: 100vh !important;
-  padding: 12px 10px !important;                 /* smaller top padding */
+  padding: calc(var(--nav-height) + 8px + env(safe-area-inset-top)) 10px !important; /* ensure content not under sticky nav and safe area */
   overflow-y: auto !important;                        /* allow outer modal to scroll on laptops */
   -webkit-overflow-scrolling: touch;
   min-height: 100svh !important;
@@ -434,33 +434,18 @@ form#incident-form button:hover {
 }
 
 /* On short-height screens (e.g., small laptops), go extra compact and ensure full scrollability */
-@media (max-height: 820px) {
-  #report-modal {
-    padding-top: 8px !important;
-  }
+@media (max-height: 740px) {
   .report-section {
-    padding: 16px 14px !important;
-    max-height: calc(100svh - 16px) !important;        /* ensure the whole form can scroll */
+    max-height: calc(100dvh - 12px) !important; /* tighter fit to allow full scroll */
   }
-  @supports (height: 100dvh) {
-    .report-section { max-height: calc(100dvh - 16px) !important; }
-  }
-  .report-section h2 {
-    font-size: 1.4rem;
-    margin-bottom: 12px;
-  }
-  #map { height: 220px !important; }
-  .report-section button.pill-btn.secondary {
-    padding: 10px 0 !important;
-    font-size: 1rem !important;
-  }
+  #map { height: 200px !important; }            /* reduce map height to free space */
 }
 
 /* Mobile fine-tuning: dynamic viewport and inner scroll so the submit button remains reachable */
 @media (max-width: 768px) {
   #report-modal {
-    align-items: flex-start;
-    padding: 12px 10px env(safe-area-inset-bottom) !important;
+    align-items: flex-start !important;
+    padding: calc(var(--nav-height) + 8px + env(safe-area-inset-top)) 10px env(safe-area-inset-bottom) !important;
   }
   .report-section {
     max-height: calc(100dvh - 20px) !important;       /* use dynamic viewport on mobile */
@@ -760,7 +745,7 @@ p {
   padding: 20px 24px;
   display: flex;
   flex-wrap: wrap;
-  gap: 20pxpx;
+  gap: 20px;
   justify-content: center;
   align-items: center;
 }
@@ -1106,7 +1091,7 @@ p {
 }
 .like-btn.liked {
   color: var(--primary);
-  background: rgba(24,119,242,.08);
+  background: rgba(24, 119, 242, 0.08);
 }
 
 /* Subtle entrance animation */
@@ -1306,7 +1291,7 @@ p {
   background: #f0f2f5;
   border: none;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   transition: background-color 0.3s ease;
 }
 #notif-btn:hover {
@@ -1466,13 +1451,17 @@ p {
 .lightbox-overlay {
   position: fixed !important;
   top: 0 !important;
+ 
   left: 0 !important;
   width: 100vw !important;
+ 
   height: 100vh !important;
   display: flex !important;
   justify-content: center !important;
+ 
   align-items: center !important;
   background: rgba(0,0,0,0.85) !important;
+ 
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
