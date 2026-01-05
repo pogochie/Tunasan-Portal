@@ -47,6 +47,8 @@
   </style>
 </head>
 <body>
+  <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation menu" />
+  <label for="nav-toggle" class="nav-toggle-label" aria-hidden="true"><span></span></label>
   <div id="navbar-placeholder"></div>
 
   <main class="container">
@@ -252,18 +254,13 @@
     loadHomeFeed();
   </script>
   <!-- Load navbar partial and then its logic -->
-  <script>
+  <script type="module">
+    import { initNavbar } from './js/navbar.js';
     fetch('partials/navbar.html')
       .then(response => response.text())
       .then(html => {
         document.getElementById('navbar-placeholder').innerHTML = html;
-        const s = document.createElement('script');
-        s.src = 'js/navbar.js';
-        document.body.appendChild(s);
-        // Load i18n after navbar
-        const i18n = document.createElement('script');
-        i18n.src = 'js/i18n.js';
-        document.body.appendChild(i18n);
+        initNavbar();
       })
       .catch(err => console.error('Failed to load navbar:', err));
   </script>
