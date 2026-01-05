@@ -1246,7 +1246,7 @@ p {
   color: var(--text);
 }
 
-.theme-dark body {
+.theme-dark {
   background-color: var(--bg);
   color: var(--text);
 }
@@ -1501,5 +1501,35 @@ p {
   .report-section {
     margin: 20px 10px;
     padding: 16px;
+  }
+}
+
+/* Modal styles */
+#report-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+}
+
+#report-modal.open {
+  display: flex;
+}
+
+/* Optional: prevent background scroll when modal open */
+body.modal-open {
+  overflow: hidden;
+}
+
+#report-btn {
+  display: none; /* hidden by default */
+}
+
+@media (max-width: 768px) {
+  #report-btn {
+    display: inline-block; /* show only on mobile */
   }
 }

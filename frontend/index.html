@@ -32,6 +32,31 @@
   </style>
   <style>
     /* Center the report form section vertically and horizontally */
+    .hero {
+      text-align: center;
+      padding: 40px 20px;
+      margin-bottom: 30px;
+      justify-content: center;
+    }
+    .hero h1 {
+      font-size: 2rem;
+      margin-bottom: 15px;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+    .feature-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+  </style>
+  <style>
+    /* Center the report form section vertically and horizontally */
     .report-section {
       display: flex;
       justify-content: center;
@@ -73,44 +98,75 @@
       <ul id="home-feed" class="feed"></ul>
     </section>
 
-    <section class="report-section" id="report-section" aria-label="Report an Incident">
-  <form id="incident-form" enctype="multipart/form-data" novalidate>
-    <h2 data-i18n="home.reportTitle">Report an Incident</h2>
+    <div id="report-modal" aria-hidden="true" role="dialog" aria-modal="true" style="
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+">
+  <section class="report-section" id="report-section" aria-label="Report an Incident" style="
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    padding: 24px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+  ">
+    <button id="close-report" aria-label="Close report form" style="
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--muted);
+    ">×</button>
 
-    <label for="reporterName">Your Name</label>
-    <input type="text" id="reporterName" name="reporterName" placeholder="Your Name" required data-i18n-placeholder="form.name" autocomplete="name" />
+    <form id="incident-form" enctype="multipart/form-data" novalidate>
+      <h2 data-i18n="home.reportTitle">Report an Incident</h2>
 
-    <label for="incidentType">Incident Type</label>
-    <input list="incident-types" id="incidentType" name="incidentType" placeholder="Select or type incident type" required data-i18n-placeholder="form.type" autocomplete="off" />
-    <datalist id="incident-types">
-      <option value="Theft"></option>
-      <option value="Vandalism"></option>
-      <option value="Noise Complaint"></option>
-      <option value="Illegal Dumping"></option>
-      <option value="Traffic Accident"></option>
-      <option value="Fire"></option>
-      <option value="Flood"></option>
-      <option value="Other"></option>
-    </datalist>
+      <label for="reporterName">Your Name</label>
+      <input type="text" id="reporterName" name="reporterName" placeholder="Your Name" required data-i18n-placeholder="form.name" autocomplete="name" />
 
-    <label for="description">Description</label>
-    <textarea id="description" name="description" placeholder="Description" required data-i18n-placeholder="form.description" rows="4"></textarea>
+      <label for="incidentType">Incident Type</label>
+      <input list="incident-types" id="incidentType" name="incidentType" placeholder="Select or type incident type" required data-i18n-placeholder="form.type" autocomplete="off" />
+      <datalist id="incident-types">
+        <option value="Theft"></option>
+        <option value="Vandalism"></option>
+        <option value="Noise Complaint"></option>
+        <option value="Illegal Dumping"></option>
+        <option value="Traffic Accident"></option>
+        <option value="Fire"></option>
+        <option value="Flood"></option>
+        <option value="Other"></option>
+      </datalist>
 
-    <!-- Hidden inputs for lat/lng -->
-    <input type="hidden" name="location[lat]" id="lat" required>
-    <input type="hidden" name="location[lng]" id="lng" required>
+      <label for="description">Description</label>
+      <textarea id="description" name="description" placeholder="Description" required data-i18n-placeholder="form.description" rows="4"></textarea>
 
-    <!-- Map container -->
-    <div id="map" style="margin-bottom: 15px; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); height: 300px;"></div>
+      <!-- Hidden inputs for lat/lng -->
+      <input type="hidden" name="location[lat]" id="lat" required>
+      <input type="hidden" name="location[lng]" id="lng" required>
 
-    <button type="button" id="geo-btn" class="pill-btn" style="margin-bottom:10px;">Use my location</button>
+      <!-- Map container -->
+      <div id="map" style="margin-bottom: 15px; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); height: 300px;"></div>
 
-    <label for="images" style="display: block; margin-bottom: 6px; font-weight: 600;">Upload Images (optional)</label>
-    <input type="file" id="images" name="images" multiple accept="image/*" data-i18n-attr="aria-label:form.images" style="margin-bottom: 15px;"/>
+      <button type="button" id="geo-btn" class="pill-btn" style="margin-bottom:10px;">Use my location</button>
 
-    <button type="submit" class="pill-btn secondary" style="width: 100%; font-size: 1.1rem; padding: 14px;">Submit Report</button>
-  </form>
-</section>
+      <label for="images" style="display: block; margin-bottom: 6px; font-weight: 600;">Upload Images (optional)</label>
+      <input type="file" id="images" name="images" multiple accept="image/*" data-i18n-attr="aria-label:form.images" style="margin-bottom: 15px;"/>
+
+      <button type="submit" class="pill-btn secondary" style="width: 100%; font-size: 1.1rem; padding: 14px;">Submit Report</button>
+    </form>
+  </section>
+</div>
   </main>
 
   <!-- Leaflet CSS & JS -->
@@ -303,5 +359,19 @@
       } catch (e) {}
     })();
   </script>
+  <!-- Add a fixed "Report Incident" button somewhere in the body, e.g., just before closing </body> -->
+<button id="report-btn" class="pill-btn secondary" aria-label="Report an Incident" style="
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1100;
+  padding: 14px 20px;
+  font-size: 1rem;
+  border-radius: 9999px;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+">
+  Report Incident
+</button>
 </body>
 </html>
