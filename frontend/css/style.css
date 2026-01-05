@@ -1934,3 +1934,132 @@ body.modal-open {
 @media (max-height: 740px) {
   #map { height: 200px !important; }
 }
+
+/* Auth pages (Register/Login) modern card UI */
+.auth-wrapper {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  backdrop-filter: saturate(120%) blur(6px);
+  padding: 22px 20px;
+  animation: fadeInUp .35s ease both;
+}
+
+.auth-card h1 {
+  margin: 0 0 12px;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--primary);
+  text-align: center;
+}
+
+/* Flatten inner form (the card already provides container visuals) */
+#register-form {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+#register-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 700;
+  color: #050505;
+}
+
+#register-form input[type="text"],
+#register-form input[type="password"],
+#register-form select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 1rem;
+  transition: border-color .2s ease, box-shadow .2s ease;
+  margin-bottom: 14px;
+}
+
+#register-form input[type="text"]:focus,
+#register-form input[type="password"]:focus,
+#register-form select:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(24,119,242,.15);
+}
+
+/* Password toggle button: compact inside input */
+#toggle-pass.pill-btn {
+  background: #f0f2f5;
+  color: #050505;
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: .9rem;
+  box-shadow: var(--shadow);
+}
+#toggle-pass.pill-btn:hover {
+  background: #e7e9ee;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Submit button full-width, modern */
+#register-form button[type="submit"] {
+  width: 100%;
+  background: var(--primary);
+  color: #fff;
+  border: 1px solid transparent;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
+  box-shadow: var(--shadow);
+}
+#register-form button[type="submit"]:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Small footer link styling inside auth card */
+.auth-card p {
+  margin: 12px 0 0;
+  text-align: center;
+  color: var(--muted);
+}
+.auth-card a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 700;
+}
+.auth-card a:hover { text-decoration: underline; }
+
+/* Dark theme overrides for auth */
+.theme-dark .auth-card {
+  background: var(--card);
+  border-color: var(--border);
+  box-shadow: var(--shadow);
+}
+.theme-dark #register-form input[type="text"],
+.theme-dark #register-form input[type="password"],
+.theme-dark #register-form select {
+  background: #2a2a2a;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.theme-dark #toggle-pass.pill-btn {
+  background: #2a2a2a;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
