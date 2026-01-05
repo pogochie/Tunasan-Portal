@@ -299,46 +299,164 @@ form#incident-form button:hover {
 
 /* Fix Report Incident modal on laptop/desktop: top-align and let modal scroll */
 #report-modal {
-  align-items: flex-start !important;          /* avoid vertical centering trap */
+  align-items: flex-start;                 /* avoid vertical centering trap */
   justify-content: center !important;          /* center horizontally */
   min-height: 100vh !important;                /* full viewport */
   height: 100vh !important;
-  padding: 16px 10px env(safe-area-inset-bottom) !important; /* smaller top padding */
-  overflow-y: auto !important;                 /* scroll modal container */
+  padding: 24px 12px 12px;                 /* smaller top padding */
+  overflow-y: auto;                        /* allow outer modal to scroll on laptops */
   -webkit-overflow-scrolling: touch;
 }
 
-/* Modal content: remove nested scroll on desktop; keep content fully visible */
+/* Compact the modal content so more fits on screen */
 .report-section {
-  max-height: none !important;                 /* no inner clamp on desktop */
-  overflow: visible !important;                /* modal handles scroll */
-  width: min(96vw, 640px) !important;          /* responsive width cap */
-  margin-top: 8px !important;                  /* keep away from top edge */
+  background: var(--card);
+  border-radius: 24px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+  padding: 24px 20px;                      /* was 40px 48px */
+  width: min(96vw, 640px);
+  max-height: 90vh;                        /* keep scroll within viewport */
+  overflow-y: auto;
 }
 
-/* Keep focused inputs visible below the top edge while scrolling */
+/* Smaller heading inside the modal */
+.report-section h2 {
+  font-size: 1.6rem;                       /* was 2rem */
+  margin-bottom: 16px;                     /* was 32px */
+}
+
+/* Compact inputs and textarea spacing */
+.report-section label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 6px;                      /* was 10px */
+  color: var(--text);
+  user-select: none;
+  font-size: 1rem;                         /* slightly smaller */
+}
+
 .report-section input[type="text"],
-.report-section textarea,
 .report-section input[list],
+.report-section textarea,
 .report-section input[type="file"] {
-  scroll-margin-top: 48px;
+  width: 100%;
+  padding: 12px 14px;                      /* was 16px 20px */
+  margin-bottom: 16px;                     /* was 28px */
+  border: 2px solid var(--border);
+  border-radius: 12px;                     /* was 16px */
+  font-size: 1rem;
+  font-weight: 500;
+  box-sizing: border-box;
+  background: #fff;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text);
+  user-select: text;
+  scroll-margin-top: 36px;                 /* keep focused field away from top edge */
 }
 
-/* Mobile: use dynamic viewport and inner scroll to keep Submit visible */
-@media (max-width: 768px) {
+.report-section input[type="text"]::placeholder,
+.report-section textarea::placeholder {
+  color: var(--muted);
+}
+
+.report-section input[type="text"]:focus,
+.report-section input[list]:focus,
+.report-section textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 5px rgba(24, 119, 242, 0.3);
+}
+
+.report-section textarea {
+  resize: vertical;
+  min-height: 140px;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.report-section button.pill-btn.secondary {
+  width: 100%;
+  padding: 14px 0;                         /* was 18px 0 */
+  font-size: 1.1rem;                       /* was 1.3rem */
+  border-radius: 9999px;
+  box-shadow: 0 10px 28px rgba(24,119,242,0.45);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  user-select: none;
+}
+
+.report-section button.pill-btn.secondary:hover {
+  background-color: var(--primary-hover);
+  box-shadow: 0 16px 48px rgba(24, 119, 242, 0.7);
+  transform: translateY(-4px);
+}
+
+#geo-btn {
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 14px 24px;
+  font-weight: 800;
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(24, 119, 242, 0.5);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 32px;
+  user-select: none;
+  font-size: 1.1rem;
+}
+
+#geo-btn:hover {
+  background-color: var(--primary-hover);
+  box-shadow: 0 20px 60px rgba(24, 119, 242, 0.8);
+}
+
+#map {
+  border-radius: 20px !important;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18) !important;
+  border: 2px solid var(--border) !important;
+  height: 300px !important;                /* was 360px */
+  margin-bottom: 32px !important;
+}
+
+/* On short-height screens (e.g., small laptops), go extra compact and ensure full scrollability */
+@media (max-height: 820px) {
   #report-modal {
-    align-items: flex-start !important;
-    justify-content: center !important;
-    min-height: 100dvh !important;
-    height: 100dvh !important;
-    padding: 20px 10px env(safe-area-inset-bottom) !important;
+    padding-top: 16px;
   }
   .report-section {
-    max-height: calc(100dvh - 32px) !important;  /* inner scroll within dvh */
-    overflow-y: auto !important;
+    padding: 20px 16px;
+    max-height: calc(100vh - 32px);        /* ensure the whole form can scroll */
+  }
+  .report-section h2 {
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+  }
+  #map { height: 240px !important; }
+  .report-section button.pill-btn.secondary {
+    padding: 12px 0;
+    font-size: 1rem;
+  }
+}
+
+/* Mobile fine-tuning: dynamic viewport and inner scroll so the submit button remains reachable */
+@media (max-width: 768px) {
+  #report-modal {
+    align-items: flex-start;
+    padding: 16px 10px env(safe-area-inset-bottom);
+  }
+  .report-section {
+    max-height: calc(100dvh - 32px);       /* use dynamic viewport on mobile */
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
+  #map { height: 260px !important; }
+}
+
+/* Extra small phones */
+@media (max-width: 480px) {
+  .report-section { padding-bottom: 20px; }
+  #map { height: 220px !important; }
 }
 
 /* Remove body margin and padding so navbar touches viewport edges */
@@ -627,7 +745,7 @@ p {
   padding: 20px 24px;
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 20pxpx;
   justify-content: center;
   align-items: center;
 }
@@ -1627,8 +1745,8 @@ p {
   justify-content: flex-start; /* align modal content from top */
   align-items: center;
   z-index: 1200;
-  padding: 80px 20px 20px; /* increased top padding */
-  overflow-y: auto;
+  padding: 24px 12px 12px;                 /* smaller top padding so <h2> is visible */
+  overflow-y: auto;                        /* allow outer modal to scroll on laptops */
   -webkit-overflow-scrolling: touch;
 }
 
@@ -1640,16 +1758,14 @@ p {
   background: var(--card);
   border-radius: 24px;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
-  padding: 40px 48px;
-  max-width: 600px;
-  width: 100%;
-  max-height: calc(100vh - 120px); /* leave space for top padding */
-  max-height: 90dvh; /* limit height */
-  overflow-y: auto; /* scroll inside modal */
+  padding: 24px 20px;                      /* was 40px 48px */
+  width: min(96vw, 640px);
+  max-height: 90vh;                        /* keep scroll within viewport */
+  overflow-y: auto;
   position: relative;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text);
-  animation: slideDownFade 0.4s ease forwards;
+  animation: slideDownFade 0.4s ease both;
 }
 
 @keyframes slideDownFade {
@@ -1661,6 +1777,8 @@ p {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
 }
 
 body.modal-open {
@@ -1684,9 +1802,9 @@ body.modal-open {
 }
 
 .report-section h2 {
-  margin-bottom: 32px;
+  margin-bottom: 16px;                     /* was 32px */
+  font-size: 1.6rem;                       /* was 2rem */
   font-weight: 900;
-  font-size: 2rem;
   color: var(--primary);
   text-align: center;
   user-select: none;
@@ -1695,10 +1813,10 @@ body.modal-open {
 .report-section label {
   display: block;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 6px;                      /* was 10px */
   color: var(--text);
   user-select: none;
-  font-size: 1.1rem;
+  font-size: 1rem;                         /* slightly smaller */
 }
 
 .report-section input[type="text"],
@@ -1706,11 +1824,11 @@ body.modal-open {
 .report-section textarea,
 .report-section input[type="file"] {
   width: 100%;
-  padding: 16px 20px;
-  margin-bottom: 28px;
+  padding: 12px 14px;                      /* was 16px 20px */
+  margin-bottom: 16px;                     /* was 28px */
   border: 2px solid var(--border);
-  border-radius: 16px;
-  font-size: 1.1rem;
+  border-radius: 12px;                     /* was 16px */
+  font-size: 1rem;
   font-weight: 500;
   box-sizing: border-box;
   background: #fff;
@@ -1718,6 +1836,7 @@ body.modal-open {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text);
   user-select: text;
+  scroll-margin-top: 36px;                 /* keep focused field away from top edge */
 }
 
 .report-section input[type="text"]::placeholder,
@@ -1742,11 +1861,10 @@ body.modal-open {
 
 .report-section button.pill-btn.secondary {
   width: 100%;
-  padding: 18px 0;
-  font-size: 1.3rem;
-  font-weight: 900;
+  padding: 14px 0;                         /* was 18px 0 */
+  font-size: 1.1rem;                       /* was 1.3rem */
   border-radius: 9999px;
-  box-shadow: 0 12px 36px rgba(24, 119, 242, 0.5);
+  box-shadow: 0 10px 28px rgba(24,119,242,0.45);
   transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
   user-select: none;
 }
@@ -1781,29 +1899,8 @@ body.modal-open {
   border-radius: 20px !important;
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18) !important;
   border: 2px solid var(--border) !important;
-  height: 360px !important;
+  height: 300px !important;                /* was 360px */
   margin-bottom: 32px !important;
-}
-
-/* Responsive adjustments */
-@media (max-width: 480px) {
-  .report-section {
-    padding: 28px 24px;
-  }
-  .report-section h2 {
-    font-size: 1.6rem;
-  }
-  #geo-btn {
-    padding: 12px 20px;
-    font-size: 1rem;
-  }
-  .report-section button.pill-btn.secondary {
-    font-size: 1.1rem;
-    padding: 16px 0;
-  }
-  #map {
-    height: 280px !important;
-  }
 }
 
 /* Ensure the floating Report Incident button is visible on mobile */
@@ -1828,14 +1925,4 @@ body.modal-open {
 
 #report-btn:hover {
   background-color: var(--primary-hover);
-}
-
-/* Responsive adjustments for mobile */
-@media (max-width: 768px) {
-  #report-btn {
-    bottom: 16px;
-    right: 16px;
-    padding: 12px 18px;
-    font-size: 0.95rem;
-  }
 }
