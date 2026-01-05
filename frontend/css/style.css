@@ -292,6 +292,55 @@ form#incident-form button:hover {
   --fab-offset: 24px;
 }
 
+/* Define nav height so body padding-top doesn't break layout */
+:root {
+  --nav-height: 56px;
+}
+
+/* Fix Report Incident modal on laptop/desktop: top-align and let modal scroll */
+#report-modal {
+  align-items: flex-start !important;          /* avoid vertical centering trap */
+  justify-content: center !important;          /* center horizontally */
+  min-height: 100vh !important;                /* full viewport */
+  height: 100vh !important;
+  padding: 16px 10px env(safe-area-inset-bottom) !important; /* smaller top padding */
+  overflow-y: auto !important;                 /* scroll modal container */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Modal content: remove nested scroll on desktop; keep content fully visible */
+.report-section {
+  max-height: none !important;                 /* no inner clamp on desktop */
+  overflow: visible !important;                /* modal handles scroll */
+  width: min(96vw, 640px) !important;          /* responsive width cap */
+  margin-top: 8px !important;                  /* keep away from top edge */
+}
+
+/* Keep focused inputs visible below the top edge while scrolling */
+.report-section input[type="text"],
+.report-section textarea,
+.report-section input[list],
+.report-section input[type="file"] {
+  scroll-margin-top: 48px;
+}
+
+/* Mobile: use dynamic viewport and inner scroll to keep Submit visible */
+@media (max-width: 768px) {
+  #report-modal {
+    align-items: flex-start !important;
+    justify-content: center !important;
+    min-height: 100dvh !important;
+    height: 100dvh !important;
+    padding: 20px 10px env(safe-area-inset-bottom) !important;
+  }
+  .report-section {
+    max-height: calc(100dvh - 32px) !important;  /* inner scroll within dvh */
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
+
 /* Remove body margin and padding so navbar touches viewport edges */
 html, body {
   margin: 0;
@@ -1788,63 +1837,5 @@ body.modal-open {
     right: 16px;
     padding: 12px 18px;
     font-size: 0.95rem;
-  }
-}
-
-@media (max-width: 768px) {
-  #report-modal {
-    justify-content: center; /* center vertically on mobile */
-    padding: 20px 10px 10px !important;
-  }
-  .report-section {
-    padding: 24px 20px;
-    max-height: 85dvh !important;
-  }
-}
-
-/* Desktop/laptop: fix modal scrolling and top alignment */
-body.modal-open {
-  overflow: hidden; /* lock page scroll when modal is open */
-}
-
-#report-modal {
-  /* let modal container handle scroll on desktop */
-  align-items: flex-start !important;       /* prevent vertical centering trap */
-  justify-content: center;                  /* center horizontally */
-  min-height: 100vh;                        /* full viewport height */
-  overflow-y: auto;                         /* scroll entire modal when needed */
-  -webkit-overflow-scrolling: touch;
-  padding: 24px 12px 12px !important;       /* reduce top padding to reveal form inputs */
-}
-
-.report-section {
-  /* disable nested scroll on desktop to avoid "stuck at top" */
-  max-height: none !important;
-  overflow: visible !important;
-  margin-top: 0;                            /* ensure no hidden top space */
-  overscroll-behavior: auto;
-}
-
-/* Keep focused inputs away from the very top edge after scroll */
-.report-section input[type="text"],
-.report-section textarea,
-.report-section input[list],
-.report-section input[type="file"] {
-  scroll-margin-top: 48px;
-}
-
-/* Mobile: re-enable inner scroll for better ergonomics */
-@media (max-width: 768px) {
-  #report-modal {
-    justify-content: center;
-    align-items: flex-start !important;
-    padding: 20px 10px 10px !important;
-    min-height: 100dvh;                     /* dynamic viewport for mobile keyboards */
-  }
-  .report-section {
-    max-height: 85dvh !important;           /* limit inner height on mobile */
-    overflow-y: auto !important;            /* inner scroll on mobile */
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
   }
 }
