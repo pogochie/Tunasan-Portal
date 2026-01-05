@@ -6,14 +6,14 @@ const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("cloudinary").v2;
 
-// Configure Cloudinary (reuse your environment keys)
+// Cloudinary config
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Multer storage for Barangay ID uploads
+// Multer storage for ID images
 const idStorage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -24,7 +24,6 @@ const idStorage = new CloudinaryStorage({
 });
 const uploadId = multer({ storage: idStorage });
 
-// Register new official (status = pending) with Barangay ID image upload (Cloudinary)
 router.post("/register", (req, res) => {
   uploadId.single("idImage")(req, res, async (err) => {
     if (err) {
@@ -33,36 +32,28 @@ router.post("/register", (req, res) => {
     }
     try {
       const { username, password, role } = req.body;
-
       if (role !== "official") {
         return res.status(400).json({ message: "Only Barangay Officials can register" });
       }
-      // Require an ID image for officials
       if (!req.file || !req.file.path) {
         return res.status(400).json({ message: "Barangay Official ID image is required" });
       }
-
       const existingUser = await User.findOne({ username });
-      if (existingUser) {
-        return res.status(400).json({ message: "Username already exists" });
-      }
-
+      if (existingUser) return res.status(400).json({ message: "Username already exists" });
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
-
       const user = new User({
         username,
         password: hashedPassword,
         role,
         status: "pending",
-        idImage: req.file.path,                    // Cloudinary URL
-        idImagePublicId: req.file.filename || "",  // Cloudinary public_id if available
+        idImage: req.file.path,
+        idImagePublicId: req.file.filename || "",
       });
-
       await user.save();
       res.json({ message: "Registration submitted. Await admin approval." });
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      console.error(err);
       res.status(500).json({ message: "Server error" });
     }
   });
@@ -92,16 +83,23 @@ router.post("/:id/approve", async (req, res) => {
   }
 });
 
-// Reject official (no auth, unprotected)
+// Reject official (delete user + Cloudinary image)
 router.post("/:id/reject", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
-
-    user.status = "rejected";
-    await user.save();
-    res.json({ message: "User rejected" });
+    // delete Cloudinary image if present
+    if (user.idImagePublicId) {
+      try {
+        await cloudinary.uploader.destroy(user.idImagePublicId);
+      } catch (e) {
+        console.warn("Failed to delete Cloudinary ID image:", e.message);
+      }
+    }
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: "User rejected and removed" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
