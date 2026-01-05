@@ -1183,6 +1183,8 @@ p {
 .mobile-tabbar {
   display: none;
 }
+
+/* Improve mobile bottom tabbar: fixed, safe-area aware, and active styles */
 @media (max-width: 768px) {
   .nav-center, .search-wrap, .pill-btn.secondary {
     display: none !important;
@@ -1190,15 +1192,22 @@ p {
   .fb-nav-inner {
     padding: 12px 20px;
   }
+
   .mobile-tabbar {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    position: fixed;           /* make it stick to bottom */
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: #fff;
     border-top: 1px solid var(--border);
     box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
-    padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
-    z-index: 1000;
+    padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); /* safe-area bottom padding */
+    z-index: 1100;             /* above content */
+    backdrop-filter: saturate(120%) blur(8px);
   }
+
   .mobile-tabbar .tab-link {
     display: flex;
     flex-direction: column;
@@ -1210,21 +1219,42 @@ p {
     text-decoration: none;
     padding: 6px 0;
     border-radius: 12px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.25s ease, color 0.25s ease;
+    min-height: 48px;          /* comfortable tap target */
   }
+
   .mobile-tabbar .tab-link:hover,
   .mobile-tabbar .tab-link.active {
     background: #f0f2f5;
+    color: var(--primary);
   }
+
   .mobile-tabbar .tab-link .ico {
-    font-size: 1.2rem;
+    width: 22px;
+    height: 22px;
+    fill: currentColor; /* ensure icon follows text color */
   }
+
   .mobile-tabbar .tab-link .txt {
     font-size: 0.75rem;
   }
+
+  /* Prevent content from being hidden behind the fixed tabbar */
   body {
-    padding-bottom: 60px;
+    padding-bottom: calc(56px + env(safe-area-inset-bottom));
   }
+}
+
+/* Dark theme for mobile tabbar */
+.theme-dark .mobile-tabbar {
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.theme-dark .mobile-tabbar .tab-link:hover,
+.theme-dark .mobile-tabbar .tab-link.active {
+  background: rgba(59,130,246,0.15);
+  color: var(--primary);
 }
 
 /* Fix lightbox overlay positioning and stacking */
