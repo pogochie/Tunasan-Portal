@@ -8,7 +8,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     enum: ["pending", "approved", "rejected"],
     default: "pending"
-  }
+  },
+  // ADD: Cloudinary URL for uploaded Barangay Official ID image
+  idImage: { type: String },            // e.g., https://res.cloudinary.com/.../image/upload/...
+  idImagePublicId: { type: String },    // optional: cloudinary public_id for later management
 });
 
 module.exports = mongoose.model("User", UserSchema);

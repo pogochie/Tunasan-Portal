@@ -2,35 +2,70 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
 
-// Register new official (status = pending)
-router.post("/register", async (req, res) => {
-  const { username, password, role } = req.body;
+// Configure Cloudinary (reuse your environment keys)
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-  if (role !== "official") {
-    return res.status(400).json({ message: "Only Barangay Officials can register" });
-  }
+// Multer storage for Barangay ID uploads
+const idStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "barangay_ids",
+    allowed_formats: ["jpg", "jpeg", "png"],
+    resource_type: "image",
+  },
+});
+const uploadId = multer({ storage: idStorage });
 
-  try {
-    const existingUser = await User.findOne({ username });
-    if (existingUser) return res.status(400).json({ message: "Username already exists" });
+// Register new official (status = pending) with Barangay ID image upload (Cloudinary)
+router.post("/register", (req, res) => {
+  uploadId.single("idImage")(req, res, async (err) => {
+    if (err) {
+      console.error("ID upload error:", err);
+      return res.status(400).json({ message: "ID image upload failed" });
+    }
+    try {
+      const { username, password, role } = req.body;
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+      if (role !== "official") {
+        return res.status(400).json({ message: "Only Barangay Officials can register" });
+      }
+      // Require an ID image for officials
+      if (!req.file || !req.file.path) {
+        return res.status(400).json({ message: "Barangay Official ID image is required" });
+      }
 
-    const user = new User({
-      username,
-      password: hashedPassword,
-      role,
-      status: "pending"
-    });
+      const existingUser = await User.findOne({ username });
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
 
-    await user.save();
-    res.json({ message: "Registration submitted. Await admin approval." });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      const user = new User({
+        username,
+        password: hashedPassword,
+        role,
+        status: "pending",
+        idImage: req.file.path,                    // Cloudinary URL
+        idImagePublicId: req.file.filename || "",  // Cloudinary public_id if available
+      });
+
+      await user.save();
+      res.json({ message: "Registration submitted. Await admin approval." });
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
 });
 
 // Get pending officials (no auth, unprotected)
