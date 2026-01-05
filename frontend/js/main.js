@@ -1,17 +1,165 @@
 const form = document.getElementById("incident-form");
 
-// Initialize Leaflet map centered on Barangay Tunasan (example coords)
-const map = L.map("map").setView([14.4089, 121.0341], 15); // Tunasan coords
+// Initialize Leaflet map and marker variables globally
+window.map = null;
+window.marker = null;
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution:
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-}).addTo(map);
+function initMap() {
+  if (window.map) {
+    // If map already initialized, just invalidate size and return
+    window.map.invalidateSize();
+    return;
+  }
 
-// Ensure proper sizing after render and on resize / drawer toggles
-setTimeout(() => map.invalidateSize(), 0);
-window.addEventListener("resize", () => map.invalidateSize());
-window.addEventListener("drawer:toggle", () => setTimeout(() => map.invalidateSize(), 250));
+  // Initialize map
+  window.map = L.map("map").setView([14.4089, 121.0341], 15);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(window.map);
+
+  // Fix map size after render and on resize / drawer toggles
+  setTimeout(() => window.map.invalidateSize(), 0);
+  window.addEventListener("resize", () => window.map.invalidateSize());
+  window.addEventListener("drawer:toggle", () => setTimeout(() => window.map.invalidateSize(), 250));
+
+  // Map click to add/move marker
+  window.map.on("click", function (e) {
+    const { lat, lng } = e.latlng;
+
+    if (window.marker) {
+      window.marker.setLatLng(e.latlng);
+    } else {
+      window.marker = L.marker(e.latlng).addTo(window.map);
+    }
+
+    // Update hidden inputs
+    document.getElementById("lat").value = lat;
+    document.getElementById("lng").value = lng;
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const reportBtn = document.getElementById("report-btn");
+  const reportModal = document.getElementById("report-modal");
+  const closeReportBtn = document.getElementById("close-report");
+  const form = document.getElementById("incident-form");
+
+  if (!reportBtn || !reportModal || !closeReportBtn || !form) {
+    console.warn("Report modal elements missing");
+    return;
+  }
+
+  const openModal = () => {
+    reportModal.style.display = "flex";
+    reportModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+    form.reset();
+    document.getElementById("lat").value = "";
+    document.getElementById("lng").value = "";
+
+    // Initialize or refresh map inside modal
+    initMap();
+
+    // Remove existing marker if any
+    if (window.marker) {
+      window.marker.remove();
+      window.marker = null;
+    }
+  };
+
+  const closeModal = () => {
+    reportModal.style.display = "none";
+    reportModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+  };
+
+  reportBtn.addEventListener("click", openModal);
+  closeReportBtn.addEventListener("click", closeModal);
+
+  reportModal.addEventListener("click", (e) => {
+    if (e.target === reportModal) closeModal();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && reportModal.style.display === "flex") {
+      closeModal();
+    }
+  });
+
+  // Geolocate and set marker/hidden inputs
+  document.getElementById("geo-btn")?.addEventListener("click", async () => {
+    if (!("geolocation" in navigator)) return alert("Geolocation not supported.");
+    try {
+      const pos = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 8000 });
+      });
+      const { latitude: lat, longitude: lng } = pos.coords;
+      if (window.marker) window.marker.remove();
+      window.marker = L.marker([lat, lng]).addTo(window.map);
+      document.getElementById("lat").value = lat;
+      document.getElementById("lng").value = lng;
+      window.map.setView([lat, lng], 17);
+      setTimeout(() => window.map.invalidateSize(), 0);
+    } catch (e) {
+      alert("Failed to get location.");
+    }
+  });
+
+  // Form submission logic (compress images, send data) remains unchanged
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const lat = document.getElementById("lat").value;
+    const lng = document.getElementById("lng").value;
+    if (!lat || !lng) {
+      alert("Please select a location on the map.");
+      return;
+    }
+
+    const formData = new FormData();
+    Array.from(form.elements).forEach(el => {
+      if (!el.name) return;
+      if (el.type === "file") return;
+      formData.append(el.name, el.value);
+    });
+
+    const fileInput = form.querySelector('input[type="file"][name="images"]');
+    const files = fileInput?.files ? Array.from(fileInput.files) : [];
+    for (const f of files) {
+      try {
+        const compressed = await compressImage(f);
+        formData.append("images", compressed);
+      } catch {
+        formData.append("images", f);
+      }
+    }
+
+    try {
+      const res = await fetch("/api/incidents", {
+        method: "POST",
+        body: formData
+      });
+      if (res.ok) {
+        alert("Report submitted successfully.");
+        form.reset();
+        if (window.marker) {
+          window.marker.remove();
+          window.marker = null;
+        }
+        document.getElementById("lat").value = "";
+        document.getElementById("lng").value = "";
+        window.map.setView([14.4089, 121.0341], 15);
+        closeModal();
+      } else {
+        const data = await res.json();
+        alert("Failed to submit report: " + (data.message || res.statusText));
+      }
+    } catch (err) {
+      alert("Network error: " + err.message);
+    }
+  });
+});
 
 // Prefill from URL (QR context)
 (function prefillFromURL() {
@@ -33,43 +181,7 @@ window.addEventListener("drawer:toggle", () => setTimeout(() => map.invalidateSi
   } catch (_) {}
 })();
 
-let marker;
-
-// When user clicks on map, place or move marker and update hidden inputs
-map.on("click", function (e) {
-  const { lat, lng } = e.latlng;
-
-  if (marker) {
-    marker.setLatLng(e.latlng);
-  } else {
-    marker = L.marker(e.latlng).addTo(map);
-  }
-
-  // Update hidden inputs
-  document.getElementById("lat").value = lat;
-  document.getElementById("lng").value = lng;
-});
-
-// Geolocate and set marker/hidden inputs
-document.getElementById("geo-btn")?.addEventListener("click", async () => {
-  if (!("geolocation" in navigator)) return alert("Geolocation not supported.");
-  try {
-    const pos = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 8000 });
-    });
-    const { latitude: lat, longitude: lng } = pos.coords;
-    if (marker) marker.remove();
-    marker = L.marker([lat, lng]).addTo(map);
-    document.getElementById("lat").value = lat;
-    document.getElementById("lng").value = lng;
-    map.setView([lat, lng], 17);
-    setTimeout(() => map.invalidateSize(), 0);
-  } catch (e) {
-    alert("Failed to get location.");
-  }
-});
-
-// Helper: compress images before upload
+// Helper: compress images before upload (keep your existing function)
 async function compressImage(file, { maxWidth = 1280, quality = 0.7 } = {}) {
   const img = document.createElement("img");
   img.src = URL.createObjectURL(file);
@@ -87,57 +199,3 @@ async function compressImage(file, { maxWidth = 1280, quality = 0.7 } = {}) {
   URL.revokeObjectURL(img.src);
   return new File([blob], file.name.replace(/\.\w+$/, ".jpg"), { type: "image/jpeg" });
 }
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const lat = document.getElementById("lat").value;
-  const lng = document.getElementById("lng").value;
-  if (!lat || !lng) {
-    alert("Please select a location on the map.");
-    return;
-  }
-
-  // Build FormData manually to inject compressed images
-  const formData = new FormData();
-  // Append text fields
-  Array.from(form.elements).forEach(el => {
-    if (!el.name) return;
-    if (el.type === "file") return; // handle below
-    formData.append(el.name, el.value);
-  });
-  // Compress and append images
-  const fileInput = form.querySelector('input[type="file"][name="images"]');
-  const files = fileInput?.files ? Array.from(fileInput.files) : [];
-  for (const f of files) {
-    try {
-      const compressed = await compressImage(f);
-      formData.append("images", compressed);
-    } catch {
-      // fallback original if compression fails
-      formData.append("images", f);
-    }
-  }
-
-  try {
-    const res = await fetch("/api/incidents", {
-      method: "POST",
-      body: formData
-    });
-    if (res.ok) {
-      alert("Report submitted successfully.");
-      form.reset();
-      if (marker) {
-        marker.remove();
-        marker = null;
-      }
-      document.getElementById("lat").value = "";
-      document.getElementById("lng").value = "";
-      map.setView([14.4089, 121.0341], 15);
-    } else {
-      const data = await res.json();
-      alert("Failed to submit report: " + (data.message || res.statusText));
-    }
-  } catch (err) {
-    alert("Network error: " + err.message);
-  }
-});
