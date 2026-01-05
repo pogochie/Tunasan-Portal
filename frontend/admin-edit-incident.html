@@ -13,6 +13,8 @@
   <nav class="admin-navbar">
     <div class="container">
       <a href="admin.html" class="logo">Admin Dashboard</a>
+      <input type="checkbox" id="admin-nav-toggle" class="admin-nav-toggle" aria-label="Toggle navigation" />
+      <label for="admin-nav-toggle" class="admin-nav-toggle-label" aria-hidden="true"><span></span></label>
       <ul class="nav-menu">
         <li><a href="admin.html">Incidents</a></li>
         <li><a href="admin-news.html">Add News</a></li>
@@ -20,8 +22,15 @@
         <li><a href="admin-user-approval.html">User Approvals</a></li>
         <li><a href="#" id="logout-link">Logout</a></li>
       </ul>
+      <div class="admin-nav-overlay" tabindex="-1" aria-hidden="true"></div>
     </div>
   </nav>
+  <div class="admin-mobile-tabbar" role="navigation" aria-label="Admin Navigation">
+    <a href="admin.html" class="tab-link">Incidents</a>
+    <a href="admin-news.html" class="tab-link">News</a>
+    <a href="admin-events.html" class="tab-link">Events</a>
+    <a href="admin-user-approval.html" class="tab-link">Approvals</a>
+  </div>
   <div class="container">
     <h1>Edit Incident</h1>
     <form id="edit-incident-form" enctype="multipart/form-data">
@@ -48,6 +57,7 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <script src="js/admin-ui.js"></script>
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const incidentId = urlParams.get("id");
@@ -106,7 +116,7 @@
       setTimeout(() => map.invalidateSize(), 0);
       window.addEventListener("resize", () => map.invalidateSize());
 
-      const navToggle = document.getElementById("nav-toggle");
+      const navToggle = document.getElementById("admin-nav-toggle");
       if (navToggle) {
         navToggle.addEventListener("change", () => setTimeout(() => map.invalidateSize(), 250));
       }

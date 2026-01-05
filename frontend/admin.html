@@ -22,6 +22,11 @@
   <nav class="admin-navbar">
     <div class="container">
       <a href="admin.html" class="logo">Admin Dashboard</a>
+
+      <!-- Mobile toggle -->
+      <input type="checkbox" id="admin-nav-toggle" class="admin-nav-toggle" aria-label="Toggle navigation" />
+      <label for="admin-nav-toggle" class="admin-nav-toggle-label" aria-hidden="true"><span></span></label>
+
       <ul class="nav-menu">
         <li><a href="admin.html">Incidents</a></li>
         <li><a href="admin-news.html">Add News</a></li>
@@ -29,6 +34,7 @@
         <li><a href="admin-user-approval.html">User Approvals</a></li>
         <li><a href="#" id="logout-link">Logout</a></li>
       </ul>
+      <div class="admin-nav-overlay" tabindex="-1" aria-hidden="true"></div>
     </div>
   </nav>
 
@@ -68,5 +74,6 @@
       window.location.href = "admin-login.html";
     });
   </script>
+  <script src="js/admin-ui.js"></script>
 </body>
 </html>

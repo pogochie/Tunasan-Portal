@@ -11,6 +11,8 @@
   <nav class="admin-navbar">
     <div class="container">
       <a href="admin.html" class="logo">Admin Dashboard</a>
+      <input type="checkbox" id="admin-nav-toggle" class="admin-nav-toggle" aria-label="Toggle navigation" />
+      <label for="admin-nav-toggle" class="admin-nav-toggle-label" aria-hidden="true"><span></span></label>
       <ul class="nav-menu">
         <li><a href="admin.html">Incidents</a></li>
         <li><a href="admin-news.html">Add News</a></li>
@@ -18,8 +20,16 @@
         <li><a href="admin-user-approval.html">User Approvals</a></li>
         <li><a href="#" id="logout-link">Logout</a></li>
       </ul>
+      <div class="admin-nav-overlay" tabindex="-1" aria-hidden="true"></div>
     </div>
   </nav>
+
+  <div class="admin-mobile-tabbar" role="navigation" aria-label="Admin Navigation">
+    <a href="admin.html" class="tab-link">Incidents</a>
+    <a href="admin-news.html" class="tab-link">News</a>
+    <a href="admin-events.html" class="tab-link">Events</a>
+    <a href="admin-user-approval.html" class="tab-link">Approvals</a>
+  </div>
 
   <h1>Pending Barangay Officials</h1>
   <ul id="pending-users-list">Loading...</ul>
@@ -110,5 +120,6 @@
       window.location.href = "admin-login.html";
     });
   </script>
+  <script src="js/admin-ui.js"></script>
 </body>
 </html>
