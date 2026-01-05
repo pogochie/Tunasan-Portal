@@ -4,12 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin - Add Event</title>
-  <!-- Removed style.css to avoid conflicts -->
   <link rel="stylesheet" href="css/admin.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-  <style>
-    #map { margin-bottom: 15px; }
-  </style>
 </head>
 <body>
   <nav class="admin-navbar">
@@ -21,7 +17,7 @@
         <li><a href="index.html">Home</a></li>
         <li><a href="admin.html">Incidents</a></li>
         <li><a href="admin-news.html">Add News</a></li>
-        <li><a href="admin-events.html">Add Events</a></li>
+        <li><a href="admin-events.html" class="active">Add Events</a></li>
         <li><a href="admin-user-approval.html">User Approvals</a></li>
         <li><a href="#" id="logout-link">Logout</a></li>
       </ul>
@@ -32,33 +28,56 @@
   <div class="admin-mobile-tabbar" role="navigation" aria-label="Admin Navigation">
     <a href="admin.html" class="tab-link">Incidents</a>
     <a href="admin-news.html" class="tab-link">News</a>
-    <a href="admin-events.html" class="tab-link">Events</a>
+    <a href="admin-events.html" class="tab-link active">Events</a>
     <a href="admin-user-approval.html" class="tab-link">Approvals</a>
   </div>
 
+  <div class="page-header">
+    <h1 class="title">Create an Event</h1>
+    <div class="admin-search">
+      <input type="search" id="events-search" placeholder="Search events…" aria-label="Search events" />
+    </div>
+  </div>
+
   <div class="container">
-    <h1>Add Event</h1>
     <form id="event-form" enctype="multipart/form-data">
+      <div class="form-head">
+        <h2 class="form-title">Event Details</h2>
+        <p class="form-desc">Publish upcoming barangay activities with a location and images.</p>
+      </div>
+
       <label for="title">Title</label>
       <input type="text" name="title" id="title" placeholder="Title" required />
+
       <label for="description">Description</label>
-      <textarea name="description" id="description" placeholder="Description" required></textarea>
-      <label for="date">Date</label>
-      <input type="date" name="date" id="date" required />
+      <textarea name="description" id="description" placeholder="Describe the event" required></textarea>
+
+      <div class="event-meta">
+        <label for="date">Date</label>
+        <input type="date" name="date" id="date" required />
+        <span class="chip info">Tap the map to set the event location</span>
+      </div>
 
       <!-- Hidden inputs for location -->
       <input type="hidden" name="location[lat]" id="lat" required />
       <input type="hidden" name="location[lng]" id="lng" required />
 
-      <div id="map"></div>
+      <div id="map" class="map-wrap"></div>
+      <p class="map-help">Tip: Click anywhere on the map to drop a pin for the event.</p>
 
       <label for="images">Upload images</label>
       <input type="file" name="images" id="images" multiple accept="image/*" />
-      <button type="submit">Submit Event</button>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-gradient">Submit Event</button>
+      </div>
     </form>
 
-    <h2>Existing Events</h2>
-    <ul id="events-list">Loading events...</ul>
+    <div class="list-head">
+      <h2>Existing Events</h2>
+      <p class="list-desc">Manage or delete previously published events.</p>
+    </div>
+    <ul id="events-list" class="events-grid">Loading events...</ul>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
@@ -69,16 +88,12 @@
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
-
     let marker;
 
     map.on("click", function (e) {
       const { lat, lng } = e.latlng;
-      if (marker) {
-        marker.setLatLng(e.latlng);
-      } else {
-        marker = L.marker(e.latlng).addTo(map);
-      }
+      if (marker) marker.setLatLng(e.latlng);
+      else marker = L.marker(e.latlng).addTo(map);
       document.getElementById("lat").value = lat;
       document.getElementById("lng").value = lng;
     });
@@ -86,27 +101,19 @@
     const form = document.getElementById("event-form");
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-
       const formData = new FormData(form);
-
       if (!formData.get("location[lat]") || !formData.get("location[lng]")) {
         alert("Please select a location on the map.");
         return;
       }
-
       try {
-        const res = await fetch("/api/events", {
-          method: "POST",
-          body: formData,
-        });
+        const res = await fetch("/api/events", { method: "POST", body: formData });
         const data = await res.json();
         if (res.ok) {
           alert(data.message);
           form.reset();
-          if (marker) {
-            map.removeLayer(marker);
-            marker = null;
-          }
+          if (marker) { map.removeLayer(marker); marker = null; }
+          loadEvents();
         } else {
           alert("Failed to submit event: " + (data.message || ""));
         }
@@ -116,37 +123,54 @@
     });
 
     const eventsList = document.getElementById("events-list");
+    const searchInput = document.getElementById("events-search");
+    let EVENTS_CACHE = [];
 
     async function loadEvents() {
       try {
         const res = await fetch("/api/events");
         if (!res.ok) throw new Error("Failed to fetch events");
         const events = await res.json();
-
-        eventsList.innerHTML = "";
-        if (events.length === 0) {
-          eventsList.innerHTML = "<li>No events available.</li>";
-          return;
-        }
-
-        events.forEach(event => {
-          eventsList.innerHTML += `
-            <li>
-              <h3>${event.title}</h3>
-              <p>${new Date(event.date).toLocaleDateString()}</p>
-              <p>${event.description}</p>
-              ${event.images && event.images.length > 0 ? event.images.map(img => `<img src="${img}" loading="lazy" width="200" style="margin-right:10px;">`).join("") : ""}
-              <br>
-              <button class="delete-event-btn" data-id="${event._id}">Delete</button>
-            </li>
-          `;
-        });
+        EVENTS_CACHE = events;
+        renderEvents(events);
       } catch (err) {
         console.error(err);
         eventsList.innerHTML = "<li>Failed to load events.</li>";
       }
     }
 
+    function renderEvents(events) {
+      eventsList.innerHTML = "";
+      if (!events || events.length === 0) {
+        eventsList.innerHTML = "<li class='event-card empty'>No events available.</li>";
+        return;
+      }
+      events.forEach(event => {
+        const imagesHtml = (event.images && event.images.length > 0)
+          ? `
+            <div class="post-images ${event.images.length === 1 ? 'single' : ''}">
+              ${event.images.map(img => `<img src="${img}" loading="lazy" alt="event image">`).join("")}
+            </div>
+          `
+          : "";
+        const li = document.createElement("li");
+        li.className = "event-card";
+        li.innerHTML = `
+          <div class="event-head">
+            <h3>${event.title}</h3>
+            <span class="chip">${new Date(event.date).toLocaleDateString()}</span>
+          </div>
+          <p>${event.description}</p>
+          ${imagesHtml}
+          <div class="event-actions">
+            <button class="delete-event-btn" data-id="${event._id}">Delete</button>
+          </div>
+        `;
+        eventsList.appendChild(li);
+      });
+    }
+
+    // Delete handler
     eventsList.addEventListener("click", async (e) => {
       if (e.target.classList.contains("delete-event-btn")) {
         const id = e.target.getAttribute("data-id");
@@ -167,10 +191,20 @@
       }
     });
 
+    // Client-side search by title/description
+    searchInput.addEventListener("input", () => {
+      const q = searchInput.value.trim().toLowerCase();
+      const filtered = EVENTS_CACHE.filter(evt =>
+        (evt.title || "").toLowerCase().includes(q) ||
+        (evt.description || "").toLowerCase().includes(q)
+      );
+      renderEvents(filtered);
+    });
+
     loadEvents();
 
-    // Invalidate map when mobile drawer toggles (admin pages don't load navbar.js)
-    const navToggle = document.getElementById("nav-toggle");
+    // Invalidate map when mobile drawer toggles
+    const navToggle = document.getElementById("admin-nav-toggle");
     if (navToggle) {
       navToggle.addEventListener("change", () => {
         setTimeout(() => map.invalidateSize(), 250);
