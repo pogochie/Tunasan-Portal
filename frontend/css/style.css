@@ -1826,3 +1826,20 @@ body.modal-open {
     overscroll-behavior: contain;
   }
 }
+
+/* Ensure the floating Report Incident button clears the mobile tab bar and doesn't overlap it */
+@media (max-width: 768px) {
+  /* Raise tabbar above general UI */
+  .mobile-tabbar {
+    z-index: 1200; /* ensure it sits above floating elements */
+  }
+
+  /* Reposition the FAB above the tabbar and keep it below the tabbar in stacking order */
+  #report-btn {
+    bottom: calc(72px + env(safe-area-inset-bottom)); /* sit above tabbar height + safe area */
+    right: 16px;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    z-index: 1100; /* below .mobile-tabbar (1200) so tabbar is on top if they overlap */
+  }
+}
