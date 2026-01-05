@@ -34,12 +34,11 @@
         </select>
 
         <!-- Upload Barangay Official ID (image) -->
-        <label for="idImage">Upload Barangay Official ID</label>
-        <input type="file" id="idImage" name="idImage" accept="image/*" />
-        <small style="display:block; margin:-6px 0 12px; color:var(--muted);">
-          For officials: please upload a clear photo of your Barangay ID for approval.
-        </small>
-        <div id="id-preview" style="display:none; margin-bottom:12px;"></div>
+        <div class="file-field">
+          <span class="file-help">For officials: upload a clear photo of your Barangay ID.</span>
+          <input type="file" id="idImage" name="idImage" accept="image/*" />
+        </div>
+        <div id="id-preview"></div>
 
         <button type="submit">Register</button>
       </form>

@@ -2157,3 +2157,75 @@ body.modal-open {
   .brand-logo { width: 50px; height: 50px; }
   .auth-title { font-size: 1.3rem; }
 }
+
+/* Smart Auth: file upload field styling */
+.auth-card .file-field {
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(255,255,255,.7);
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 14px;
+}
+.auth-card .file-field:hover {
+  background: rgba(255,255,255,.85);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Helper text under upload */
+.auth-card .file-help {
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+/* Refined native file selector button inside the Register form */
+#register-form input[type="file"] {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+#register-form input[type="file"]::file-selector-button,
+#register-form input[type="file"]::-webkit-file-upload-button {
+  background: linear-gradient(90deg, #5B8DEF, #00D4FF 60%, #8A5CF6);
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: filter .15s ease, transform .05s ease, box-shadow .2s ease;
+  box-shadow: 0 8px 24px rgba(24,119,242,0.24);
+}
+#register-form input[type="file"]::file-selector-button:hover,
+#register-form input[type="file"]::-webkit-file-upload-button:hover {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(24,119,242,0.3);
+}
+
+/* Preview image in the auth card */
+#id-preview {
+  display: none;
+  margin-bottom: 12px;
+}
+#id-preview img {
+  max-width: 100%;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+/* Dark theme adjustments for upload */
+.theme-dark .auth-card .file-field {
+  background: #2a2a2a;
+  border-color: var(--border);
+}
+.theme-dark #register-form input[type="file"]::file-selector-button,
+.theme-dark #register-form input[type="file"]::-webkit-file-upload-button {
+  background: linear-gradient(90deg, #3b82f6, #22d3ee 60%, #8b5cf6);
+  box-shadow: 0 10px 30px rgba(59,130,246,0.35);
+}
