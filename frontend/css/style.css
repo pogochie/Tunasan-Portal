@@ -269,82 +269,6 @@ form#incident-form button:hover {
   fill: currentColor;
 }
 
-/* Ensure we have a nav height token for fixed navbar offset */
-:root {
-  --nav-height: 64px;
-}
-
-/* Make the main site navbar fixed to the top on all screens */
-.fb-navbar {
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  z-index: 1200; /* sits above content but below lightbox/report modal */
-}
-
-/* Compensate body content for the fixed navbar height */
-html, body {
-  padding-top: calc(var(--nav-height) + env(safe-area-inset-top)) !important;
-}
-
-/* Report Incident modal: full-viewport overlay with scroll */
-#report-modal {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 2000 !important;                 /* above navbar and other UI */
-  display: flex !important;
-  align-items: flex-start !important;       /* top-align to avoid vertical centering trap */
-  justify-content: center !important;       /* center horizontally */
-  min-height: 100vh !important;
-  height: 100vh !important;
-  padding: 16px 10px env(safe-area-inset-bottom) !important;
-  overflow-y: auto !important;              /* allow entire modal to scroll */
-  -webkit-overflow-scrolling: touch;
-  background: rgba(0, 0, 0, 0.6) !important;/* ensure dim background */
-}
-
-/* Modal content: remove inner clamps on desktop so all fields are reachable */
-.report-section {
-  width: min(96vw, 640px) !important;
-  max-height: none !important;              /* no inner cap on desktop */
-  overflow: visible !important;             /* let outer modal handle scroll */
-  margin-top: 8px !important;               /* slight spacing from top */
-}
-
-/* Keep focused inputs visible after scroll */
-.report-section input[type="text"],
-.report-section textarea,
-.report-section input[list],
-.report-section input[type="file"] {
-  scroll-margin-top: 48px;
-}
-
-/* Mobile: use dynamic viewport and inner scrolling to keep Submit visible */
-@media (max-width: 768px) {
-  #report-modal {
-    align-items: flex-start !important;
-    justify-content: center !important;
-    min-height: 100dvh !important;
-    height: 100dvh !important;
-    padding: 20px 10px env(safe-area-inset-bottom) !important;
-  }
-  .report-section {
-    max-height: calc(100dvh - 32px) !important;  /* inner scroll within dynamic viewport */
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-  }
-}
-
-/* Ensure the Submit button area is not clipped on very small screens */
-@media (max-width: 480px) {
-  .report-section {
-    padding-bottom: 24px !important;
-  }
-}
-
 /* ================================
    Modern Facebook-like theme overrides
    ================================ */
@@ -370,7 +294,7 @@ html, body {
 
 /* Define nav height so body padding-top doesn't break layout */
 :root {
-  --nav-height: 64px;
+  --nav-height: 56px;
 }
 
 /* Fix Report Incident modal on laptop/desktop: top-align and let modal scroll */
@@ -390,6 +314,31 @@ html, body {
   overflow: visible !important;                /* modal handles scroll */
   width: min(96vw, 640px) !important;          /* responsive width cap */
   margin-top: 8px !important;                  /* keep away from top edge */
+}
+
+/* Keep focused inputs visible below the top edge while scrolling */
+.report-section input[type="text"],
+.report-section textarea,
+.report-section input[list],
+.report-section input[type="file"] {
+  scroll-margin-top: 48px;
+}
+
+/* Mobile: use dynamic viewport and inner scroll to keep Submit visible */
+@media (max-width: 768px) {
+  #report-modal {
+    align-items: flex-start !important;
+    justify-content: center !important;
+    min-height: 100dvh !important;
+    height: 100dvh !important;
+    padding: 20px 10px env(safe-area-inset-bottom) !important;
+  }
+  .report-section {
+    max-height: calc(100dvh - 32px) !important;  /* inner scroll within dvh */
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
 }
 
 /* Remove body margin and padding so navbar touches viewport edges */
@@ -1673,7 +1622,8 @@ p {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6) !important;/* ensure dim background */
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
   justify-content: flex-start; /* align modal content from top */
   align-items: center;
   z-index: 1200;
@@ -1878,4 +1828,14 @@ body.modal-open {
 
 #report-btn:hover {
   background-color: var(--primary-hover);
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+  #report-btn {
+    bottom: 16px;
+    right: 16px;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+  }
 }
