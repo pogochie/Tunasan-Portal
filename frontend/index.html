@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <!-- Added viewport for mobile -->
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Barangay Tunasan Portal</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css" />
   <style>
     .hero {
       text-align: center;
@@ -98,6 +97,93 @@
       <ul id="home-feed" class="feed"></ul>
     </section>
   </main>
+
+  <!-- Modal container wrapping the report form -->
+  <div id="report-modal" aria-hidden="true" role="dialog" aria-modal="true" style="
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1200;
+  ">
+    <section class="report-section" id="report-section" aria-label="Report an Incident" style="
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+      padding: 24px;
+      width: 90%;
+      max-width: 600px;
+      position: relative;
+    ">
+      <button id="close-report" aria-label="Close report form" style="
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--muted);
+      ">×</button>
+
+      <!-- Full incident form -->
+      <form id="incident-form" enctype="multipart/form-data" novalidate>
+        <h2 data-i18n="home.reportTitle">Report an Incident</h2>
+
+        <label for="reporterName">Your Name</label>
+        <input type="text" id="reporterName" name="reporterName" placeholder="Your Name" required data-i18n-placeholder="form.name" autocomplete="name" />
+
+        <label for="incidentType">Incident Type</label>
+        <input list="incident-types" id="incidentType" name="incidentType" placeholder="Select or type incident type" required data-i18n-placeholder="form.type" autocomplete="off" />
+        <datalist id="incident-types">
+          <option value="Theft"></option>
+          <option value="Vandalism"></option>
+          <option value="Noise Complaint"></option>
+          <option value="Illegal Dumping"></option>
+          <option value="Traffic Accident"></option>
+          <option value="Fire"></option>
+          <option value="Flood"></option>
+          <option value="Other"></option>
+        </datalist>
+
+        <label for="description">Description</label>
+        <textarea id="description" name="description" placeholder="Description" required data-i18n-placeholder="form.description" rows="4"></textarea>
+
+        <!-- Hidden inputs for lat/lng -->
+        <input type="hidden" name="location[lat]" id="lat" required />
+        <input type="hidden" name="location[lng]" id="lng" required />
+
+        <!-- Map container -->
+        <div id="map" style="margin-bottom: 15px; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); height: 300px;"></div>
+
+        <button type="button" id="geo-btn" class="pill-btn" style="margin-bottom:10px;">Use my location</button>
+
+        <label for="images" style="display: block; margin-bottom: 6px; font-weight: 600;">Upload Images (optional)</label>
+        <input type="file" id="images" name="images" multiple accept="image/*" data-i18n-attr="aria-label:form.images" style="margin-bottom: 15px;" />
+
+        <button type="submit" class="pill-btn secondary" style="width: 100%; font-size: 1.1rem; padding: 14px;">Submit Report</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Floating Report Incident button -->
+  <button id="report-btn" class="pill-btn secondary" aria-label="Report an Incident" style="
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1100;
+    padding: 14px 20px;
+    font-size: 1rem;
+    border-radius: 9999px;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+  ">
+    Report Incident
+  </button>
 
   <!-- Leaflet CSS & JS -->
   <link
@@ -289,92 +375,56 @@
       } catch (e) {}
     })();
   </script>
-  <!-- Add a fixed "Report Incident" button somewhere in the body, e.g., just before closing </body> -->
-<!-- Floating Report Incident button -->
-<button id="report-btn" class="pill-btn secondary" aria-label="Report an Incident" style="
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 1100;
-  padding: 14px 20px;
-  font-size: 1rem;
-  border-radius: 9999px;
-  box-shadow: var(--shadow-lg);
-  cursor: pointer;
-">
-  Report Incident
-</button>
+  <!-- Inline modal open/close script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const reportBtn = document.getElementById("report-btn");
+      const reportModal = document.getElementById("report-modal");
+      const closeReportBtn = document.getElementById("close-report");
+      const form = document.getElementById("incident-form");
 
-<!-- Modal container wrapping the full report form -->
-<div id="report-modal" aria-hidden="true" role="dialog" aria-modal="true" style="
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 1200;
-">
-  <section class="report-section" id="report-section" aria-label="Report an Incident" style="
-    max-height: 90vh;
-    overflow-y: auto;
-    background: var(--card);
-    border-radius: 16px;
-    box-shadow: var(--shadow-lg);
-    padding: 24px;
-    width: 90%;
-    max-width: 600px;
-    position: relative;
-  ">
-    <button id="close-report" aria-label="Close report form" style="
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: transparent;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--muted);
-    ">×</button>
+      if (!reportBtn || !reportModal || !closeReportBtn || !form) {
+        console.warn("Report modal elements missing");
+        return;
+      }
 
-    <!-- Full incident form with all fields -->
-    <form id="incident-form" enctype="multipart/form-data" novalidate>
-      <h2 data-i18n="home.reportTitle">Report an Incident</h2>
+      const openModal = () => {
+        reportModal.style.display = "flex";
+        reportModal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-open");
+        form.reset();
+        // Reset hidden lat/lng inputs
+        document.getElementById("lat").value = "";
+        document.getElementById("lng").value = "";
+        // Reset map view and marker if you have global map/marker variables
+        if (window.map && window.marker) {
+          window.map.setView([14.4089, 121.0341], 15);
+          window.marker.remove();
+          window.marker = null;
+        }
+      };
 
-      <label for="reporterName">Your Name</label>
-      <input type="text" id="reporterName" name="reporterName" placeholder="Your Name" required data-i18n-placeholder="form.name" autocomplete="name" />
+      const closeModal = () => {
+        reportModal.style.display = "none";
+        reportModal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modal-open");
+      };
 
-      <label for="incidentType">Incident Type</label>
-      <input list="incident-types" id="incidentType" name="incidentType" placeholder="Select or type incident type" required data-i18n-placeholder="form.type" autocomplete="off" />
-      <datalist id="incident-types">
-        <option value="Theft"></option>
-        <option value="Vandalism"></option>
-        <option value="Noise Complaint"></option>
-        <option value="Illegal Dumping"></option>
-        <option value="Traffic Accident"></option>
-        <option value="Fire"></option>
-        <option value="Flood"></option>
-        <option value="Other"></option>
-      </datalist>
+      reportBtn.addEventListener("click", openModal);
+      closeReportBtn.addEventListener("click", closeModal);
 
-      <label for="description">Description</label>
-      <textarea id="description" name="description" placeholder="Description" required data-i18n-placeholder="form.description" rows="4"></textarea>
+      // Close modal on clicking outside the form
+      reportModal.addEventListener("click", (e) => {
+        if (e.target === reportModal) closeModal();
+      });
 
-      <!-- Hidden inputs for lat/lng -->
-      <input type="hidden" name="location[lat]" id="lat" required>
-      <input type="hidden" name="location[lng]" id="lng" required>
-
-      <!-- Map container -->
-      <div id="map" style="margin-bottom: 15px; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); height: 300px;"></div>
-
-      <button type="button" id="geo-btn" class="pill-btn" style="margin-bottom:10px;">Use my location</button>
-
-      <label for="images" style="display: block; margin-bottom: 6px; font-weight: 600;">Upload Images (optional)</label>
-      <input type="file" id="images" name="images" multiple accept="image/*" data-i18n-attr="aria-label:form.images" style="margin-bottom: 15px;"/>
-
-      <button type="submit" class="pill-btn secondary" style="width: 100%; font-size: 1.1rem; padding: 14px;">Submit Report</button>
-    </form>
-  </section>
-</div>
+      // Close modal on Escape key
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && reportModal.style.display === "flex") {
+          closeModal();
+        }
+      });
+    });
+  </script>
 </body>
 </html>
