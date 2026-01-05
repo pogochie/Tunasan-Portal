@@ -303,9 +303,17 @@ form#incident-form button:hover {
   justify-content: center !important;          /* center horizontally */
   min-height: 100vh !important;                /* full viewport */
   height: 100vh !important;
-  padding: 24px 12px 12px;                 /* smaller top padding */
-  overflow-y: auto;                        /* allow outer modal to scroll on laptops */
+  padding: 12px 10px !important;                 /* smaller top padding */
+  overflow-y: auto !important;                        /* allow outer modal to scroll on laptops */
   -webkit-overflow-scrolling: touch;
+  min-height: 100svh !important;
+  height: 100svh !important;
+}
+@supports (height: 100dvh) {
+  #report-modal {
+    min-height: 100dvh !important;
+    height: 100dvh !important;
+  }
 }
 
 /* Compact the modal content so more fits on screen */
@@ -313,26 +321,32 @@ form#incident-form button:hover {
   background: var(--card);
   border-radius: 24px;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
-  padding: 24px 20px;                      /* was 40px 48px */
+  padding: 20px 16px !important;                      /* was 40px 48px */
   width: min(96vw, 640px);
-  max-height: 90vh;                        /* keep scroll within viewport */
-  overflow-y: auto;
+  max-height: calc(100svh - 24px) !important;                        /* keep scroll within viewport */
+  overflow-y: auto !important;
+  box-sizing: border-box;
+}
+@supports (height: 100dvh) {
+  .report-section {
+    max-height: calc(100dvh - 24px) !important;
+  }
 }
 
 /* Smaller heading inside the modal */
 .report-section h2 {
-  font-size: 1.6rem;                       /* was 2rem */
-  margin-bottom: 16px;                     /* was 32px */
+  font-size: 1.5rem !important;                       /* was 2rem */
+  margin-bottom: 12px !important;                     /* was 32px */
 }
 
 /* Compact inputs and textarea spacing */
 .report-section label {
   display: block;
   font-weight: 700;
-  margin-bottom: 6px;                      /* was 10px */
+  margin-bottom: 6px !important;                      /* was 10px */
   color: var(--text);
   user-select: none;
-  font-size: 1rem;                         /* slightly smaller */
+  font-size: 1rem !important;                         /* slightly smaller */
 }
 
 .report-section input[type="text"],
@@ -340,11 +354,11 @@ form#incident-form button:hover {
 .report-section textarea,
 .report-section input[type="file"] {
   width: 100%;
-  padding: 12px 14px;                      /* was 16px 20px */
-  margin-bottom: 16px;                     /* was 28px */
+  padding: 12px 14px !important;                      /* was 16px 20px */
+  margin-bottom: 14px !important;                     /* was 28px */
   border: 2px solid var(--border);
-  border-radius: 12px;                     /* was 16px */
-  font-size: 1rem;
+  border-radius: 12px !important;                     /* was 16px */
+  font-size: 1rem !important;
   font-weight: 500;
   box-sizing: border-box;
   background: #fff;
@@ -352,7 +366,7 @@ form#incident-form button:hover {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text);
   user-select: text;
-  scroll-margin-top: 36px;                 /* keep focused field away from top edge */
+  scroll-margin-top: 40px;                 /* keep focused field away from top edge */
 }
 
 .report-section input[type="text"]::placeholder,
@@ -377,10 +391,10 @@ form#incident-form button:hover {
 
 .report-section button.pill-btn.secondary {
   width: 100%;
-  padding: 14px 0;                         /* was 18px 0 */
-  font-size: 1.1rem;                       /* was 1.3rem */
+  padding: 12px 0 !important;                         /* was 18px 0 */
+  font-size: 1.05rem !important;                       /* was 1.3rem */
   border-radius: 9999px;
-  box-shadow: 0 10px 28px rgba(24,119,242,0.45);
+  box-shadow: 0 8px 24px rgba(24,119,242,0.45);
   transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
   user-select: none;
 }
@@ -415,27 +429,30 @@ form#incident-form button:hover {
   border-radius: 20px !important;
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18) !important;
   border: 2px solid var(--border) !important;
-  height: 300px !important;                /* was 360px */
+  height: 260px !important;                /* was 360px */
   margin-bottom: 32px !important;
 }
 
 /* On short-height screens (e.g., small laptops), go extra compact and ensure full scrollability */
 @media (max-height: 820px) {
   #report-modal {
-    padding-top: 16px;
+    padding-top: 8px !important;
   }
   .report-section {
-    padding: 20px 16px;
-    max-height: calc(100vh - 32px);        /* ensure the whole form can scroll */
+    padding: 16px 14px !important;
+    max-height: calc(100svh - 16px) !important;        /* ensure the whole form can scroll */
+  }
+  @supports (height: 100dvh) {
+    .report-section { max-height: calc(100dvh - 16px) !important; }
   }
   .report-section h2 {
     font-size: 1.4rem;
     margin-bottom: 12px;
   }
-  #map { height: 240px !important; }
+  #map { height: 220px !important; }
   .report-section button.pill-btn.secondary {
-    padding: 12px 0;
-    font-size: 1rem;
+    padding: 10px 0 !important;
+    font-size: 1rem !important;
   }
 }
 
@@ -443,14 +460,14 @@ form#incident-form button:hover {
 @media (max-width: 768px) {
   #report-modal {
     align-items: flex-start;
-    padding: 16px 10px env(safe-area-inset-bottom);
+    padding: 12px 10px env(safe-area-inset-bottom) !important;
   }
   .report-section {
-    max-height: calc(100dvh - 32px);       /* use dynamic viewport on mobile */
+    max-height: calc(100dvh - 20px) !important;       /* use dynamic viewport on mobile */
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
-  #map { height: 260px !important; }
+  #map { height: 220px !important; }
 }
 
 /* Extra small phones */
@@ -932,7 +949,7 @@ p {
     flex-direction: column !important;
     padding: 70px 16px 16px !important;
     gap: 6px !important;
-    transform: translateX(100%);          /* hidden off-canvas */
+    transform: translateX(100%) !important;          /* hidden off-canvas */
     transition: transform .25s ease;
     z-index: 1001;
     will-change: transform;
@@ -1036,7 +1053,7 @@ p {
   color: var(--primary);
   background: rgba(24,119,242,.08);
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: 9999px;
   padding: 2px 8px;
   margin-left: 6px;
 }
@@ -1532,6 +1549,7 @@ p {
   --success-hover: #16a34a;
   --danger: #ef4444;
   --danger-hover: #dc2626;
+ 
   --border: #333333;
   --shadow: 0 2px 12px rgba(0,0,0,0.8);
   --shadow-lg: 0 8px 24px rgba(0,0,0,0.9);
@@ -1656,6 +1674,7 @@ p {
 .theme-dark .like-btn:hover {
   background: var(--primary-hover);
   color: #fff;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.6);
 }
 
 .theme-dark .like-btn.liked {
@@ -1745,8 +1764,8 @@ p {
   justify-content: flex-start; /* align modal content from top */
   align-items: center;
   z-index: 1200;
-  padding: 24px 12px 12px;                 /* smaller top padding so <h2> is visible */
-  overflow-y: auto;                        /* allow outer modal to scroll on laptops */
+  padding: 12px 10px !important;                 /* smaller top padding so <h2> is visible */
+  overflow-y: auto !important;                        /* allow outer modal to scroll on laptops */
   -webkit-overflow-scrolling: touch;
 }
 
@@ -1758,10 +1777,10 @@ p {
   background: var(--card);
   border-radius: 24px;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
-  padding: 24px 20px;                      /* was 40px 48px */
+  padding: 20px 16px !important;                      /* was 40px 48px */
   width: min(96vw, 640px);
-  max-height: 90vh;                        /* keep scroll within viewport */
-  overflow-y: auto;
+  max-height: calc(100svh - 24px) !important;                        /* keep scroll within viewport */
+  overflow-y: auto !important;
   position: relative;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text);
@@ -1779,7 +1798,6 @@ p {
   }
 }
 
-}
 
 body.modal-open {
   overflow: hidden;
@@ -1802,8 +1820,8 @@ body.modal-open {
 }
 
 .report-section h2 {
-  margin-bottom: 16px;                     /* was 32px */
-  font-size: 1.6rem;                       /* was 2rem */
+  margin-bottom: 12px !important;                     /* was 32px */
+  font-size: 1.5rem !important;                       /* was 2rem */
   font-weight: 900;
   color: var(--primary);
   text-align: center;
@@ -1813,10 +1831,10 @@ body.modal-open {
 .report-section label {
   display: block;
   font-weight: 700;
-  margin-bottom: 6px;                      /* was 10px */
+  margin-bottom: 6px !important;                      /* was 10px */
   color: var(--text);
   user-select: none;
-  font-size: 1rem;                         /* slightly smaller */
+  font-size: 1rem !important;                         /* slightly smaller */
 }
 
 .report-section input[type="text"],
@@ -1824,11 +1842,11 @@ body.modal-open {
 .report-section textarea,
 .report-section input[type="file"] {
   width: 100%;
-  padding: 12px 14px;                      /* was 16px 20px */
-  margin-bottom: 16px;                     /* was 28px */
+  padding: 12px 14px !important;                      /* was 16px 20px */
+  margin-bottom: 14px !important;                     /* was 28px */
   border: 2px solid var(--border);
-  border-radius: 12px;                     /* was 16px */
-  font-size: 1rem;
+  border-radius: 12px !important;                     /* was 16px */
+  font-size: 1rem !important;
   font-weight: 500;
   box-sizing: border-box;
   background: #fff;
@@ -1836,7 +1854,7 @@ body.modal-open {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text);
   user-select: text;
-  scroll-margin-top: 36px;                 /* keep focused field away from top edge */
+  scroll-margin-top: 40px;                 /* keep focused field away from top edge */
 }
 
 .report-section input[type="text"]::placeholder,
@@ -1861,10 +1879,10 @@ body.modal-open {
 
 .report-section button.pill-btn.secondary {
   width: 100%;
-  padding: 14px 0;                         /* was 18px 0 */
-  font-size: 1.1rem;                       /* was 1.3rem */
+  padding: 12px 0 !important;                         /* was 18px 0 */
+  font-size: 1.05rem !important;                       /* was 1.3rem */
   border-radius: 9999px;
-  box-shadow: 0 10px 28px rgba(24,119,242,0.45);
+  box-shadow: 0 8px 24px rgba(24,119,242,0.45);
   transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
   user-select: none;
 }
@@ -1899,7 +1917,7 @@ body.modal-open {
   border-radius: 20px !important;
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18) !important;
   border: 2px solid var(--border) !important;
-  height: 300px !important;                /* was 360px */
+  height: 260px !important;                /* was 360px */
   margin-bottom: 32px !important;
 }
 
