@@ -22,30 +22,26 @@ export function initNavbar() {
       window.location.href = "index.html";
     });
   }
+  
 
-  // Mobile drawer helpers
-  const dispatchDrawerToggle = () => {
-    window.dispatchEvent(new Event("drawer:toggle"));
-  };
-
-  if (navToggle) {
-    navToggle.addEventListener("change", dispatchDrawerToggle);
-  }
+  // Close nav when clicking overlay
   if (overlay && navToggle) {
     overlay.addEventListener("click", () => {
       navToggle.checked = false;
-      dispatchDrawerToggle();
     });
   }
+
+  // Close nav when clicking a nav link (mobile)
   if (navMenu && navToggle) {
     navMenu.addEventListener("click", (e) => {
       if (e.target.tagName === "A") {
         navToggle.checked = false;
-        dispatchDrawerToggle();
       }
     });
   }
 
+  // ... rest of your existing navbar code (theme toggle, language toggle, notifications) ...
+  
   // Theme toggle
   const themeBtn = document.getElementById("theme-toggle");
   const applyTheme = (theme) => {

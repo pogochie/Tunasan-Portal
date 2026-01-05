@@ -181,104 +181,118 @@ form#incident-form button:hover {
   top: 8px;
 }
 
+/* Hide nav toggle checkbox */
+.nav-toggle {
+  display: none;
+}
+
+/* Hamburger icon */
+.nav-toggle-label {
+  display: none;
+  cursor: pointer;
+  padding: 8px;
+  position: relative;
+  z-index: 1101;
+}
+.nav-toggle-label span,
+.nav-toggle-label span::before,
+.nav-toggle-label span::after {
+  display: block;
+  background: #050505;
+  height: 2px;
+  width: 24px;
+  border-radius: 2px;
+  position: relative;
+  transition: transform 0.25s ease, opacity 0.2s ease, background 0.25s ease;
+}
+.nav-toggle-label span::before,
+.nav-toggle-label span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+.nav-toggle-label span::before { top: -7px; }
+.nav-toggle-label span::after { top: 7px; }
+
+/* Overlay */
+.nav-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(2px);
+  z-index: 1100;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Side drawer menu */
+.nav-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: min(80vw, 300px);
+  background: #fff;
+  border-left: 1px solid var(--border);
+  box-shadow: 0 0 20px rgba(0,0,0,0.15);
+  flex-direction: column;
+  padding: 70px 16px 16px;
+  gap: 12px;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  z-index: 1101;
+  overflow-y: auto;
+}
+
+/* Show hamburger and drawer on mobile */
 @media (max-width: 768px) {
-  .nav-menu {
-    position: absolute;
-    top: 60px;
-    right: 0;
-    background-color: #2980b9;
-    flex-direction: column;
-    width: 200px;
-    display: none;
-  }
-
-  .nav-menu li {
-    margin: 10px 0;
-  }
-
-  .nav-toggle:checked + .nav-toggle-label + .nav-menu {
-    display: flex;
-  }
-
-  .nav-toggle {
-    display: block;
-  }
-
   .nav-toggle-label {
     display: block;
   }
+  .nav-menu {
+    display: flex;
+  }
+  /* When nav toggle is checked, show drawer and overlay */
+  .nav-toggle:checked ~ .nav-menu {
+    transform: translateX(0);
+  }
+  .nav-toggle:checked ~ .nav-overlay {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  /* Prevent body scroll when nav open */
+  body:has(#nav-toggle:checked) {
+    overflow: hidden;
+  }
 }
 
-/* ================================
-   Modern Facebook-like theme overrides
-   ================================ */
-:root {
-  --bg: #F0F2F5;
-  --card: #fff;
-  --text: #1C1E21;
-  --muted: #65676B;
-  --primary: #1877F2;
-  --primary-hover: #166FE5;
-  --success: #42B72A;
-  --success-hover: #36A420;
-  --danger: #E53935;
-  --danger-hover: #D32F2F;
-  --border: #E4E6EB;
-  --shadow: 0 2px 12px rgba(0,0,0,0.06);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+/* Style nav links inside drawer */
+.nav-menu li a {
+  padding: 12px 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #050505;
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-menu li a:hover,
+.nav-menu li a.active {
+  background-color: var(--primary);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(24,119,242,0.4);
 }
 
-/* Remove body margin and padding so navbar touches viewport edges */
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
-  min-height: 100vh;
-  position: relative;
-  padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
-}
-
-/* Remove container horizontal padding to let navbar stretch full width */
-.container {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding-left: 0;
-  padding-right: 0;
-}
-
-/* Optional: if you want the navbar background to stretch full width beyond container */
-.fb-navbar {
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-/* If you want the navbar content to align with container edges, keep container padding 0 and add padding inside navbar as above */
-
-/* Background image with blur (add your image at /frontend/images/tunasan-bg.jpg) */
-body {
-  position: relative;
-  min-height: 100vh;
-}
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background: url('/images/tunasan-bg.jpg') center/cover no-repeat;
-  filter: blur(10px) brightness(0.85);
-  transform: scale(1.05); /* reduce edge blur clipping */
-}
-
-/* Utility visibility classes */
-.mobile-only { display: none; }
-.desktop-only { display: inline-block; }
-@media (max-width: 768px) {
-  .mobile-only { display: block; }
-  .desktop-only { display: none !important; }
+/* Adjust icons size */
+.nav-menu li a .ico {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
 }
 
 /* Modern theme tokens */
@@ -1525,11 +1539,5 @@ body.modal-open {
 }
 
 #report-btn {
-  display: none; /* hidden by default */
-}
-
-@media (max-width: 768px) {
-  #report-btn {
-    display: inline-block; /* show only on mobile */
-  }
+  display: inline-block !important;
 }
