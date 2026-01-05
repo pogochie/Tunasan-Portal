@@ -1378,7 +1378,7 @@ p {
 
 /* Improve mobile bottom tabbar: fixed, safe-area aware, and active styles */
 @media (max-width: 768px) {
-  .nav-center, .search-wrap, .pill-btn.secondary {
+  .nav-center, .search-wrap, .nav-right .pill-btn.secondary, .fb-navbar .pill-btn.secondary, .navbar .pill-btn.secondary {
     display: none !important;
   }
   .fb-nav-inner {
@@ -1584,6 +1584,7 @@ p {
 .theme-dark .nav-center .nav-items,
 .theme-dark .nav-menu {
   background: transparent;
+ 
 }
 
 .theme-dark .nav-link {
@@ -1916,47 +1917,16 @@ body.modal-open {
   margin-bottom: 32px !important;
 }
 
-/* Ensure the floating Report Incident button is visible on mobile */
-
-/* Override any styles hiding the button */
-#report-btn {
-  display: inline-block !important;
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 1100;
-  padding: 14px 20px;
-  font-size: 1rem;
-  border-radius: 9999px;
-  box-shadow: var(--shadow-lg);
-  cursor: pointer;
-  background-color: var(--primary);
-  color: #fff;
-  border: none;
-  transition: background-color 0.3s ease;
-}
-
-#report-btn:hover {
-  background-color: var(--primary-hover);
-}
-
-/* Ensure submit button is reachable and not hidden by bottom tabbar on mobile */
+/* Keep the submit button visible while scrolling inside the modal on mobile */
 @media (max-width: 768px) {
   .report-section {
-    /* add safe bottom space inside the scroll container */
     padding-bottom: calc(24px + var(--tabbar-height) + env(safe-area-inset-bottom)) !important;
-    /* keep focused elements and the submit button away from the bottom edge */
     scroll-padding-bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 24px);
   }
-  #incident-form {
-    /* small breathing room inside the form */
-    padding-bottom: 16px !important;
-  }
   .report-section button.pill-btn.secondary {
-    /* keep the submit button visible while scrolling */
     position: sticky;
     bottom: 12px;
-    z-index: 1;
+    z-index: 2;
   }
 }
 
