@@ -146,41 +146,6 @@ form#incident-form button:hover {
   background-color: #1c5980;
 }
 
-/* Responsive */
-.nav-toggle {
-  display: none;
-}
-
-.nav-toggle-label {
-  display: none;
-  cursor: pointer;
-}
-
-.nav-toggle-label span,
-.nav-toggle-label span::before,
-.nav-toggle-label span::after {
-  display: block;
-  background: white;
-  height: 2px;
-  width: 25px;
-  border-radius: 2px;
-  position: relative;
-}
-
-.nav-toggle-label span::before,
-.nav-toggle-label span::after {
-  content: "";
-  position: absolute;
-}
-
-.nav-toggle-label span::before {
-  top: -8px;
-}
-
-.nav-toggle-label span::after {
-  top: 8px;
-}
-
 /* Hide nav toggle checkbox */
 .nav-toggle {
   display: none;
@@ -293,6 +258,78 @@ form#incident-form button:hover {
   width: 20px;
   height: 20px;
   fill: currentColor;
+}
+
+/* ================================
+   Modern Facebook-like theme overrides
+   ================================ */
+:root {
+  --bg: #F0F2F5;
+  --card: #fff;
+  --text: #1C1E21;
+  --muted: #65676B;
+  --primary: #1877F2;
+  --primary-hover: #166FE5;
+  --success: #42B72A;
+  --success-hover: #36A420;
+  --danger: #E53935;
+  --danger-hover: #D32F2F;
+  --border: #E4E6EB;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+/* Remove body margin and padding so navbar touches viewport edges */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+  position: relative;
+  padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
+}
+
+/* Remove container horizontal padding to let navbar stretch full width */
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Optional: if you want the navbar background to stretch full width beyond container */
+.fb-navbar {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* If you want the navbar content to align with container edges, keep container padding 0 and add padding inside navbar as above */
+
+/* Background image with blur (add your image at /frontend/images/tunasan-bg.jpg) */
+body {
+  position: relative;
+  min-height: 100vh;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: url('/images/tunasan-bg.jpg') center/cover no-repeat;
+  filter: blur(10px) brightness(0.85);
+  transform: scale(1.05); /* reduce edge blur clipping */
+}
+
+/* Utility visibility classes */
+.mobile-only { display: none; }
+.desktop-only { display: inline-block; }
+@media (max-width: 768px) {
+  .mobile-only { display: block; }
+  .desktop-only { display: none !important; }
 }
 
 /* Modern theme tokens */
@@ -428,6 +465,8 @@ input[type="file"]::file-selector-button:hover {
   display: none;
   cursor: pointer;
   padding: 8px;
+  position: relative;
+  z-index: 1101;
 }
 .nav-toggle-label span,
 .nav-toggle-label span::before,
@@ -438,7 +477,7 @@ input[type="file"]::file-selector-button:hover {
   width: 24px;
   border-radius: 2px;
   position: relative;
-  transition: transform .25s ease, opacity .2s ease, background .25s ease;
+  transition: transform 0.25s ease, opacity 0.2s ease, background 0.25s ease;
 }
 .nav-toggle-label span::before,
 .nav-toggle-label span::after {
@@ -453,9 +492,12 @@ input[type="file"]::file-selector-button:hover {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 1000;
-  background: rgba(0,0,0,.35);
+  background: rgba(0,0,0,0.35);
   backdrop-filter: blur(2px);
+  z-index: 1100;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Ensure no horizontal scroll (prevents peeking drawer) */
