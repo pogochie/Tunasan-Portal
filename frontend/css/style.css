@@ -786,7 +786,7 @@ p {
   color: #fff;
   border: none;
   padding: 10px 18px;
-  border-radius: 999px;
+  border-radius: 9999px;
   font-weight: 700;
   cursor: pointer;
   box-shadow: var(--shadow);
@@ -902,7 +902,7 @@ p {
   color: #fff;
   border: none;
   padding: 10px 24px;
-  border-radius: 999px;
+  border-radius: 9999px;
   font-weight: 700;
   cursor: pointer;
   box-shadow: var(--shadow);
@@ -1423,6 +1423,7 @@ p {
     width: 22px;
     height: 22px;
     fill: currentColor; /* ensure icon follows text color */
+ 
   }
 
   .mobile-tabbar .tab-link .txt {
@@ -1431,6 +1432,7 @@ p {
 
   /* Prevent content from being hidden behind the fixed tabbar */
   body {
+ 
     padding-bottom: calc(56px + env(safe-area-inset-bottom));
   }
 }
@@ -1448,6 +1450,7 @@ p {
 }
 
 /* Fix lightbox overlay positioning and stacking */
+ 
 .lightbox-overlay {
   position: fixed !important;
   top: 0 !important;
@@ -1931,4 +1934,29 @@ body.modal-open {
 
 #report-btn:hover {
   background-color: var(--primary-hover);
+}
+
+/* Ensure submit button is reachable and not hidden by bottom tabbar on mobile */
+@media (max-width: 768px) {
+  .report-section {
+    /* add safe bottom space inside the scroll container */
+    padding-bottom: calc(24px + var(--tabbar-height) + env(safe-area-inset-bottom)) !important;
+    /* keep focused elements and the submit button away from the bottom edge */
+    scroll-padding-bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 24px);
+  }
+  #incident-form {
+    /* small breathing room inside the form */
+    padding-bottom: 16px !important;
+  }
+  .report-section button.pill-btn.secondary {
+    /* keep the submit button visible while scrolling */
+    position: sticky;
+    bottom: 12px;
+    z-index: 1;
+  }
+}
+
+/* Slightly more compact on short-height devices (extra safety) */
+@media (max-height: 740px) {
+  #map { height: 200px !important; }
 }
