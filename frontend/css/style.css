@@ -1318,7 +1318,7 @@ p {
 .theme-dark .nav-right button:hover {
   background-color: var(--primary-hover);
   color: #fff;
-  box-shadow: 0 8px 20px rgba(59,130,246,0.6);
+  box-shadow: 0 8px 20px rgba(59,130,242,0.6);
 }
 
 /* Post cards dark mode */
@@ -1426,4 +1426,80 @@ p {
 .theme-dark ::-webkit-scrollbar-thumb {
   background-color: var(--primary);
   border-radius: 4px;
+}
+
+/* Additional styles for modern report form */
+
+.report-section {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  max-width: 600px;
+  margin: 40px auto;
+  flex-direction: column;
+}
+
+.report-section h2 {
+  margin-bottom: 20px;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+}
+
+.report-section label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text);
+  display: block;
+}
+
+.report-section input[type="text"],
+.report-section input[list],
+.report-section textarea,
+.report-section input[type="file"] {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  background: #fff;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.report-section input[type="text"]:focus,
+.report-section input[list]:focus,
+.report-section textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(24,119,242,0.15);
+}
+
+.report-section textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.report-section button.pill-btn.secondary {
+  font-weight: 700;
+  box-shadow: var(--shadow-lg);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.report-section button.pill-btn.secondary:hover {
+  background-color: var(--primary-hover);
+  box-shadow: 0 10px 30px rgba(24,119,242,0.4);
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .report-section {
+    margin: 20px 10px;
+    padding: 16px;
+  }
 }

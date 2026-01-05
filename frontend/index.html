@@ -73,27 +73,44 @@
       <ul id="home-feed" class="feed"></ul>
     </section>
 
+    <section class="report-section" id="report-section" aria-label="Report an Incident">
+  <form id="incident-form" enctype="multipart/form-data" novalidate>
     <h2 data-i18n="home.reportTitle">Report an Incident</h2>
 
-    <section class="report-section" id="report-section">
-      <form id="incident-form" enctype="multipart/form-data">
-        <input type="text" name="reporterName" placeholder="Your Name" required data-i18n-placeholder="form.name">
-        <input type="text" name="incidentType" placeholder="Incident Type" required data-i18n-placeholder="form.type">
-        <textarea name="description" placeholder="Description" required data-i18n-placeholder="form.description"></textarea>
+    <label for="reporterName">Your Name</label>
+    <input type="text" id="reporterName" name="reporterName" placeholder="Your Name" required data-i18n-placeholder="form.name" autocomplete="name" />
 
-        <!-- Hidden inputs for lat/lng -->
-        <input type="hidden" name="location[lat]" id="lat" required>
-        <input type="hidden" name="location[lng]" id="lng" required>
+    <label for="incidentType">Incident Type</label>
+    <input list="incident-types" id="incidentType" name="incidentType" placeholder="Select or type incident type" required data-i18n-placeholder="form.type" autocomplete="off" />
+    <datalist id="incident-types">
+      <option value="Theft"></option>
+      <option value="Vandalism"></option>
+      <option value="Noise Complaint"></option>
+      <option value="Illegal Dumping"></option>
+      <option value="Traffic Accident"></option>
+      <option value="Fire"></option>
+      <option value="Flood"></option>
+      <option value="Other"></option>
+    </datalist>
 
-        <!-- Map container (responsive height via CSS) -->
-        <div id="map" style="margin-bottom: 15px;"></div>
-        <button type="button" id="geo-btn" class="pill-btn" style="margin-bottom:10px;">Use my location</button>
+    <label for="description">Description</label>
+    <textarea id="description" name="description" placeholder="Description" required data-i18n-placeholder="form.description" rows="4"></textarea>
 
-        <input type="file" name="images" multiple accept="image/*" data-i18n-attr="aria-label:form.images">
-        <br>
-        <button type="submit" data-i18n="form.submit">Submit Report</button>
-      </form>
-    </section>
+    <!-- Hidden inputs for lat/lng -->
+    <input type="hidden" name="location[lat]" id="lat" required>
+    <input type="hidden" name="location[lng]" id="lng" required>
+
+    <!-- Map container -->
+    <div id="map" style="margin-bottom: 15px; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); height: 300px;"></div>
+
+    <button type="button" id="geo-btn" class="pill-btn" style="margin-bottom:10px;">Use my location</button>
+
+    <label for="images" style="display: block; margin-bottom: 6px; font-weight: 600;">Upload Images (optional)</label>
+    <input type="file" id="images" name="images" multiple accept="image/*" data-i18n-attr="aria-label:form.images" style="margin-bottom: 15px;"/>
+
+    <button type="submit" class="pill-btn secondary" style="width: 100%; font-size: 1.1rem; padding: 14px;">Submit Report</button>
+  </form>
+</section>
   </main>
 
   <!-- Leaflet CSS & JS -->
