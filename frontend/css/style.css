@@ -1130,9 +1130,6 @@ p {
   backdrop-filter: saturate(180%) blur(12px);
   will-change: background-color, box-shadow;
 }
-#navbar-placeholder {
-position: fixed;
-}
 
 .fb-navbar:hover {
   background: #f7f9fc;
