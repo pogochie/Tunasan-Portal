@@ -59,6 +59,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("lat").value = "";
     document.getElementById("lng").value = "";
 
+    // Ensure modal starts at top and content is visible
+    reportModal.scrollTop = 0;
+    document.getElementById("report-section")?.scrollTo({ top: 0, behavior: "auto" });
+
     // Initialize or refresh map inside modal
     initMap();
 
@@ -67,6 +71,9 @@ document.addEventListener("DOMContentLoaded", () => {
       window.marker.remove();
       window.marker = null;
     }
+
+    // Invalidate map size after modal layout settles
+    setTimeout(() => window.map?.invalidateSize(), 50);
   };
 
   const closeModal = () => {
