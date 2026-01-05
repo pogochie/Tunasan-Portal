@@ -1521,12 +1521,13 @@ p {
   display: none;
   position: fixed;
   inset: 0;
+  justify-content: flex-start; /* align modal content from top */
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(6px);
   justify-content: center;
   align-items: center;
   z-index: 1200;
-  padding: 20px;
+  padding: px;
   overflow-y: auto;
 }
 
@@ -1541,6 +1542,7 @@ p {
   padding: 40px 48px;
   max-width: 600px;
   width: 100%;
+  max-height: calc(100vh - 120px); /* leave space for top padding */
   max-height: 90vh; /* limit height */
   overflow-y: auto; /* scroll inside modal */
   position: relative;
@@ -1558,10 +1560,12 @@ p {
     opacity: 1;
     transform: translateY(0);
   }
-}/* Ensure form elements stack properly */
+}
+
 .report-section form {
   display: flex;
   flex-direction: column;
+  padding-bottom: 40px;
 }
 
 
@@ -1736,5 +1740,16 @@ p {
     right: 16px;
     padding: 12px 18px;
     font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 768px) {
+  #report-modal {
+    justify-content: center; /* center vertically on mobile */
+    padding: 20px 10px 10px;
+  }
+  .report-section {
+    padding: 24px 20px;
+    max-height: 85vh;
   }
 }
