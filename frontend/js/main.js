@@ -180,3 +180,47 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const reportBtn = document.getElementById("report-btn");
+  const reportModal = document.getElementById("report-modal");
+  const closeReportBtn = document.getElementById("close-report");
+  const incidentForm = document.getElementById("incident-form");
+
+  if (!reportBtn || !reportModal || !closeReportBtn || !incidentForm) return;
+
+  const openModal = () => {
+    reportModal.classList.add("open");
+    document.body.classList.add("modal-open");
+    incidentForm.reset();
+    // Reset hidden lat/lng inputs
+    document.getElementById("lat").value = "";
+    document.getElementById("lng").value = "";
+    // Reset map view and marker if you have global map/marker variables
+    if (window.map && window.marker) {
+      window.map.setView([14.4089, 121.0341], 15);
+      window.marker.remove();
+      window.marker = null;
+    }
+  };
+
+  const closeModal = () => {
+    reportModal.classList.remove("open");
+    document.body.classList.remove("modal-open");
+  };
+
+  reportBtn.addEventListener("click", openModal);
+  closeReportBtn.addEventListener("click", closeModal);
+
+  // Close modal on clicking outside the form
+  reportModal.addEventListener("click", (e) => {
+    if (e.target === reportModal) closeModal();
+  });
+
+  // Close modal on Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && reportModal.classList.contains("open")) {
+      closeModal();
+    }
+  });
+});

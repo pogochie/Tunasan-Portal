@@ -126,9 +126,9 @@ form#incident-form button:hover {
 }
 
 .nav-menu {
-  list-style: none;
   display: flex;
-  gap: 15px;
+  gap: 12px;
+  list-style: none;
   margin: 0;
   padding: 0;
 }
@@ -1302,7 +1302,20 @@ p {
   color: var(--text);
 }
 
-.theme-dark body {
+.theme-dark {
+  --bg: #121212;
+  --card: #1e1e1e;
+  --text: #e0e0e0;
+  --muted: #a0a0a0;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --success: #22c55e;
+  --success-hover: #16a34a;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --border: #333333;
+  --shadow: 0 2px 12px rgba(0,0,0,0.8);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.9);
   background-color: var(--bg);
   color: var(--text);
 }
