@@ -32,11 +32,29 @@
     <a href="admin-user-approval.html" class="tab-link">Approvals</a>
   </div>
 
-  <h1>Pending Barangay Officials</h1>
-  <ul id="pending-users-list">Loading...</ul>
+  <div class="page-header">
+    <h1 class="title">Pending Barangay Officials</h1>
+    <div class="admin-search">
+      <input type="search" id="user-search" placeholder="Search username…" aria-label="Search pending users" />
+    </div>
+  </div>
+  <ul id="pending-users-list" class="approvals-grid">Loading...</ul>
+
+  <!-- Image lightbox -->
+  <div id="img-lightbox" class="img-lightbox" aria-hidden="true">
+    <button class="img-lightbox-close" aria-label="Close">×</button>
+    <div class="img-lightbox-content">
+      <img id="img-lightbox-img" alt="Barangay ID preview">
+    </div>
+  </div>
 
   <script>
     const pendingUsersList = document.getElementById("pending-users-list");
+    const searchInput = document.getElementById("user-search");
+    const lightbox = document.getElementById("img-lightbox");
+    const lightboxImg = document.getElementById("img-lightbox-img");
+    const lightboxClose = document.querySelector(".img-lightbox-close");
+    let USERS = [];
 
     async function loadPendingUsers() {
       try {
@@ -48,29 +66,67 @@
         if (!res.ok) throw new Error("Failed to fetch pending users");
         const users = await res.json();
 
-        pendingUsersList.innerHTML = "";
-        if (users.length === 0) {
-          pendingUsersList.innerHTML = "<li>No pending users.</li>";
-          return;
-        }
-
-        users.forEach(user => {
-          const li = document.createElement("li");
-          li.innerHTML = `
-            <strong>${user.username}</strong> - Status: ${user.status}
-            <button class="approve-btn" data-id="${user._id}">Approve</button>
-            <button class="reject-btn" data-id="${user._id}">Reject</button>
-          `;
-          pendingUsersList.appendChild(li);
-        });
+        USERS = users;
+        renderUsers(USERS);
       } catch (err) {
         console.error(err);
         pendingUsersList.innerHTML = "<li>Failed to load pending users.</li>";
       }
     }
 
+    function renderUsers(list) {
+      pendingUsersList.innerHTML = "";
+      if (!list || list.length === 0) {
+        pendingUsersList.innerHTML = "<li class='approval-card empty'>No pending users.</li>";
+        return;
+      }
+      list.forEach(user => {
+        const avatarInitial = (user.username || "?").slice(0, 1).toUpperCase();
+        const idImg = user.idImage || ""; // Cloudinary URL if provided
+        const li = document.createElement("li");
+        li.className = "approval-card";
+        li.innerHTML = `
+          <div class="user-row">
+            <div class="avatar">${avatarInitial}</div>
+            <div class="user-info">
+              <strong class="username">${user.username}</strong>
+              <div class="meta"><span class="badge">${user.role || "official"}</span> <span class="status-badge">${user.status}</span></div>
+            </div>
+          </div>
+          <div class="approval-media">
+            ${idImg ? `<img src="${idImg}" alt="Barangay ID of ${user.username}" class="id-image" data-src="${idImg}">`
+                    : `<div class="id-placeholder">No ID uploaded</div>`}
+          </div>
+          <div class="action-row">
+            <button class="view-btn" ${idImg ? "" : "disabled"} data-src="${idImg}">View ID</button>
+            <div class="spacer"></div>
+            <button class="approve-btn" data-id="${user._id}">Approve</button>
+            <button class="reject-btn" data-id="${user._id}">Reject</button>
+          </div>
+        `;
+        pendingUsersList.appendChild(li);
+      });
+    }
+
+    // Client-side search
+    searchInput.addEventListener("input", () => {
+      const q = searchInput.value.trim().toLowerCase();
+      const filtered = USERS.filter(u => (u.username || "").toLowerCase().includes(q));
+      renderUsers(filtered);
+    });
+
     pendingUsersList.addEventListener("click", async (e) => {
       const token = localStorage.getItem("token");
+      // Lightbox open
+      const imgEl = e.target.closest(".id-image");
+      const viewBtn = e.target.closest(".view-btn");
+      const src = imgEl?.getAttribute("data-src") || viewBtn?.getAttribute("data-src");
+      if (src) {
+        lightboxImg.src = src;
+        lightbox.setAttribute("aria-hidden", "false");
+        lightbox.classList.add("open");
+        return;
+      }
       if (e.target.classList.contains("approve-btn")) {
         const id = e.target.getAttribute("data-id");
         if (confirm("Approve this user?")) {
@@ -109,6 +165,20 @@
             alert("Error: " + err.message);
           }
         }
+      }
+    });
+
+    // Lightbox interactions
+    lightboxClose.addEventListener("click", () => {
+      lightbox.classList.remove("open");
+      lightbox.setAttribute("aria-hidden", "true");
+      lightboxImg.src = "";
+    });
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) {
+        lightbox.classList.remove("open");
+        lightbox.setAttribute("aria-hidden", "true");
+        lightboxImg.src = "";
       }
     });
 
