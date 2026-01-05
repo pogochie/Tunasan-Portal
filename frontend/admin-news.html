@@ -6,9 +6,6 @@
   <title>Admin - Add News</title>
   <!-- Removed style.css to avoid conflicts -->
   <link rel="stylesheet" href="css/admin.css" />
-  <style>
-    #map { height: 300px; margin-bottom: 15px; }
-  </style>
 </head>
 <body>
   <nav class="admin-navbar">
@@ -19,7 +16,7 @@
       <ul class="nav-menu">
         <li><a href="index.html">Home</a></li>
         <li><a href="admin.html">Incidents</a></li>
-        <li><a href="admin-news.html">Add News</a></li>
+        <li><a href="admin-news.html" class="active">Add News</a></li>
         <li><a href="admin-events.html">Add Events</a></li>
         <li><a href="admin-user-approval.html">User Approvals</a></li>
         <li><a href="#" id="logout-link">Logout</a></li>
@@ -28,27 +25,40 @@
     </div>
   </nav>
 
+  <div class="page-header">
+    <h1 class="title">Publish News</h1>
+    <div class="admin-search">
+      <input type="search" id="news-search" placeholder="Search news…" aria-label="Search news" />
+    </div>
+  </div>
+
   <div class="container">
-    <h1>Add News</h1>
     <form id="news-form" enctype="multipart/form-data">
+      <div class="form-head">
+        <h2 class="form-title">News Details</h2>
+        <p class="form-desc">Share official updates with images.</p>
+      </div>
       <label for="title">Title</label>
       <input type="text" name="title" id="title" placeholder="Title" required />
       <label for="description">Description</label>
       <textarea name="description" id="description" placeholder="Description" required></textarea>
       <label for="images">Upload images</label>
       <input type="file" name="images" id="images" multiple accept="image/*" />
-      <button type="submit">Submit News</button>
+      <div class="form-actions">
+        <button type="submit" class="btn-gradient">Submit News</button>
+      </div>
     </form>
 
-    <div class="container">
+    <div class="list-head">
       <h2>Existing News</h2>
-      <ul id="news-list">Loading news...</ul>
+      <p class="list-desc">Manage or delete previously published news.</p>
     </div>
+    <ul id="news-list" class="news-grid">Loading news...</ul>
   </div>
 
   <div class="admin-mobile-tabbar" role="navigation" aria-label="Admin Navigation">
     <a href="admin.html" class="tab-link">Incidents</a>
-    <a href="admin-news.html" class="tab-link">News</a>
+    <a href="admin-news.html" class="tab-link active">News</a>
     <a href="admin-events.html" class="tab-link">Events</a>
     <a href="admin-user-approval.html" class="tab-link">Approvals</a>
   </div>
@@ -69,10 +79,7 @@
         if (res.ok) {
           alert(data.message);
           form.reset();
-          if (marker) {
-            map.removeLayer(marker);
-            marker = null;
-          }
+          loadNews();
         } else {
           alert("Failed to submit news: " + (data.message || ""));
         }
@@ -82,35 +89,61 @@
     });
 
     const newsList = document.getElementById("news-list");
+    const searchInput = document.getElementById("news-search");
+    let NEWS_CACHE = [];
 
     async function loadNews() {
       try {
         const res = await fetch("/api/news");
         if (!res.ok) throw new Error("Failed to fetch news");
         const newsItems = await res.json();
-
-        newsList.innerHTML = "";
-        if (newsItems.length === 0) {
-          newsList.innerHTML = "<li>No news available.</li>";
-          return;
-        }
-
-        newsItems.forEach(item => {
-          newsList.innerHTML += `
-            <li>
-              <h3>${item.title}</h3>
-              <p>${item.description}</p>
-              ${item.images && item.images.length > 0 ? item.images.map(img => `<img src="${img}" loading="lazy" width="200" style="margin-right:10px;">`).join("") : ""}
-              <br>
-              <button class="delete-news-btn" data-id="${item._id}">Delete</button>
-            </li>
-          `;
-        });
+        NEWS_CACHE = newsItems;
+        renderNews(newsItems);
       } catch (err) {
         console.error(err);
-        newsList.innerHTML = "<li>Failed to load news.</li>";
+        newsList.innerHTML = "<li class='news-card empty'>Failed to load news.</li>";
       }
     }
+
+    function renderNews(items) {
+      newsList.innerHTML = "";
+      if (!items || items.length === 0) {
+        newsList.innerHTML = "<li class='news-card empty'>No news available.</li>";
+        return;
+      }
+      items.forEach(item => {
+        const imagesHtml = (item.images && item.images.length > 0)
+          ? `
+            <div class="post-images ${item.images.length === 1 ? 'single' : ''}">
+              ${item.images.map(img => `<img src="${img}" loading="lazy" alt="news image">`).join("")}
+            </div>
+          `
+          : "";
+        const li = document.createElement("li");
+        li.className = "news-card";
+        li.innerHTML = `
+          <div class="news-head">
+            <h3>${item.title}</h3>
+          </div>
+          <p>${item.description}</p>
+          ${imagesHtml}
+          <div class="news-actions">
+            <button class="delete-news-btn" data-id="${item._id}">Delete</button>
+          </div>
+        `;
+        newsList.appendChild(li);
+      });
+    }
+
+    // Client-side search
+    searchInput.addEventListener("input", () => {
+      const q = searchInput.value.trim().toLowerCase();
+      const filtered = NEWS_CACHE.filter(n =>
+        (n.title || "").toLowerCase().includes(q) ||
+        (n.description || "").toLowerCase().includes(q)
+      );
+      renderNews(filtered);
+    });
 
     newsList.addEventListener("click", async (e) => {
       if (e.target.classList.contains("delete-news-btn")) {
