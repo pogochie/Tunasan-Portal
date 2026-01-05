@@ -42,6 +42,21 @@ io.on("connection", (socket) => {
 // Make io accessible in routes
 app.set("io", io);
 
+// Serve a "killer" Service Worker to unregister any previously installed SW
+app.get('/sw.js', (req, res) => {
+  res.set('Content-Type', 'application/javascript');
+  res.set('Cache-Control', 'no-store');
+  res.send(`self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', () => {
+  self.registration.unregister().then(() => {
+    self.clients.matchAll({ type: 'window' }).then(clients => {
+      clients.forEach(client => client.navigate(client.url));
+    });
+  });
+});
+self.addEventListener('fetch', () => {});`);
+});
+
 // Routes
 app.use('/api/incidents', require('./routes/incidents'));
 app.use('/api/news', require('./routes/news'));

@@ -43,7 +43,17 @@
 
 // Register Service Worker (shared across pages)
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch(err => console.warn("SW registration failed:", err));
+  window.addEventListener("load", async () => {
+    try {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      regs.forEach(reg => reg.unregister());
+      if (window.caches) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+      console.info("Service Workers disabled and caches cleared.");
+    } catch (err) {
+      console.warn("SW disable failed:", err);
+    }
   });
 }
