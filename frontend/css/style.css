@@ -1302,7 +1302,7 @@ p {
   color: var(--text);
 }
 
-.theme-dark {
+.theme-dark body {
   background-color: var(--bg);
   color: var(--text);
 }
@@ -1374,7 +1374,7 @@ p {
 .theme-dark .nav-right button:hover {
   background-color: var(--primary-hover);
   color: #fff;
-  box-shadow: 0 8px 20px rgba(59,130,242,0.6);
+  box-shadow: 0 8px 20px rgba(59,130,246,0.6);
 }
 
 /* Post cards dark mode */
