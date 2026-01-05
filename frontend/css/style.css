@@ -126,11 +126,20 @@ form#incident-form button:hover {
 }
 
 .nav-menu {
-  display: flex;
+  display: flex !important; /* force display */
   gap: 12px;
   list-style: none;
   margin: 0;
   padding: 0;
+  position: static !important; /* reset any fixed/absolute */
+  height: auto !important;
+  width: auto !important;
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  flex-direction: row !important;
+  z-index: auto !important;
 }
 
 .nav-menu li a {
@@ -153,7 +162,7 @@ form#incident-form button:hover {
 
 /* Hamburger icon */
 .nav-toggle-label {
-  display: none;
+  display: none !important;
   cursor: pointer;
   padding: 8px;
   position: relative;
@@ -214,10 +223,10 @@ form#incident-form button:hover {
 /* Show hamburger and drawer on mobile */
 @media (max-width: 768px) {
   .nav-toggle-label {
-    display: block;
+    display: block !important;
   }
   .nav-menu {
-    display: flex;
+    display: flex !important;
   }
   /* When nav toggle is checked, show drawer and overlay */
   .nav-toggle:checked ~ .nav-menu {
@@ -433,10 +442,19 @@ input[type="file"]::file-selector-button:hover {
 /* Desktop menu items */
 .nav-menu {
   list-style: none;
-  display: flex;
-  gap: 8px;
+  display: flex !important; /* force display */
+  gap: 12px;
   margin: 0;
   padding: 0;
+  position: static !important; /* reset any fixed/absolute */
+  height: auto !important;
+  width: auto !important;
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  flex-direction: row !important;
+  z-index: auto !important;
 }
 .nav-menu li a {
   color: #050505;
@@ -462,7 +480,7 @@ input[type="file"]::file-selector-button:hover {
 /* Mobile hamburger + drawer */
 .nav-toggle { display: none; }
 .nav-toggle-label {
-  display: none;
+  display: none !important;
   cursor: pointer;
   padding: 8px;
   position: relative;
@@ -1457,7 +1475,7 @@ p {
 .theme-dark .search-input:focus {
   background: #1e1e1e;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.3);
+  box-shadow: 0 0 0 3px rgba(59,130,242,0.3);
 }
 
 /* Notification button and panel */
