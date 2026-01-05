@@ -352,7 +352,9 @@ form#incident-form button:hover {
 .report-section input[type="text"],
 .report-section input[list],
 .report-section textarea,
-.report-section input[type="file"] {
+.report-section input[type="file"],
+/* Add select so the mobile fallback matches styling */
+.report-section select {
   width: 100%;
   padding: 12px 14px !important;                      /* was 16px 20px */
   margin-bottom: 14px !important;                     /* was 28px */
@@ -1422,7 +1424,7 @@ p {
   .mobile-tabbar .tab-link .ico {
     width: 22px;
     height: 22px;
-    fill: currentColor; /* ensure icon follows text color */
+    fill: currentColor; 
  
   }
 
@@ -1831,7 +1833,9 @@ body.modal-open {
 .report-section input[type="text"],
 .report-section input[list],
 .report-section textarea,
-.report-section input[type="file"] {
+.report-section input[type="file"],
+/* Add select so the mobile fallback matches styling */
+.report-section select {
   width: 100%;
   padding: 12px 14px !important;                      /* was 16px 20px */
   margin-bottom: 14px !important;                     /* was 28px */

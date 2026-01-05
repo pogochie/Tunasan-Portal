@@ -141,6 +141,18 @@
           <option value="Flood"></option>
           <option value="Other"></option>
         </datalist>
+        <!-- Mobile fallback: shown on iOS/unsupported datalist -->
+        <select id="incidentTypeSelect" aria-label="Incident Type (mobile fallback)" style="display:none">
+          <option value="">Select Incident Type</option>
+          <option value="Theft">Theft</option>
+          <option value="Vandalism">Vandalism</option>
+          <option value="Noise Complaint">Noise Complaint</option>
+          <option value="Illegal Dumping">Illegal Dumping</option>
+          <option value="Traffic Accident">Traffic Accident</option>
+          <option value="Fire">Fire</option>
+          <option value="Flood">Flood</option>
+          <option value="Other">Other</option>
+        </select>
 
         <label for="description">Description</label>
         <textarea id="description" name="description" placeholder="Description" required data-i18n-placeholder="form.description" rows="4"></textarea>
@@ -417,6 +429,25 @@
         }
       });
     });
+  </script>
+  <script>
+    // Datalist fallback for mobile (iOS Safari and browsers without good datalist UI)
+    (function datalistFallback() {
+      const input = document.getElementById('incidentType');
+      const select = document.getElementById('incidentTypeSelect');
+      if (!input || !select) return;
+      const ua = navigator.userAgent || "";
+      const isIOS = /iPad|iPhone|iPod/.test(ua);
+      const supportsDataList = !!window.HTMLDataListElement;
+      // Treat iOS as not supported and also handle browsers without HTMLDataListElement
+      if (isIOS || !supportsDataList) {
+        // Show select, hide the datalist input
+        select.style.display = 'block';
+        input.style.display = 'none';
+        // Keep the real form field updated so backend receives incidentType
+        select.addEventListener('change', () => { input.value = select.value; });
+      }
+    })();
   </script>
 </body>
 </html>
