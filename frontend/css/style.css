@@ -1521,14 +1521,14 @@ p {
   display: none;
   position: fixed;
   inset: 0;
-  justify-content: flex-start; /* align modal content from top */
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(6px);
-  justify-content: center;
+  justify-content: flex-start; /* align modal content from top */
   align-items: center;
   z-index: 1200;
-  padding: px;
+  padding: 80px 20px 20px; /* increased top padding */
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 #report-modal.open {
@@ -1543,7 +1543,7 @@ p {
   max-width: 600px;
   width: 100%;
   max-height: calc(100vh - 120px); /* leave space for top padding */
-  max-height: 90vh; /* limit height */
+  max-height: 90dvh; /* limit height */
   overflow-y: auto; /* scroll inside modal */
   position: relative;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1562,13 +1562,9 @@ p {
   }
 }
 
-.report-section form {
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 40px;
+body.modal-open {
+  overflow: hidden;
 }
-
-
 
 #close-report {
   position: absolute;
@@ -1746,10 +1742,57 @@ p {
 @media (max-width: 768px) {
   #report-modal {
     justify-content: center; /* center vertically on mobile */
-    padding: 20px 10px 10px;
+    padding: 20px 10px 10px !important;
   }
   .report-section {
     padding: 24px 20px;
-    max-height: 85vh;
+    max-height: 85dvh !important;
+  }
+}
+
+/* Desktop/laptop: fix modal scrolling and top alignment */
+body.modal-open {
+  overflow: hidden; /* lock page scroll when modal is open */
+}
+
+#report-modal {
+  /* let modal container handle scroll on desktop */
+  align-items: flex-start !important;       /* prevent vertical centering trap */
+  justify-content: center;                  /* center horizontally */
+  min-height: 100vh;                        /* full viewport height */
+  overflow-y: auto;                         /* scroll entire modal when needed */
+  -webkit-overflow-scrolling: touch;
+  padding: 24px 12px 12px !important;       /* reduce top padding to reveal form inputs */
+}
+
+.report-section {
+  /* disable nested scroll on desktop to avoid "stuck at top" */
+  max-height: none !important;
+  overflow: visible !important;
+  margin-top: 0;                            /* ensure no hidden top space */
+  overscroll-behavior: auto;
+}
+
+/* Keep focused inputs away from the very top edge after scroll */
+.report-section input[type="text"],
+.report-section textarea,
+.report-section input[list],
+.report-section input[type="file"] {
+  scroll-margin-top: 48px;
+}
+
+/* Mobile: re-enable inner scroll for better ergonomics */
+@media (max-width: 768px) {
+  #report-modal {
+    justify-content: center;
+    align-items: flex-start !important;
+    padding: 20px 10px 10px !important;
+    min-height: 100dvh;                     /* dynamic viewport for mobile keyboards */
+  }
+  .report-section {
+    max-height: 85dvh !important;           /* limit inner height on mobile */
+    overflow-y: auto !important;            /* inner scroll on mobile */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 }
