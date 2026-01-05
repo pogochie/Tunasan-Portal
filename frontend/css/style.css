@@ -1130,6 +1130,21 @@ p {
   backdrop-filter: saturate(180%) blur(12px);
   will-change: background-color, box-shadow;
 }
+#navbar-placeholder {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.1);
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+  z-index: 1100;
+  backdrop-filter: saturate(120%) blur(8px);
+}
+
 .fb-navbar:hover {
   background: #f7f9fc;
   box-shadow: 0 4px 20px rgba(0,0,0,0.12);
@@ -1779,7 +1794,7 @@ p {
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
   padding: 20px 16px !important;                      /* was 40px 48px */
   width: min(96vw, 640px);
-  max-height: calc(100svh - 24px) !important;                        /* keep scroll within viewport */
+  max-height: calc(1000svh - 24px) !important;                        /* keep scroll within viewport */
   overflow-y: auto !important;
   position: relative;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
