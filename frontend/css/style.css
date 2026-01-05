@@ -298,7 +298,7 @@ body::before {
 }
 
 /* Base + container */
-body { background: var(--bg); color: var(--text); line-height: 1.5; }
+body { background: rgba(240, 242, 253, 0); color: var(--text); line-height: 1.5; }
 .container { max-width: 1120px; margin: 0 auto; }
 
 /* Cards and forms */
