@@ -1227,7 +1227,7 @@ p {
   }
 }
 
-/* Dark theme */
+/* Dark theme overrides */
 .theme-dark {
   --bg: #121212;
   --card: #1e1e1e;
@@ -1251,39 +1251,118 @@ p {
   color: var(--text);
 }
 
-.theme-dark .post-card,
-.theme-dark form#incident-form,
-.theme-dark #notif-panel,
-.theme-dark .auth-card,
-.theme-dark .stat-card {
+/* Navbar dark mode */
+.theme-dark .fb-navbar {
   background: var(--card);
-  border-color: var(--border);
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: saturate(180%) blur(12px);
+}
+
+.theme-dark .fb-navbar .logo {
+  color: var(--primary);
+}
+
+.theme-dark .nav-center .nav-items,
+.theme-dark .nav-menu {
+  background: transparent;
+}
+
+.theme-dark .nav-link {
+  color: var(--text);
+  background: transparent;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.theme-dark .nav-link:hover {
+  background-color: var(--primary-hover);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(59,130,246,0.5);
+  transform: translateY(-2px);
+}
+
+.theme-dark .nav-link.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(59,130,246,0.7);
+  transform: translateY(-2px);
+}
+
+.theme-dark .nav-link::after {
+  background: #93c5fd;
+}
+
+.theme-dark .nav-right button,
+.theme-dark .pill-btn {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.theme-dark .pill-btn.secondary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.theme-dark .pill-btn.secondary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  box-shadow: 0 8px 20px rgba(59,130,246,0.6);
+}
+
+.theme-dark .pill-btn:hover,
+.theme-dark .nav-right button:hover {
+  background-color: var(--primary-hover);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(59,130,246,0.6);
+}
+
+/* Post cards dark mode */
+.theme-dark .post-card {
+  background: var(--card);
+  border: 1px solid var(--border);
   color: var(--text);
   box-shadow: var(--shadow);
 }
 
-.theme-dark h1, 
-.theme-dark h2 {
-  color: var(--text);
-  background: var(--card);
-  border-color: var(--border);
-}
-
-.theme-dark .nav-menu li a,
-.theme-dark .pill-btn,
-.theme-dark .like-btn,
-.theme-dark .nav-link {
+.theme-dark .post-header .title-wrap h3,
+.theme-dark .post-header .title-wrap .meta {
   color: var(--text);
 }
 
-.theme-dark .nav-menu li a:hover,
-.theme-dark .pill-btn:hover,
-.theme-dark .like-btn:hover,
-.theme-dark .nav-link:hover {
-  background-color: var(--primary-hover);
+.theme-dark .post-content p {
+  color: var(--text);
+}
+
+.theme-dark .post-actions {
+  color: var(--muted);
+}
+
+.theme-dark .like-btn {
+  background: #2a2a2a;
+  color: var(--muted);
+}
+
+.theme-dark .like-btn:hover {
+  background: var(--primary-hover);
   color: #fff;
 }
 
+.theme-dark .like-btn.liked {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.6);
+}
+
+.theme-dark .like-count {
+  color: var(--muted);
+}
+
+/* Inputs and textareas */
 .theme-dark input[type="text"],
 .theme-dark select,
 .theme-dark textarea,
@@ -1299,15 +1378,7 @@ p {
   color: var(--muted);
 }
 
-.theme-dark input[type="file"]::file-selector-button {
-  background: var(--primary);
-  color: #fff;
-}
-
-.theme-dark input[type="file"]::file-selector-button:hover {
-  background: var(--primary-hover);
-}
-
+/* Search input */
 .theme-dark .search-input {
   background: #2a2a2a;
   color: var(--text);
@@ -1320,6 +1391,7 @@ p {
   box-shadow: 0 0 0 3px rgba(59,130,246,0.3);
 }
 
+/* Notification button and panel */
 .theme-dark #notif-btn {
   background: #2a2a2a;
   color: var(--text);
@@ -1341,38 +1413,6 @@ p {
   color: var(--text);
   border-color: var(--border);
   box-shadow: var(--shadow-lg);
-}
-
-.theme-dark button.action-btn {
-  background-color: var(--primary);
-  color: #fff;
-}
-
-.theme-dark button.action-btn:hover {
-  background-color: var(--primary-hover);
-}
-
-.theme-dark #approveBtn {
-  background: var(--success);
-  color: #fff;
-}
-
-.theme-dark #approveBtn:hover {
-  background: var(--success-hover);
-}
-
-.theme-dark #rejectBtn {
-  background: var(--danger);
-  color: #fff;
-}
-
-.theme-dark #rejectBtn:hover {
-  background: var(--danger-hover);
-}
-
-.theme-dark #backBtn:hover {
-  background: #444;
-  color: #fff;
 }
 
 /* Scrollbar for dark mode */
