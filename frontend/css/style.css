@@ -286,6 +286,9 @@ form#incident-form button:hover {
   --border: #E4E6EB;
   --shadow: 0 2px 12px rgba(0,0,0,0.06);
   --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+
+  /* add a variable for mobile tabbar height */
+  --tabbar-height: 56px;
 }
 
 /* Remove body margin and padding so navbar touches viewport edges */
@@ -356,6 +359,9 @@ body::before {
   --border: #E4E6EB;
   --shadow: 0 2px 12px rgba(0,0,0,.06);
   --shadow-lg: 0 8px 24px rgba(0,0,0,.08);
+
+  /* add a variable for mobile tabbar height */
+  --tabbar-height: 56px;
 }
 
 /* Base + container */
@@ -1836,7 +1842,7 @@ body.modal-open {
 
   /* Reposition the FAB above the tabbar and keep it below the tabbar in stacking order */
   #report-btn {
-    bottom: calc(72px + env(safe-area-inset-bottom)); /* sit above tabbar height + safe area */
+    bottom: calc(var(--tabbar-height) + 16px + env(safe-area-inset-bottom)); /* sit above tabbar height + safe area */
     right: 16px;
     padding: 12px 18px;
     font-size: 0.95rem;
