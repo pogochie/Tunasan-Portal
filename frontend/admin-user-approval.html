@@ -148,7 +148,7 @@
         }
       } else if (e.target.classList.contains("reject-btn")) {
         const id = e.target.getAttribute("data-id");
-        if (confirm("Reject this user?")) {
+        if (confirm("Reject this user? This will delete their data.")) {
           try {
             const res = await fetch(`/api/users/${id}/reject`, {
               method: "POST",
