@@ -487,7 +487,6 @@ html, body {
   line-height: 1.5;
   min-height: 100vh;
   position: relative;
-  padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
 }
 
 /* Remove container horizontal padding to let navbar stretch full width */
