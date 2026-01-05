@@ -155,6 +155,123 @@ form#incident-form button:hover {
   background-color: #1c5980;
 }
 
+/* Hide nav toggle checkbox by default */
+.nav-toggle {
+  display: none;
+}
+
+/* Hamburger icon label */
+.nav-toggle-label {
+  display: none;
+  cursor: pointer;
+  padding: 8px;
+  position: relative;
+  z-index: 1101;
+}
+.nav-toggle-label span,
+.nav-toggle-label span::before,
+.nav-toggle-label span::after {
+  display: block;
+  background: #050505;
+  height: 2px;
+  width: 24px;
+  border-radius: 2px;
+  position: relative;
+  transition: transform 0.25s ease, opacity 0.2s ease, background 0.25s ease;
+}
+.nav-toggle-label span::before,
+.nav-toggle-label span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+.nav-toggle-label span::before { top: -7px; }
+.nav-toggle-label span::after { top: 7px; }
+
+/* Overlay for mobile nav */
+.nav-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(2px);
+  z-index: 1100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* Navigation menu drawer */
+.nav-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: min(80vw, 300px);
+  background: #fff;
+  border-left: 1px solid var(--border);
+  box-shadow: 0 0 20px rgba(0,0,0,0.15);
+  flex-direction: column;
+  padding: 70px 16px 16px;
+  gap: 12px;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  z-index: 1101;
+  overflow-y: auto;
+  display: flex;
+}
+
+/* Show hamburger and drawer on mobile */
+@media (max-width: 768px) {
+  .nav-toggle-label {
+    display: block;
+  }
+
+  /* Show nav menu when toggle checked */
+  .nav-toggle:checked ~ .nav-menu {
+    transform: translateX(0);
+  }
+
+  /* Show overlay when toggle checked */
+  .nav-toggle:checked ~ .nav-overlay {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Lock body scroll when nav open */
+  body:has(#nav-toggle:checked) {
+    overflow: hidden;
+  }
+}
+
+/* Nav links styling */
+.nav-menu li a {
+  padding: 12px 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #050505;
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+.nav-menu li a:hover,
+.nav-menu li a.active {
+  background-color: var(--primary);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(24,119,242,0.4);
+}
+
+/* Icon size inside nav links */
+.nav-menu li a .ico {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
 /* Hide nav toggle checkbox */
 .nav-toggle {
   display: none;
@@ -218,6 +335,7 @@ form#incident-form button:hover {
   transition: transform 0.25s ease;
   z-index: 1101;
   overflow-y: auto;
+  display: flex;
 }
 
 /* Show hamburger and drawer on mobile */
@@ -254,6 +372,7 @@ form#incident-form button:hover {
   display: flex;
   align-items: center;
   gap: 8px;
+  user-select: none;
 }
 .nav-menu li a:hover,
 .nav-menu li a.active {
@@ -1515,32 +1634,81 @@ p {
   border-radius: 4px;
 }
 
-/* Additional styles for modern report form */
+/* Modern styling for the report modal and form */
+
+#report-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+#report-modal.open {
+  display: flex;
+}
 
 .report-section {
-  display: flex;
-  justify-content: center;
-  padding: 20px;
   background: var(--card);
-  border-radius: 16px;
-  box-shadow: var(--shadow-lg);
+  border-radius: 24px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+  padding: 40px 48px;
   max-width: 600px;
-  margin: 40px auto;
-  flex-direction: column;
+  width: 100%;
+  position: relative;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text);
+  animation: slideDownFade 0.4s ease forwards;
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#close-report {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: var(--muted);
+  transition: color 0.3s ease;
+  user-select: none;
+}
+#close-report:hover {
+  color: var(--danger);
 }
 
 .report-section h2 {
-  margin-bottom: 20px;
-  font-weight: 700;
+  margin-bottom: 32px;
+  font-weight: 900;
+  font-size: 2rem;
   color: var(--primary);
   text-align: center;
+  user-select: none;
 }
 
 .report-section label {
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: var(--text);
   display: block;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text);
+  user-select: none;
+  font-size: 1.1rem;
 }
 
 .report-section input[type="text"],
@@ -1548,14 +1716,23 @@ p {
 .report-section textarea,
 .report-section input[type="file"] {
   width: 100%;
-  padding: 12px 14px;
-  margin-bottom: 20px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  font-size: 1rem;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  font-size: 1.1rem;
+  font-weight: 500;
   box-sizing: border-box;
   background: #fff;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text);
+  user-select: text;
+}
+
+.report-section input[type="text"]::placeholder,
+.report-section textarea::placeholder {
+  color: var(--muted);
 }
 
 .report-section input[type="text"]:focus,
@@ -1563,54 +1740,78 @@ p {
 .report-section textarea:focus {
   border-color: var(--primary);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(24,119,242,0.15);
+  box-shadow: 0 0 0 5px rgba(24, 119, 242, 0.3);
 }
 
 .report-section textarea {
   resize: vertical;
-  min-height: 100px;
+  min-height: 140px;
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
 
 .report-section button.pill-btn.secondary {
-  font-weight: 700;
-  box-shadow: var(--shadow-lg);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  padding: 18px 0;
+  font-size: 1.3rem;
+  font-weight: 900;
+  border-radius: 9999px;
+  box-shadow: 0 12px 36px rgba(24, 119, 242, 0.5);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  user-select: none;
 }
 
 .report-section button.pill-btn.secondary:hover {
   background-color: var(--primary-hover);
-  box-shadow: 0 10px 30px rgba(24,119,242,0.4);
-  transform: translateY(-2px);
+  box-shadow: 0 16px 48px rgba(24, 119, 242, 0.7);
+  transform: translateY(-4px);
 }
 
-/* Responsive */
-@media (max-width: 640px) {
+#geo-btn {
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 14px 24px;
+  font-weight: 800;
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(24, 119, 242, 0.5);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 32px;
+  user-select: none;
+  font-size: 1.1rem;
+}
+
+#geo-btn:hover {
+  background-color: var(--primary-hover);
+  box-shadow: 0 20px 60px rgba(24, 119, 242, 0.8);
+}
+
+#map {
+  border-radius: 20px !important;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18) !important;
+  border: 2px solid var(--border) !important;
+  height: 360px !important;
+  margin-bottom: 32px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
   .report-section {
-    margin: 20px 10px;
-    padding: 16px;
+    padding: 28px 24px;
   }
-}
-
-/* Modal styles */
-#report-modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  justify-content: center;
-  align-items: center;
-  z-index: 1200;
-}
-
-#report-modal.open {
-  display: flex;
-}
-
-/* Optional: prevent background scroll when modal open */
-body.modal-open {
-  overflow: hidden;
-}
-
-#report-btn {
-  display: inline-block !important;
+  .report-section h2 {
+    font-size: 1.6rem;
+  }
+  #geo-btn {
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
+  .report-section button.pill-btn.secondary {
+    font-size: 1.1rem;
+    padding: 16px 0;
+  }
+  #map {
+    height: 280px !important;
+  }
 }
