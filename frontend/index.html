@@ -11,6 +11,7 @@
       text-align: center;
       padding: 40px 20px;
       margin-bottom: 30px;
+      justify-content: center;
     }
     .hero h1 {
       font-size: 2rem;
@@ -51,10 +52,8 @@
   <main class="container">
     <section class="hero">
       <h1 data-i18n="home.title">Welcome to Barangay Tunasan</h1>
-      <p data-i18n="home.subtitle">A connected community portal</p>
       <div class="qr-container">
         <canvas id="qr-code" width="160" height="160" aria-label="QR code to open portal"></canvas>
-        <p><small data-i18n="home.qrNote">Scan to open on mobile</small></p>
       </div>
     </section>
 
@@ -66,13 +65,15 @@
       <!-- More feature cards -->
     </section>
 
+     <h2>Recent Community Activity</h2>
     <section class="community-updates">
-      <h2>Recent Community Activity</h2>
+      
       <ul id="home-feed" class="feed"></ul>
     </section>
 
+    <h2 data-i18n="home.reportTitle">Report an Incident</h2>
+
     <section class="report-section" id="report-section">
-      <h2 data-i18n="home.reportTitle">Report an Incident</h2>
       <form id="incident-form" enctype="multipart/form-data">
         <input type="text" name="reporterName" placeholder="Your Name" required data-i18n-placeholder="form.name">
         <input type="text" name="incidentType" placeholder="Incident Type" required data-i18n-placeholder="form.type">
