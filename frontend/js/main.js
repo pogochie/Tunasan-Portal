@@ -93,7 +93,6 @@ form.addEventListener("submit", async (e) => {
   const lat = document.getElementById("lat").value;
   const lng = document.getElementById("lng").value;
   if (!lat || !lng) {
-    e.preventDefault();
     alert("Please select a location on the map.");
     return;
   }
@@ -119,107 +118,67 @@ form.addEventListener("submit", async (e) => {
     }
   }
 
-  // Offline-first: queue if offline
-  // ... existing offline queue code ...
-
   try {
     const res = await fetch("/api/incidents", {
       method: "POST",
       body: formData
     });
-    // ... existing response parsing ...
+    if (res.ok) {
+      alert("Report submitted successfully.");
+      form.reset();
+      if (marker) {
+        marker.remove();
+        marker = null;
+      }
+      document.getElementById("lat").value = "";
+      document.getElementById("lng").value = "";
+      map.setView([14.4089, 121.0341], 15);
+    } else {
+      const data = await res.json();
+      alert("Failed to submit report: " + (data.message || res.statusText));
+    }
   } catch (err) {
     alert("Network error: " + err.message);
   }
 });
 
-// async function registerServiceWorker() {
-//   if ('serviceWorker' in navigator && 'PushManager' in window) {
-//     try {
-//       const registration = await navigator.serviceWorker.register('/sw.js');
-//       console.log('Service Worker registered');
-
-//       const subscription = await registration.pushManager.getSubscription() ||
-//         await registration.pushManager.subscribe({
-//           userVisibleOnly: true,
-//           applicationServerKey: urlBase64ToUint8Array('BJyVEl1sk0MNoWxlxdP7a3oCSVJ_UVB0HgQxBUpUSMu4xT1Mwha194nxqYiDUfnSuk4mj8Ud-cNJwUCDB6Pu_3o')
-//         });
-
-//       // Send subscription to backend to save
-//       await fetch('/api/notifications/subscribe', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify(subscription)
-//       });
-
-//       console.log('User subscribed for push notifications');
-//     } catch (error) {
-//       console.error('Service Worker registration or subscription failed:', error);
-//     }
-//   } else {
-//     console.warn('Push messaging is not supported');
-//   }
-// }
-
-// // Utility to convert VAPID key
-// function urlBase64ToUint8Array(base64String) {
-//   const padding = '='.repeat((4 - base64String.length % 4) % 4);
-//   const base64 = (base64String + padding)
-//     .replace(/\-/g, '+')
-//     .replace(/_/g, '/');
-//   const rawData = window.atob(base64);
-//   return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
-// }
-
-// registerServiceWorker();
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(registrations => {
-    registrations.forEach(registration => {
-      registration.unregister();
-    });
-  });
-}
-
+// Modal open/close logic for report button and modal
 document.addEventListener("DOMContentLoaded", () => {
   const reportBtn = document.getElementById("report-btn");
   const reportModal = document.getElementById("report-modal");
   const closeReportBtn = document.getElementById("close-report");
-  const incidentForm = document.getElementById("incident-form");
 
-  if (!reportBtn || !reportModal || !closeReportBtn || !incidentForm) return;
+  if (!reportBtn || !reportModal || !closeReportBtn) return;
 
   const openModal = () => {
-    reportModal.classList.add("open");
+    reportModal.style.display = "flex";
+    reportModal.setAttribute("aria-hidden", "false");
     document.body.classList.add("modal-open");
-    incidentForm.reset();
-    // Reset hidden lat/lng inputs
+    form.reset();
+    if (marker) {
+      marker.remove();
+      marker = null;
+    }
     document.getElementById("lat").value = "";
     document.getElementById("lng").value = "";
-    // Reset map view and marker if you have global map/marker variables
-    if (window.map && window.marker) {
-      window.map.setView([14.4089, 121.0341], 15);
-      window.marker.remove();
-      window.marker = null;
-    }
+    map.setView([14.4089, 121.0341], 15);
   };
 
   const closeModal = () => {
-    reportModal.classList.remove("open");
+    reportModal.style.display = "none";
+    reportModal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("modal-open");
   };
 
   reportBtn.addEventListener("click", openModal);
   closeReportBtn.addEventListener("click", closeModal);
 
-  // Close modal on clicking outside the form
   reportModal.addEventListener("click", (e) => {
     if (e.target === reportModal) closeModal();
   });
 
-  // Close modal on Escape key
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && reportModal.classList.contains("open")) {
+    if (e.key === "Escape" && reportModal.style.display === "flex") {
       closeModal();
     }
   });
