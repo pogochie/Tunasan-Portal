@@ -1,13 +1,52 @@
-/* General styles */
-body {
+css
+/* ================================
+   Combined styles - clean optimized
+   ================================ */
+
+/* Modern theme tokens - combining CSS variables */
+:root {
+  --bg: rgba(240, 242, 253, .75); /* translucent to let bg image glow through */
+  --card: rgba(255, 255, 255, .88);
+  --text: #1C1E21;
+  --muted: #65676B;
+  --primary: #1877F2; 
+  --primary-hover: #166FE5;
+  --success: #42B72A;
+  --success-hover: #36A420;
+  --danger: #E53935;
+  --danger-hover: #D32F2F;
+  --border: #E4E6EB;
+  --shadow: 0 2px 12px rgba(0,0,0,.06);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.08);
+  --nav-height: 60px;
+}
+
+/* General styles and base layout */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 20px;
-  background-color: #f9f9f9;
-  color: #333;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+  position: relative;
+  padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
 }
 
 h1, h2 {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  text-align: center;
   color: #2c3e50;
+  font-weight: 700;
+  margin: 1rem 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 h1 {
@@ -19,13 +58,67 @@ h2 {
   margin-bottom: 15px;
 }
 
-/* Form styles */
-form#incident-form {
-  background: #fff;
+p {
+  text-align: center;
+  color: #555;
+  font-size: 1rem;
+  margin: 0.5rem 0 1.5rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Background image with blur + contrast overlay */
+body {
+  position: relative;
+  min-height: 100vh;
+  background-color: #F0F2F5;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: url('/images/tunasan-bg.jpg') center/cover no-repeat;
+  filter: blur(10px) brightness(0.85);
+  transform: scale(1.05); /* reduce edge blur clipping */
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(255,255,255,0.55); /* light wash to improve legibility */
+  pointer-events: none;
+}
+
+/* Utility visibility classes */
+.mobile-only { display: none; }
+.desktop-only { display: inline-block; }
+@media (max-width: 768px) {
+  .mobile-only { display: block; }
+  .desktop-only { display: none !important; }
+}
+
+/* Form styles - combined for all forms */
+form#incident-form,
+form#news-form,
+form#event-form,
+form#edit-incident-form,
+#login-form,
+#register-form {
+  background: var(--card);
+  backdrop-filter: saturate(120%) blur(4px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
   padding: 20px;
-  border-radius: 8px;
   max-width: 500px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 form#incident-form label {
@@ -55,7 +148,7 @@ form#incident-form textarea:focus {
 }
 
 form#incident-form button {
-  background-color: #2980b9;
+  background-color: var(--primary);
   color: white;
   border: none;
   padding: 12px 20px;
@@ -66,255 +159,7 @@ form#incident-form button {
 }
 
 form#incident-form button:hover {
-  background-color: #1c5980;
-}
-
-/* QR code canvas */
-#qr-code {
-  display: block;
-  margin: 10px 0 30px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-
-/* Incident list (for real-time display) */
-#incident-list {
-  list-style: none;
-  padding-left: 0;
-  max-width: 700px;
-}
-
-#incident-list li {
-  background: #fff;
-  margin-bottom: 10px;
-  padding: 12px 15px;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  font-size: 0.95rem;
-  color: #444;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  form#incident-form, #incident-list {
-    width: 100%;
-    max-width: 100%;
-  }
-}
-
-/* Navbar styles */
-.navbar {
-  background-color: #2980b9;
-  color: white;
-  padding: 10px 20px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.navbar .container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.navbar .logo {
-  font-weight: 700;
-  font-size: 1.2rem;
-  color: white;
-  text-decoration: none;
-}
-
-.nav-menu {
-  list-style: none;
-  display: flex;
-  gap: 15px;
-  margin: 0;
-  padding: 0;
-}
-
-.nav-menu li a {
-  color: white;
-  text-decoration: none;
-  font-weight: 600;
-  padding: 8px 12px;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-}
-
-.nav-menu li a:hover {
-  background-color: #1c5980;
-}
-
-/* Responsive */
-.nav-toggle {
-  display: none;
-}
-
-.nav-toggle-label {
-  display: none;
-  cursor: pointer;
-}
-
-.nav-toggle-label span,
-.nav-toggle-label span::before,
-.nav-toggle-label span::after {
-  display: block;
-  background: white;
-  height: 2px;
-  width: 25px;
-  border-radius: 2px;
-  position: relative;
-}
-
-.nav-toggle-label span::before,
-.nav-toggle-label span::after {
-  content: "";
-  position: absolute;
-}
-
-.nav-toggle-label span::before {
-  top: -8px;
-}
-
-.nav-toggle-label span::after {
-  top: 8px;
-}
-
-@media (max-width: 768px) {
-  .nav-menu {
-    position: absolute;
-    top: 60px;
-    right: 0;
-    background-color: #2980b9;
-    flex-direction: column;
-    width: 200px;
-    display: none;
-  }
-
-  .nav-menu li {
-    margin: 10px 0;
-  }
-
-  .nav-toggle:checked + .nav-toggle-label + .nav-menu {
-    display: flex;
-  }
-
-  .nav-toggle {
-    display: block;
-  }
-
-  .nav-toggle-label {
-    display: block;
-  }
-}
-
-/* ================================
-   Modern Facebook-like theme overrides
-   ================================ */
-:root {
-  --bg: #F0F2F5;
-  --card: #fff;
-  --text: #1C1E21;
-  --muted: #65676B;
-  --primary: #1877F2;
-  --primary-hover: #166FE5;
-  --success: #42B72A;
-  --success-hover: #36A420;
-  --danger: #E53935;
-  --danger-hover: #D32F2F;
-  --border: #E4E6EB;
-  --shadow: 0 2px 12px rgba(0,0,0,0.06);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
-}
-
-/* Remove body margin and padding so navbar touches viewport edges */
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
-  min-height: 100vh;
-  position: relative;
-  padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
-}
-
-/* Remove container horizontal padding to let navbar stretch full width */
-.container {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding-left: 0;
-  padding-right: 0;
-}
-
-/* Optional: if you want the navbar background to stretch full width beyond container */
-.fb-navbar {
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-/* If you want the navbar content to align with container edges, keep container padding 0 and add padding inside navbar as above */
-
-/* Background image with blur (add your image at /frontend/images/tunasan-bg.jpg) */
-body {
-  position: relative;
-  min-height: 100vh;
-  background-color: #F0F2F5;
-}
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background: url('/images/tunasan-bg.jpg') center/cover no-repeat;
-  filter: blur(10px) brightness(0.85);
-  transform: scale(1.05); /* reduce edge blur clipping */
-}
-
-/* Utility visibility classes */
-.mobile-only { display: none; }
-.desktop-only { display: inline-block; }
-@media (max-width: 768px) {
-  .mobile-only { display: block; }
-  .desktop-only { display: none !important; }
-}
-
-/* Modern theme tokens */
-:root {
-  --bg: rgba(240, 242, 253, .75); /* translucent to let bg image glow through */
-  --card: rgba(255, 255, 255, .88);
-  --text: #1C1E21;
-  --muted: #65676B;
-  --primary: #1877F2;
-  --primary-hover: #166FE5;
-  --success: #42B72A;
-  --success-hover: #36A420;
-  --danger: #E53935;
-  --danger-hover: #D32F2F;
-  --border: #E4E6EB;
-  --shadow: 0 2px 12px rgba(0,0,0,.06);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,.08);
-}
-
-/* Base + container */
-body { background: var(--bg); color: var(--text); line-height: 1.5; }
-.container { max-width: 1120px; margin: 0 auto; }
-
-/* Cards and forms */
-form#incident-form,
-form#news-form,
-form#event-form,
-form#edit-incident-form,
-#login-form,
-#register-form {
-  background: var(--card);
-  backdrop-filter: saturate(120%) blur(4px);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
+  background-color: var(--primary-hover);
 }
 
 /* File input styled as button */
@@ -339,6 +184,31 @@ input[type="file"]::file-selector-button {
 input[type="file"]::file-selector-button:hover {
   background: var(--primary-hover);
   box-shadow: var(--shadow-lg);
+}
+
+/* QR code canvas */
+#qr-code {
+  display: block;
+  margin: 10px 0 30px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+/* Lists and content containers */
+#incident-list {
+  list-style: none;
+  padding-left: 0;
+  max-width: 700px;
+}
+
+#incident-list li {
+  background: #fff;
+  margin-bottom: 10px;
+  padding: 12px 15px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  font-size: 0.95rem;
+  color: #444;
 }
 
 /* Images responsive */
@@ -372,13 +242,21 @@ input[type="file"]::file-selector-button:hover {
   border-bottom: 1px solid var(--border);
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   backdrop-filter: saturate(120%) blur(6px);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 .navbar .container {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-.navbar .logo { color: var(--primary); font-weight: 700; font-size: 1.2rem; }
+.navbar .logo { 
+  color: var(--primary); 
+  font-weight: 700; 
+  font-size: 1.2rem;
+  text-decoration: none;
+}
 
 /* Desktop menu items */
 .nav-menu {
@@ -443,47 +321,6 @@ input[type="file"]::file-selector-button:hover {
   z-index: 1000;
   background: rgba(0,0,0,.35);
   backdrop-filter: blur(2px);
-}
-
-/* Ensure no horizontal scroll (prevents peeking drawer) */
-html, body {
-  overflow-x: hidden;
-}
-
-/* Background image layer stays; add a soft white overlay to boost contrast */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: rgba(255,255,255,0.55); /* light wash to improve legibility */
-  pointer-events: none;
-}
-
-/* Headings as "chips" so they don't float and remain readable on bg */
-h1, h2 {
-  display: inline-block;
-  padding: 8px 12px;
-  border-radius: 12px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-}
-
-/* Center and style headings and paragraphs */
-h1, h2 {
-  text-align: center;
-  color: #2c3e50;
-  font-weight: 700;
-  margin: 1rem 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-p {
-  text-align: center;
-  color: #555;
-  font-size: 1rem;
-  margin: 0.5rem 0 1.5rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Filter controls container */
@@ -663,65 +500,6 @@ p {
 #hm-fit:hover {
   background: var(--primary-hover);
   box-shadow: var(--shadow-lg);
-}
-
-/* MOBILE DRAWER FIXES
-   Override any previous mobile nav rules to a single consistent drawer.
-   Prevent duplicate/dangling drawer and horizontal scroll issues. */
-@media (max-width: 768px) {
-  /* Force side drawer style and visibility control */
-  .navbar .nav-menu {
-    position: fixed !important;
-    top: 0 !important;
-    right: 0 !important;
-    height: 100vh !important;
-    width: min(80vw, 300px) !important;
-    background: #fff !important;
-    border-left: 1px solid var(--border) !important;
-    border-radius: 0 !important;
-    box-shadow: var(--shadow-lg) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    padding: 70px 16px 16px !important;
-    gap: 6px !important;
-    transform: translateX(100%);          /* hidden off-canvas */
-    transition: transform .25s ease;
-    z-index: 1001;
-    will-change: transform;
-  }
-  /* Ensure mobile links are dark on white drawer */
-  .navbar .nav-menu li a {
-    color: #050505 !important;
-  }
-  /* Hide interaction when off-canvas to prevent "second drawer" feel */
-  .navbar .nav-toggle:not(:checked) ~ .nav-menu {
-    visibility: hidden;
-    pointer-events: none;
-  }
-  /* Show drawer only when checked */
-  .navbar .nav-toggle:checked ~ .nav-menu {
-    transform: translateX(0);
-    visibility: visible;
-    pointer-events: auto;
-  }
-
-  /* Overlay for focus and to close drawer */
-  .nav-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    background: rgba(0,0,0,.35);
-    backdrop-filter: blur(2px);
-  }
-  .navbar .nav-toggle:checked ~ .nav-overlay {
-    display: block;
-  }
-
-  /* Lock page scroll when the drawer is open (modern :has()) */
-  body:has(#nav-toggle:checked) {
-    overflow-y: hidden;
-  }
 }
 
 /* Feed layout: Facebook-like cards */
@@ -1106,54 +884,6 @@ p {
   border-bottom: none;
 }
 
-/* Mobile tabbar */
-.mobile-tabbar {
-  display: none;
-}
-@media (max-width: 768px) {
-  .nav-center, .search-wrap, .pill-btn.secondary {
-    display: none !important;
-  }
-  .fb-nav-inner {
-    padding: 12px 20px;
-  }
-  .mobile-tabbar {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    background: #fff;
-    border-top: 1px solid var(--border);
-    box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
-    padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
-    z-index: 1000;
-  }
-  .mobile-tabbar .tab-link {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    color: #050505;
-    font-weight: 600;
-    text-decoration: none;
-    padding: 6px 0;
-    border-radius: 12px;
-    transition: background-color 0.3s ease;
-  }
-  .mobile-tabbar .tab-link:hover,
-  .mobile-tabbar .tab-link.active {
-    background: #f0f2f5;
-  }
-  .mobile-tabbar .tab-link .ico {
-    font-size: 1.2rem;
-  }
-  .mobile-tabbar .tab-link .txt {
-    font-size: 0.75rem;
-  }
-  body {
-    padding-bottom: 60px;
-  }
-}
-
 /* Fix lightbox overlay positioning and stacking */
 .lightbox-overlay {
   position: fixed !important;
@@ -1211,19 +941,10 @@ p {
   color: white;
 }
 
-/* Responsive adjustments */
-@media (max-width: 480px) {
-  .filter-controls,
-  .map-controls {
-    padding: 16px 16px;
-    grid-template-columns: 1fr;
-  }
-  #filter-clear {
+/* Mobile styles and responsive adjustments */
+@media (max-width: 768px) {
+  form#incident-form, #incident-list {
     width: 100%;
-    min-width: unset;
-    align-self: stretch;
-  }
-  #hm-fit {
-    width: 100%;
+    max-width: 100%;
   }
 }
