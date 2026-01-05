@@ -18,6 +18,10 @@ h2 {
   margin-bottom: 15px;
 }
 
+form {
+  text-align: center;
+}
+
 /* Form styles */
 form#incident-form {
   background: #fff;
