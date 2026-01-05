@@ -25,7 +25,6 @@ export function initNavbar() {
 
   // Mobile drawer helpers
   const dispatchDrawerToggle = () => {
-    // Notify maps to invalidate size when drawer toggles
     window.dispatchEvent(new Event("drawer:toggle"));
   };
 
@@ -68,6 +67,69 @@ export function initNavbar() {
       applyTheme(next);
     });
   }
+
+  // Language toggle (EN/Fil)
+  const langBtn = document.getElementById("lang-toggle");
+  const applyLang = (lng) => {
+    if (window.applyLocale) window.applyLocale(lng);
+    if (langBtn) langBtn.textContent = lng === "fil" ? "FIL" : "EN";
+    localStorage.setItem("locale", lng);
+  };
+  const savedLng = localStorage.getItem("locale") || "en";
+  applyLang(savedLng);
+  if (langBtn) {
+    langBtn.addEventListener("click", () => {
+      const current = localStorage.getItem("locale") || "en";
+      const next = current === "en" ? "fil" : "en";
+      applyLang(next);
+    });
+  }
+
+  // Notification center
+  const notifBtn = document.getElementById("notif-btn");
+  const notifPanel = document.getElementById("notif-panel");
+  const notifList = document.getElementById("notif-list");
+  const notifCount = document.getElementById("notif-count");
+  const closeBtn = notifPanel?.querySelector(".notif-close");
+
+  const togglePanel = (open) => {
+    if (!notifPanel) return;
+    notifPanel.classList.toggle("open", open);
+  };
+
+  const loadNotifications = async () => {
+    try {
+      const [newsRes, incRes] = await Promise.all([fetch("/api/news"), fetch("/api/incidents")]);
+      const [newsItems, incidents] = await Promise.all([newsRes.json(), incRes.json()]);
+      const approvedInc = incidents.filter(i => (i.status || "").toLowerCase() === "approved");
+      const updates = [
+        ...newsItems.map(n => ({ t: n.title, d: n.description, when: n.createdAt || Date.now(), kind: "News" })),
+        ...approvedInc.map(i => ({ t: i.incidentType, d: i.description, when: i.createdAt || Date.now(), kind: "Incident" }))
+      ].sort((a,b) => new Date(b.when) - new Date(a.when)).slice(0, 8);
+      if (notifList) {
+        notifList.innerHTML = updates.map(u =>
+          `<li><strong>${u.kind}:</strong> ${u.t}<br><small>${new Date(u.when).toLocaleString()}</small></li>`
+        ).join("") || `<li>No updates</li>`;
+      }
+      if (notifCount) notifCount.textContent = String(updates.length);
+    } catch (e) {
+      if (notifList) notifList.innerHTML = `<li>Failed to load updates</li>`;
+    }
+  };
+
+  if (notifBtn) {
+    notifBtn.addEventListener("click", async () => {
+      const open = !notifPanel?.classList.contains("open");
+      togglePanel(open);
+      if (open) await loadNotifications();
+    });
+  }
+  if (closeBtn) closeBtn.addEventListener("click", () => togglePanel(false));
+  document.addEventListener("click", (e) => {
+    if (notifPanel && notifPanel.classList.contains("open")) {
+      if (!e.target.closest("#notif-panel") && !e.target.closest("#notif-btn")) togglePanel(false);
+    }
+  });
 
   // --- Global search wiring ---
   const searchInput = document.querySelector(".search-input");
@@ -135,65 +197,6 @@ export function initNavbar() {
     setTimeout(runSearch, 0);
     window.addEventListener("feed:loaded", () => setTimeout(runSearch, 0), { once: true });
   }
-
-  // Language toggle (EN/Fil)
-  const langBtn = document.getElementById("lang-toggle");
-  const applyLang = (lng) => {
-    if (window.applyLocale) window.applyLocale(lng);
-    if (langBtn) langBtn.textContent = lng === "fil" ? "FIL" : "EN";
-    localStorage.setItem("locale", lng);
-  };
-  const savedLng = localStorage.getItem("locale") || "en";
-  applyLang(savedLng);
-  if (langBtn) {
-    langBtn.addEventListener("click", () => {
-      const next = (localStorage.getItem("locale") || "en") === "en" ? "fil" : "en";
-      applyLang(next);
-    });
-  }
-
-  // Notification center
-  const notifBtn = document.getElementById("notif-btn");
-  const notifPanel = document.getElementById("notif-panel");
-  const notifList = document.getElementById("notif-list");
-  const notifCount = document.getElementById("notif-count");
-  const closeBtn = notifPanel?.querySelector(".notif-close");
-  const togglePanel = (open) => {
-    if (!notifPanel) return;
-    notifPanel.classList.toggle("open", open);
-  };
-  const loadNotifications = async () => {
-    try {
-      const [newsRes, incRes] = await Promise.all([fetch("/api/news"), fetch("/api/incidents")]);
-      const [newsItems, incidents] = await Promise.all([newsRes.json(), incRes.json()]);
-      const approvedInc = incidents.filter(i => (i.status || "").toLowerCase() === "approved");
-      const updates = [
-        ...newsItems.map(n => ({ t: n.title, d: n.description, when: n.createdAt || Date.now(), kind: "News" })),
-        ...approvedInc.map(i => ({ t: i.incidentType, d: i.description, when: i.createdAt || Date.now(), kind: "Incident" }))
-      ].sort((a,b) => new Date(b.when) - new Date(a.when)).slice(0, 8);
-      if (notifList) {
-        notifList.innerHTML = updates.map(u =>
-          `<li><strong>${u.kind}:</strong> ${u.t}<br><small>${new Date(u.when).toLocaleString()}</small></li>`
-        ).join("") || `<li>No updates</li>`;
-      }
-      if (notifCount) notifCount.textContent = String(updates.length);
-    } catch (e) {
-      if (notifList) notifList.innerHTML = `<li>Failed to load updates</li>`;
-    }
-  };
-  if (notifBtn) {
-    notifBtn.addEventListener("click", async () => {
-      const open = !notifPanel?.classList.contains("open");
-      togglePanel(open);
-      if (open) await loadNotifications();
-    });
-  }
-  if (closeBtn) closeBtn.addEventListener("click", () => togglePanel(false));
-  document.addEventListener("click", (e) => {
-    if (notifPanel && notifPanel.classList.contains("open")) {
-      if (!e.target.closest("#notif-panel") && !e.target.closest("#notif-btn")) togglePanel(false);
-    }
-  });
 
   // PWA install prompt
   const installBtn = document.getElementById("install-btn");
