@@ -36,11 +36,13 @@
       <h1 class="title">Edit Incident</h1>
       <span id="edit-status-badge" class="status-badge">Pending</span>
     </div>
+
     <div class="card">
       <div class="card-head">
         <h2 class="card-title">Incident Details</h2>
         <p class="card-desc">Update fields, adjust location, and add images.</p>
       </div>
+
       <form id="edit-incident-form" enctype="multipart/form-data">
         <div class="form-section">
           <h3>Basic Info</h3>
@@ -65,9 +67,27 @@
           </select>
         </div>
 
+        <div class="form-section">
+          <h3>Assignment & Priority</h3>
+          <label for="assignee">Assigned Official</label>
+          <input type="text" name="assignee" id="assignee" placeholder="Official Name" />
+
+          <label for="priority">Priority</label>
+          <select name="priority" id="priority">
+            <option value="">None</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Critical">Critical</option>
+          </select>
+
+          <label for="due">Due Date (SLA)</label>
+          <input type="date" name="due" id="due" />
+          <div id="sla-chip" class="deadline-chip" aria-live="polite"></div>
+        </div>
+
         <div class="form-section map-card">
           <h3>Location</h3>
-          <!-- Hidden inputs for location -->
           <input type="hidden" name="location[lat]" id="lat" required />
           <input type="hidden" name="location[lng]" id="lng" required />
           <div id="map" class="map-wrap"></div>
@@ -86,13 +106,23 @@
             <button type="button" class="pill-btn">Browse</button>
             <input type="file" name="images" id="images" multiple accept="image/*" style="display:none" />
           </div>
-          <div class="file-list" id="file-list"></div>
+          <div class="file-list" id="file-list">No files selected.</div>
+          <div id="preview-grid" class="image-grid"></div>
         </div>
 
         <div class="form-actions">
           <button type="submit" class="btn-gradient">Save Changes</button>
         </div>
       </form>
+    </div>
+
+    <!-- Optional audit trail card (populated via comments endpoint or future 'audit' field) -->
+    <div class="card" style="margin-top:12px;">
+      <div class="card-head">
+        <h2 class="card-title">Audit Trail</h2>
+        <p class="card-desc">Key changes and actions are logged here.</p>
+      </div>
+      <ul id="audit-list" class="audit-list"></ul>
     </div>
   </div>
 
@@ -112,14 +142,33 @@
     const descriptionInput = document.getElementById("description");
     const statusSelect = document.getElementById("status");
     const statusBadge = document.getElementById("edit-status-badge");
+    const assigneeInput = document.getElementById("assignee");
+    const prioritySelect = document.getElementById("priority");
+    const dueInput = document.getElementById("due");
+    const slaChip = document.getElementById("sla-chip");
     const latInput = document.getElementById("lat");
     const lngInput = document.getElementById("lng");
     const imagesInput = document.getElementById("images");
     const fileDrop = document.getElementById("file-drop");
     const fileList = document.getElementById("file-list");
+    const previewGrid = document.getElementById("preview-grid");
     const currentImages = document.getElementById("current-images");
+    const auditList = document.getElementById("audit-list");
 
-    let map, marker;
+    let map, marker, ORIGINAL = {};
+
+    function updateSLA() {
+      const val = dueInput.value;
+      if (!val) { slaChip.textContent = ""; slaChip.className = "deadline-chip"; return; }
+      const now = new Date();
+      const due = new Date(val);
+      const diff = Math.ceil((due.getTime() - now.getTime()) / 86400000); // days
+      if (diff > 1) { slaChip.textContent = `${diff} days remaining`; slaChip.className = "deadline-chip ok"; }
+      else if (diff === 1) { slaChip.textContent = "1 day remaining"; slaChip.className = "deadline-chip warn"; }
+      else if (diff === 0) { slaChip.textContent = "Due today"; slaChip.className = "deadline-chip warn"; }
+      else { slaChip.textContent = `Overdue by ${Math.abs(diff)} day${Math.abs(diff)>1?"s":""}`; slaChip.className = "deadline-chip danger"; }
+    }
+    dueInput.addEventListener("change", updateSLA);
 
     async function loadIncident() {
       try {
@@ -127,30 +176,47 @@
         if (!res.ok) throw new Error("Incident not found");
         const incident = await res.json();
 
-        reporterNameInput.value = incident.reporterName || "";
-        incidentTypeInput.value = incident.incidentType || "";
-        descriptionInput.value = incident.description || "";
-        if (incident.status) {
-          statusSelect.value = incident.status;
-          statusBadge.textContent = incident.status;
-        }
+        // Cache original values for audit diff
+        ORIGINAL = {
+          reporterName: incident.reporterName || "",
+          incidentType: incident.incidentType || "",
+          description: incident.description || "",
+          status: incident.status || "Pending",
+          assignee: incident.assignee || "",
+          priority: incident.priority || "",
+          due: incident.due || null
+        };
+
+        reporterNameInput.value = ORIGINAL.reporterName;
+        incidentTypeInput.value = ORIGINAL.incidentType;
+        descriptionInput.value = ORIGINAL.description;
+        statusSelect.value = ORIGINAL.status;
+        statusBadge.textContent = ORIGINAL.status;
+        assigneeInput.value = ORIGINAL.assignee;
+        prioritySelect.value = ORIGINAL.priority;
+        if (ORIGINAL.due) { dueInput.value = new Date(ORIGINAL.due).toISOString().slice(0,10); }
+        updateSLA();
 
         if (incident.location && incident.location.lat && incident.location.lng) {
           latInput.value = incident.location.lat;
           lngInput.value = incident.location.lng;
           initMap(incident.location.lat, incident.location.lng);
         } else {
-          initMap(14.4089, 121.0341); // default coords
+          initMap(14.4089, 121.0341);
         }
 
-        // Render current images
         if (Array.isArray(incident.images) && incident.images.length > 0) {
-          currentImages.innerHTML = incident.images
-            .map(src => `<img src="${src}" alt="incident image">`)
-            .join("");
+          currentImages.innerHTML = incident.images.map(src => `<img src="${src}" alt="incident image">`).join("");
         } else {
           currentImages.innerHTML = "<p class='form-desc'>No images uploaded for this incident.</p>";
         }
+
+        // Load comments as simple audit trail items (if you want to reuse comments)
+        try {
+          const cr = await fetch(`/api/incidents/${incidentId}/comments`);
+          const comments = await cr.json();
+          auditList.innerHTML = (comments || []).map(c => `<li><strong>${c.user||'System'}</strong> (${c.role||'note'}) • ${c.comment}</li>`).join("");
+        } catch {}
       } catch (err) {
         alert("Failed to load incident: " + err.message);
         window.location.href = "admin.html";
@@ -160,8 +226,7 @@
     function initMap(lat, lng) {
       map = L.map("map").setView([lat, lng], 15);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
       marker = L.marker([lat, lng], { draggable: true }).addTo(map);
@@ -185,34 +250,74 @@
     fileDrop.addEventListener("click", () => imagesInput.click());
     fileDrop.addEventListener("dragover", (e) => {
       e.preventDefault();
-      fileDrop.style.background = "#f0f2f5";
+      fileDrop.classList.add("dragging");
     });
     fileDrop.addEventListener("dragleave", () => {
-      fileDrop.style.background = "#fff";
+      fileDrop.classList.remove("dragging");
     });
     fileDrop.addEventListener("drop", (e) => {
       e.preventDefault();
-      fileDrop.style.background = "#fff";
-      imagesInput.files = e.dataTransfer.files;
-      updateFileList();
+      fileDrop.classList.remove("dragging");
+      if (!e.dataTransfer?.files?.length) return;
+      appendFiles(e.dataTransfer.files);
     });
-    imagesInput.addEventListener("change", updateFileList);
-    function updateFileList() {
-      const files = Array.from(imagesInput.files || []);
-      if (files.length === 0) { fileList.textContent = "No files selected."; return; }
-      fileList.innerHTML = files.map(f => `• ${f.name}`).join("<br>");
-    }
+    imagesInput.addEventListener("change", () => {
+      if (imagesInput.files?.length) appendFiles(imagesInput.files, true);
+    });
 
+    const MAX_IMAGES = 6;
+    function setFiles(filesArr) {
+      const dt = new DataTransfer();
+      filesArr.forEach(f => dt.items.add(f));
+      imagesInput.files = dt.files;
+      updatePreview();
+    }
+    function appendFiles(fileListLike, replace = false) {
+      const current = Array.from(imagesInput.files || []);
+      const incoming = Array.from(fileListLike || []).filter(f => f.type.startsWith("image/"));
+      let merged = replace ? [] : current.slice();
+      for (const f of incoming) {
+        if (merged.length >= MAX_IMAGES) break;
+        merged.push(f);
+      }
+      if (merged.length > MAX_IMAGES) merged = merged.slice(0, MAX_IMAGES);
+      setFiles(merged);
+    }
+    function updatePreview() {
+      const files = Array.from(imagesInput.files || []);
+      fileList.textContent = files.length ? `${files.length} file${files.length>1?"s":""} selected` : "No files selected.";
+      previewGrid.innerHTML = "";
+      files.forEach((file, idx) => {
+        const url = URL.createObjectURL(file);
+        const wrap = document.createElement("div");
+        wrap.className = "thumb";
+        wrap.innerHTML = `<img src="${url}" alt="${file.name}" /><button type="button" class="remove-thumb" aria-label="Remove image" data-index="${idx}">×</button>`;
+        previewGrid.appendChild(wrap);
+      });
+    }
+    previewGrid.addEventListener("click", (e) => {
+      const btn = e.target.closest(".remove-thumb");
+      if (!btn) return;
+      const idx = parseInt(btn.getAttribute("data-index"), 10);
+      const files = Array.from(imagesInput.files || []);
+      files.splice(idx, 1);
+      setFiles(files);
+    });
+
+    // Submit with audit logging (via comments endpoint)
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const formData = new FormData(form);
-
-      // Location as JSON string for backend parsing
       formData.set("location", JSON.stringify({
         lat: parseFloat(latInput.value),
         lng: parseFloat(lngInput.value)
       }));
+
+      // Add workflow fields (if backend supports them)
+      formData.set("assignee", assigneeInput.value);
+      formData.set("priority", prioritySelect.value);
+      formData.set("due", dueInput.value);
 
       try {
         const res = await fetch(`/api/incidents/${incidentId}`, {
@@ -221,7 +326,43 @@
         });
         const data = await res.json();
         if (res.ok) {
-          alert(data.message);
+          alert(data.message || "Incident updated");
+
+          // Build audit summary message
+          const changes = [];
+          const curr = {
+            reporterName: reporterNameInput.value,
+            incidentType: incidentTypeInput.value,
+            description: descriptionInput.value,
+            status: statusSelect.value,
+            assignee: assigneeInput.value,
+            priority: prioritySelect.value,
+            due: dueInput.value || null
+          };
+          if (ORIGINAL.status !== curr.status) changes.push(`Status: ${ORIGINAL.status} → ${curr.status}`);
+          if (ORIGINAL.assignee !== curr.assignee) changes.push(`Assignee: ${ORIGINAL.assignee||'—'} → ${curr.assignee||'—'}`);
+          if (ORIGINAL.priority !== curr.priority) changes.push(`Priority: ${ORIGINAL.priority||'—'} → ${curr.priority||'—'}`);
+          if ((ORIGINAL.due||"") !== (curr.due||"")) changes.push(`Due: ${ORIGINAL.due?new Date(ORIGINAL.due).toLocaleDateString():'—'} → ${curr.due?new Date(curr.due).toLocaleDateString():'—'}`);
+
+          if (changes.length) {
+            const username = localStorage.getItem("username") || "Admin";
+            const role = localStorage.getItem("role") || "admin";
+            const comment = `[Audit] ${new Date().toLocaleString()}: ${changes.join("; ")}`;
+            try {
+              const cr = await fetch(`/api/incidents/${incidentId}/comments`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user: username, role, comment })
+              });
+              if (cr.ok) {
+                // Optimistically append
+                const li = document.createElement("li");
+                li.innerHTML = `<strong>${username}</strong> (${role}) • ${comment}`;
+                auditList.prepend(li);
+              }
+            } catch {}
+          }
+
           window.location.href = "admin.html";
         } else {
           alert("Failed to update incident: " + (data.message || ""));

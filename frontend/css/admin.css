@@ -1639,3 +1639,60 @@ button.action-btn:hover,
   display: flex;
   gap: 8px;
 }
+
+/* Deadline (SLA) chip styles */
+.deadline-chip {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #F0F2F5;
+  color: #65676B;
+  font-weight: 700;
+  font-size: .9rem;
+  border: 1px solid var(--border);
+}
+.deadline-chip.ok {
+  background: rgba(66, 183, 42, .10);
+  color: #2e7d32;
+  border-color: #cdeccd;
+}
+.deadline-chip.warn {
+  background: rgba(255, 193, 7, .15);
+  color: #b78700;
+  border-color: #ffe39c;
+}
+.deadline-chip.danger {
+  background: rgba(229, 57, 53, .10);
+  color: #c62828;
+  border-color: #f5b4b2;
+}
+
+/* Priority badge colors (optional use elsewhere) */
+.priority-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .85rem;
+  border: 1px solid var(--border);
+}
+.priority-badge.low { background: #f0f7ee; color: #2e7d32; }
+.priority-badge.medium { background: #fff6e5; color: #b78700; }
+.priority-badge.high { background: #feecec; color: #c62828; }
+.priority-badge.critical { background: #fde7ef; color: #c2185b; }
+
+/* Audit trail list */
+.audit-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.audit-list li {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+}
