@@ -53,30 +53,8 @@
             <span class="txt" data-i18n="nav.events">Events</span>
           </a>
         </li>
-        <li role="none">
-          <a href="emergency.html" class="nav-link" role="menuitem" tabindex="-1" aria-label="Hotlines">
-            <svg class="ico" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h-2v-4H8v4H6V6h4V2h6v4h4v12h-8v-6H8v6H6v4z"/></svg>
-            <span class="txt" data-i18n="nav.hotlines">Hotlines</span>
-          </a>
-        </li>
-        <li role="none">
-          <a href="directory.html" class="nav-link" role="menuitem" tabindex="-1" aria-label="Officials">
-            <svg class="ico" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zm0-10v2h14V7H7z"/></path></svg>
-            <span class="txt" data-i18n="nav.officials">Officials</span>
-          </a>
-        </li>
-        <li role="none">
-          <a href="schedules.html" class="nav-link" role="menuitem" tabindex="-1" aria-label="Schedules">
-            <svg class="ico" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zM12 16v-4h2v4h-2zm0 4h2v-2h-2v2zm0-8h2V7h-2v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zm0-10v2h14V7H7z"/></path></svg>
-            <span class="txt" data-i18n="nav.schedules">Schedules</span>
-          </a>
-        </li>
-        <li role="none">
-          <a href="faq.html" class="nav-link" role="menuitem" tabindex="-1" aria-label="FAQs">
-            <svg class="ico" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></path></svg>
-            <span class="txt" data-i18n="nav.faq">FAQs</span>
-          </a>
-        </li>
+        <!-- Removed secondary links from top navbar to avoid overlap -->
+        <!-- Hotlines, Officials, Schedules, FAQs moved to sidebar -->
       </ul>
     </div>
 
@@ -115,6 +93,10 @@
       <a href="admin.html" id="admin-link" class="pill-btn" aria-label="Go to Dashboard" data-i18n="nav.dashboard">Dashboard</a>
       <a href="#" id="logout-link" class="pill-btn" style="display:none;" aria-label="Logout" data-i18n="nav.logout">Logout</a>
       <a href="register.html" class="pill-btn secondary" aria-label="Register new account" data-i18n="nav.register">Register</a>
+
+      <!-- Sidebar toggle (desktop/tablet) -->
+      <input type="checkbox" id="side-toggle" class="side-toggle" aria-label="Toggle sections sidebar" />
+      <label for="side-toggle" class="side-toggle-btn pill-btn" title="Sections">Sections ▸</label>
     </div>
   </div>
 
@@ -122,8 +104,34 @@
   <div class="nav-overlay" tabindex="-1" aria-hidden="true"></div>
 </nav>
 
+<!-- Responsive Sections Sidebar (Hotlines, Officials, Schedules, FAQs) -->
+<aside class="side-nav" aria-label="Sections">
+  <div class="side-head">
+    <strong>Sections</strong>
+    <label for="side-toggle" class="side-close" aria-label="Close sidebar">✕</label>
+  </div>
+  <ul class="side-menu" role="menu">
+    <li role="none"><a href="emergency.html" role="menuitem">
+      <svg class="ico" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h-2v-4H8v4H6V6h4V2h6v4h4v12h-8v-6H8v6H6v4z"/></svg>
+      <span data-i18n="nav.hotlines">Hotlines</span>
+    </a></li>
+    <li role="none"><a href="directory.html" role="menuitem">
+      <svg class="ico" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zm0-10v2h14V7H7z"/></svg>
+      <span data-i18n="nav.officials">Officials</span>
+    </a></li>
+    <li role="none"><a href="schedules.html" role="menuitem">
+      <svg class="ico" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zM12 16v-4h2v4h-2zm0 4h2v-2h-2v2zm0-8h2V7h-2v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zm0-10v2h14V7H7z"/></svg>
+      <span data-i18n="nav.schedules">Schedules</span>
+    </a></li>
+    <li role="none"><a href="faq.html" role="menuitem">
+      <svg class="ico" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+      <span data-i18n="nav.faq">FAQs</span>
+    </a></li>
+  </ul>
+</aside>
+<div class="side-overlay" aria-hidden="true"></div>
 
-<!-- Mobile bottom tabbar -->
+<!-- Mobile bottom tabbar (unchanged) -->
 <div class="mobile-tabbar" role="navigation" aria-label="Mobile Navigation">
   <a href="index.html" class="tab-link" aria-label="Home">
     <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 20v-6h4v6h-2v-4H8v4H6V6h4V2h6v4h4v12h-8v-6H8v6H6v4z"/></svg>

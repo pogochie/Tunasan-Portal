@@ -5,24 +5,95 @@ export function initNavbar() {
   const navToggle = document.getElementById("nav-toggle");
   const overlay = document.querySelector(".nav-overlay");
   const navMenu = document.querySelector(".nav-menu");
+  const moreItem = navMenu?.querySelector(".more");
+  const moreMenu = document.getElementById("more-menu");
+  const moreBtn = moreItem?.querySelector(".more-btn");
+  const notifBadge = document.getElementById("notif-badge");
 
   function checkAdminAuth() {
     const isLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
-    if (adminLink) adminLink.style.display = isLoggedIn ? "inline-block" : "none";
+    if (adminLink) adminLink.style.display = "inline-block";
     if (logoutLink) logoutLink.style.display = isLoggedIn ? "inline-block" : "none";
   }
-
   checkAdminAuth();
 
   if (logoutLink) {
     logoutLink.addEventListener("click", (e) => {
       e.preventDefault();
       localStorage.removeItem("adminLoggedIn");
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("username");
       checkAdminAuth();
       window.location.href = "index.html";
     });
   }
-  
+
+  // Mobile drawer
+  if (navToggle && overlay && navMenu) {
+    overlay.addEventListener("click", () => (navToggle.checked = false));
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") navToggle.checked = false;
+    });
+  }
+
+  // Notifications demo badge update (you can wire to real socket later)
+  if (notifBtn && notifBadge) {
+    notifBtn.addEventListener("click", () => {
+      notifBadge.hidden = true;
+    });
+    // Example: show random count on load
+    const count = Math.floor(Math.random() * 3);
+    if (count > 0) {
+      notifBadge.textContent = String(count);
+      notifBadge.hidden = false;
+    }
+  }
+
+  // Responsive overflow: move excess items into "More" dropdown
+  function fitNav() {
+    if (!navMenu || !moreItem || !moreMenu) return;
+    // Reset: move all items back except .more
+    const items = Array.from(moreMenu.children);
+    items.forEach(li => navMenu.insertBefore(li, moreItem));
+
+    // Reserve space for utilities; measure available width
+    const container = navMenu.parentElement;
+    const available = container.clientWidth - (container.querySelector(".nav-utilities")?.clientWidth || 0) - 32;
+
+    // Move trailing items into "More" until it fits
+    let overflows = navMenu.scrollWidth > available;
+    const movable = () => Array.from(navMenu.children).filter(li => !li.classList.contains("more"));
+    while (overflows && movable().length > 0) {
+      const toMove = movable().pop();
+      if (!toMove) break;
+      moreMenu.insertBefore(toMove, moreMenu.firstChild);
+      overflows = navMenu.scrollWidth > available;
+    }
+
+    // Toggle visibility of "More"
+    moreItem.style.display = moreMenu.children.length ? "inline-block" : "none";
+  }
+
+  // Toggle "More" dropdown
+  if (moreBtn && moreMenu) {
+    moreBtn.addEventListener("click", () => {
+      const expanded = moreBtn.getAttribute("aria-expanded") === "true";
+      moreBtn.setAttribute("aria-expanded", (!expanded).toString());
+      moreMenu.classList.toggle("open", !expanded);
+    });
+    document.addEventListener("click", (e) => {
+      if (!moreItem.contains(e.target)) {
+        moreBtn.setAttribute("aria-expanded", "false");
+        moreMenu.classList.remove("open");
+      }
+    });
+  }
+
+  window.addEventListener("resize", fitNav);
+  // Run once after layout
+  setTimeout(fitNav, 0);
+
 
   // Close nav when clicking overlay
   if (overlay && navToggle) {
@@ -161,7 +232,8 @@ export function initNavbar() {
           msg.textContent = "No matching results.";
           list.appendChild(msg);
         }
-      } else if (noMsg) {
+      }
+      else if (noMsg) {
         noMsg.remove();
       }
     });

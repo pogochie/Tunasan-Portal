@@ -295,6 +295,129 @@ form#incident-form button:hover {
 /* Define nav height so body padding-top doesn't break layout */
 :root {
   --nav-height: 56px;
+  --side-width: 264px;
+}
+
+.side-toggle { display: none; }
+
+/* Toggle button */
+.side-toggle-btn {
+  background: #f0f2f5;
+  color: #050505;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  padding: 8px 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
+  user-select: none;
+}
+.side-toggle-btn:hover {
+  background: #e7eaef;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+/* Off-canvas sidebar */
+.side-nav {
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  height: calc(100vh - var(--nav-height));
+  width: var(--side-width);
+  background: #fff;
+  border-right: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  transform: translateX(-100%);
+  transition: transform .25s ease;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 10px;
+  backdrop-filter: saturate(120%) blur(8px);
+}
+.side-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.side-head strong {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #050505;
+}
+.side-close {
+  background: #f0f2f5;
+  color: #050505;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.side-menu {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.side-menu a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #050505;
+  font-weight: 700;
+  transition: background-color .2s ease, color .2s ease;
+}
+.side-menu a:hover,
+.side-menu a.active {
+  background: #f0f2f5;
+  color: var(--primary);
+}
+
+/* Overlay to close sidebar on click */
+.side-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+  z-index: 1000;
+}
+
+/* Open states via checkbox */
+.side-toggle:checked ~ .side-nav {
+  transform: translateX(0);
+}
+.side-toggle:checked ~ .side-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Desktop: keep the top navbar uncluttered; sidebar use when needed */
+@media (min-width: 769px) {
+  /* Hide secondary links from top bar if any remain */
+  .fb-navbar .nav-center .nav-items .secondary-link { display: none !important; }
+}
+
+/* Tablet/mobile: hide sidebar toggle (use bottom tabbar) */
+@media (max-width: 768px) {
+  .side-toggle-btn,
+  .side-nav,
+  .side-overlay {
+    display: none !important;
+  }
 }
 
 /* Fix Report Incident modal on laptop/desktop: top-align and let modal scroll */
@@ -2228,4 +2351,31 @@ body.modal-open {
 .theme-dark #register-form input[type="file"]::-webkit-file-upload-button {
   background: linear-gradient(90deg, #3b82f6, #22d3ee 60%, #8b5cf6);
   box-shadow: 0 10px 30px rgba(59,130,246,0.35);
+}
+
+/* Prevent navbar overlap: allow center menu to scroll horizontally */
+.fb-navbar .nav-center .nav-items {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.fb-navbar .nav-center .nav-items::-webkit-scrollbar { height: 6px; }
+.fb-navbar .nav-center .nav-items::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 6px;
+}
+
+/* Slightly reduce search width on medium screens to avoid collision */
+.fb-navbar .search-input {
+  width: clamp(160px, 24vw, 220px);
+}
+@media (max-width: 1024px) {
+  .fb-navbar .search-wrap { display: none; }
+}
+
+/* Ensure overlay for mobile drawer still functions */
+.fb-navbar .nav-toggle:checked ~ .nav-overlay {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
 }
