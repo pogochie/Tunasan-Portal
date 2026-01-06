@@ -8,9 +8,6 @@
   <link
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-  integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4dIbHSmHGh0fE6k5hD5F8X2AQ=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
 />
   <style>
     .hero {
@@ -23,70 +20,50 @@
       font-size: 2rem;
       margin-bottom: 15px;
     }
+    .features-slider {
+  display: flex;
+  gap: 1.25rem;
+  padding: 0 1.25rem 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.features-slider::-webkit-scrollbar {
+  display: none;
+}
+
     .features {
-  padding: 4rem 1.5rem;
-  background: linear-gradient(180deg, #0f172a, #020617);
-  color: #e5e7eb;
-  text-align: center;
+  padding: 4rem 0 3rem;
+  background: linear-gradient(180deg, #0b1a2a, #0f2740);
 }
 
 .section-title {
+  text-align: center;
   font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 2rem;
+  color: #fff;
 }
 
-.section-subtitle {
-  max-width: 620px;
-  margin: 0 auto 2.5rem;
-  color: #9ca3af;
-  font-size: 1rem;
+.features-slider {
+  display: flex;
+  gap: 1.25rem;
+  padding: 0 1.25rem 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 1.5rem;
-  max-width: 1100px;
-  margin: 0 auto;
+.features-slider::-webkit-scrollbar {
+  display: none;
 }
 
-.feature-card {
-  width: 100%;
-  max-width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 2rem 1.5rem;
-  backdrop-filter: blur(10px);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  overflow: hidden;
-}
-
-.feature-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
-}
-
-.feature-icon {
-  font-size: 2.2rem;
-  color: #38bdf8;
+.feature-card i {
+  font-size: 2.4rem;
+  color: #4fc3f7;
   margin-bottom: 1rem;
-  display: block;
-  margin: 0 auto 1rem;
 }
 
-.feature-card h3 {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-  color: #f9fafb;
-}
-
-.feature-card p {
-  font-size: 0.95rem;
-  line-height: 1.55;
-  color: #cbd5f5;
-}
 
   </style>
   <style>
@@ -128,6 +105,39 @@
       max-width: 500px;
       width: 100%;
     }
+    .swipe-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.7);
+
+  margin-bottom: 1.2rem;
+  animation: swipeHint 1.6s ease-in-out infinite;
+}
+
+.swipe-indicator i {
+  font-size: 0.9rem;
+}
+
+@keyframes swipeHint {
+  0% {
+    transform: translateX(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateX(6px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 0.4;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -143,44 +153,38 @@
 
     <section class="features">
   <h2 class="section-title">What You Can Do</h2>
-  <p class="section-subtitle">
-    A modern barangay portal designed for transparency, speed, and community safety.
-  </p>
 
-  <div class="features-grid">
+  <div class="features-slider">
     <div class="feature-card">
-      <i class="fa-solid fa-map-location-dot feature-icon"></i>
-      <h3>Map-Based Reporting</h3>
-      <p>
-        Select exact incident locations using an interactive barangay map for accuracy.
-      </p>
+      <i class="fa-solid fa-bullhorn"></i>
+      <h3>Report Incidents</h3>
+      <p>Submit community issues with images and map location.</p>
     </div>
 
     <div class="feature-card">
-      <i class="fa-solid fa-camera feature-icon"></i>
-      <h3>Photo Evidence Submission</h3>
-      <p>
-        Upload images to support reports and help officials verify incidents effectively.
-      </p>
+      <i class="fa-solid fa-map-location-dot"></i>
+      <h3>Pin Location</h3>
+      <p>Select exact incident location using the interactive map.</p>
     </div>
 
     <div class="feature-card">
-      <i class="fa-solid fa-bolt feature-icon"></i>
-      <h3>Real-Time Notifications</h3>
-      <p>
-        Reports are instantly sent to barangay administrators for quick review.
-      </p>
+      <i class="fa-solid fa-newspaper"></i>
+      <h3>Barangay News</h3>
+      <p>View verified announcements and official updates.</p>
     </div>
 
     <div class="feature-card">
-      <i class="fa-solid fa-shield-check feature-icon"></i>
-      <h3>Verified News & Events</h3>
-      <p>
-        Only approved reports are published as official barangay news and announcements.
-      </p>
+      <i class="fa-solid fa-qrcode"></i>
+      <h3>QR Access</h3>
+      <p>Scan QR codes to instantly open the report form.</p>
     </div>
   </div>
 </section>
+<div class="swipe-indicator" id="swipeIndicator">
+  <span>Swipe</span>
+  <i class="fa-solid fa-arrow-right"></i>
+</div>
+
 
 
      <h2>Recent Community Activity</h2>
