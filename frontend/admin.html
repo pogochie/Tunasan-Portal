@@ -39,7 +39,7 @@
   </nav>
 
   <div class="container">
-    <!-- Futuristic page header -->
+    <!-- Modern page header, matching admin-events style -->
     <div class="page-header">
       <h1 class="title">Incident Management</h1>
       <div class="admin-actions">
@@ -48,20 +48,50 @@
       </div>
     </div>
 
-    <!-- Stats summary -->
+    <!-- Toolbar: quick status filters and export -->
+    <div class="admin-toolbar">
+      <div class="chips">
+        <button class="chip active" data-status="">All</button>
+        <button class="chip" data-status="Pending">Pending</button>
+        <button class="chip" data-status="Approved">Approved</button>
+        <button class="chip" data-status="Rejected">Rejected</button>
+        <button class="chip" data-status="In Progress">In Progress</button>
+        <button class="chip" data-status="Resolved">Resolved</button>
+      </div>
+      <div class="toolbar-actions">
+        <button id="export-csv" class="pill-btn">Export CSV</button>
+      </div>
+    </div>
+
+    <!-- Stats summary (styled like cards) -->
     <div id="admin-stats" class="admin-stats"></div>
 
-    <table id="incident-table">
-      <thead>
-        <tr>
-          <th>Reporter</th>
-          <th>Type</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <!-- Incidents table card -->
+    <div class="card">
+      <div class="card-head">
+        <h2 class="card-title">Incidents</h2>
+        <p class="card-desc">Review, edit, or delete community reports.</p>
+      </div>
+      <table id="incident-table">
+        <thead>
+          <tr>
+            <th>Reporter</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mobile tabbar for quick admin navigation -->
+  <div class="admin-mobile-tabbar" role="navigation" aria-label="Admin Navigation">
+    <a href="admin.html" class="tab-link active">Incidents</a>
+    <a href="admin-news.html" class="tab-link">News</a>
+    <a href="admin-events.html" class="tab-link">Events</a>
+    <a href="admin-user-approval.html" class="tab-link">Approvals</a>
   </div>
 
   <div id="review-modal" style="display:none;"></div>
@@ -75,7 +105,7 @@
       window.location.href = "admin-login.html";
     });
 
-    // Client-side search for incidents table
+    // Client-side search filter for incidents table
     const search = document.getElementById("incident-search");
     const tableBody = document.querySelector("#incident-table tbody");
     if (search && tableBody) {
@@ -88,20 +118,44 @@
         });
       });
     }
+
+    // Status chip filters
+    const chips = document.querySelectorAll(".admin-toolbar .chip");
+    chips.forEach(chip => {
+      chip.addEventListener("click", () => {
+        chips.forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        const status = chip.getAttribute("data-status");
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+        rows.forEach(row => {
+          const cell = row.querySelector("[data-label='Status']");
+          const val = cell ? cell.textContent.trim() : "";
+          row.style.display = !status || val === status ? "" : "none";
+        });
+      });
+    });
+
+    // Export table to CSV
+    document.getElementById("export-csv")?.addEventListener("click", () => {
+      const rows = Array.from(document.querySelectorAll("#incident-table tr"));
+      const data = rows.map(row => Array.from(row.children).map(td => `"${(td.textContent || "").replace(/"/g, '""')}"`).join(","));
+      const csv = data.join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "incidents.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
     // Simple refresh action
-    const refreshBtn = document.getElementById("reload-incidents");
-    refreshBtn?.addEventListener("click", () => {
+    document.getElementById("reload-incidents")?.addEventListener("click", () => {
       window.location.reload();
     });
   </script>
   <script src="js/admin-ui.js"></script>
-
-  <!-- Optional mobile bottom tabbar for quick navigation -->
-  <div class="admin-mobile-tabbar" role="navigation" aria-label="Admin Navigation">
-    <a href="admin.html" class="tab-link active">Incidents</a>
-    <a href="admin-news.html" class="tab-link">News</a>
-    <a href="admin-events.html" class="tab-link">Events</a>
-    <a href="admin-user-approval.html" class="tab-link">Approvals</a>
-  </div>
 </body>
 </html>
