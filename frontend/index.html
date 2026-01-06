@@ -52,12 +52,15 @@
 }
 
 .feature-card {
+  width: 100%;
+  max-width: 100%;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 2rem 1.5rem;
   backdrop-filter: blur(10px);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
 }
 
 .feature-card:hover {
@@ -69,6 +72,8 @@
   font-size: 2.2rem;
   color: #38bdf8;
   margin-bottom: 1rem;
+  display: block;
+  margin: 0 auto 1rem;
 }
 
 .feature-card h3 {
