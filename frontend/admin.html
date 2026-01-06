@@ -84,6 +84,64 @@
         <tbody></tbody>
       </table>
     </div>
+
+    <!-- Analytics section -->
+    <div class="list-head" style="margin-top:16px;">
+      <h2>Analytics</h2>
+      <p class="list-desc">Overview of incidents by type, status, and time.</p>
+    </div>
+    <div class="analytics-controls">
+      <div class="range">
+        <label>From
+          <input type="date" id="ana-from" />
+        </label>
+        <label>To
+          <input type="date" id="ana-to" />
+        </label>
+        <button id="ana-apply" class="pill-btn">Apply</button>
+      </div>
+      <div class="toggles">
+        <label class="toggle">
+          <input type="checkbox" id="ana-rolling" checked />
+          <span>Rolling 14 days</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="analytics-grid">
+      <div class="chart-card">
+        <div class="card-head"><h3 class="card-title">Incidents by Type</h3></div>
+        <canvas id="chart-types" height="180"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="card-head"><h3 class="card-title">Status Distribution</h3></div>
+        <canvas id="chart-status" height="180"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="card-head"><h3 class="card-title">Daily Trend</h3><p class="card-desc">Reports per day</p></div>
+        <canvas id="chart-trend" height="180"></canvas>
+      </div>
+      <div class="chart-card kpi-card">
+        <div class="kpi">
+          <div class="kpi-item">
+            <div class="label">Total</div>
+            <div class="value" id="kpi-total">0</div>
+          </div>
+          <div class="kpi-item">
+            <div class="label">Overdue</div>
+            <div class="value danger" id="kpi-overdue">0</div>
+          </div>
+          <div class="kpi-item">
+            <div class="label">Due soon</div>
+            <div class="value warn" id="kpi-soon">0</div>
+          </div>
+          <div class="kpi-item">
+            <div class="label">Resolved</div>
+            <div class="value ok" id="kpi-resolved">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Mobile tabbar for quick admin navigation -->
@@ -96,7 +154,202 @@
 
   <div id="review-modal" style="display:none;"></div>
 
-  <script type="module" src="js/admin.js"></script>
+  <!-- Chart.js and analytics script -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    (function adminAnalytics() {
+      const fromEl = document.getElementById('ana-from');
+      const toEl = document.getElementById('ana-to');
+      const applyBtn = document.getElementById('ana-apply');
+      const rollingEl = document.getElementById('ana-rolling');
+
+      const elTotal = document.getElementById('kpi-total');
+      const elOverdue = document.getElementById('kpi-overdue');
+      const elSoon = document.getElementById('kpi-soon');
+      const elResolved = document.getElementById('kpi-resolved');
+
+      let CH_TYPES, CH_STATUS, CH_TREND;
+      const COLORS = {
+        blue: '#1877F2',
+        green: '#42B72A',
+        orange: '#FFB020',
+        red: '#E53935',
+        gray: '#95A3AF',
+        palette: ['#1877F2','#8A5CF6','#00B8D9','#36B37E','#FFAB00','#FF5630','#6554C0']
+      };
+
+      function parseDate(d) { return new Date(d); }
+      function fmtDate(d) { const x=new Date(d); return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`; }
+
+      function inRange(ts, from, to) {
+        if (from && ts < from) return false;
+        if (to && ts > to) return false;
+        return true;
+      }
+
+      function aggregate(incidents, range) {
+        const now = Date.now();
+        const from = range.from ? new Date(range.from).setHours(0,0,0,0) : null;
+        const to = range.to ? new Date(range.to).setHours(23,59,59,999) : null;
+
+        const filtered = incidents.filter(i => {
+          const t = new Date(i.createdAt || i.time || Date.now()).getTime();
+          return inRange(t, from, to);
+        });
+
+        // By type
+        const byType = {};
+        filtered.forEach(i => {
+          const key = (i.incidentType || 'Other').trim();
+          byType[key] = (byType[key] || 0) + 1;
+        });
+
+        // By status
+        const byStatus = {};
+        filtered.forEach(i => {
+          const st = (i.status || 'Pending').trim();
+          byStatus[st] = (byStatus[st] || 0) + 1;
+        });
+
+        // Trend by day
+        const days = [];
+        const counts = {};
+        let startDay = from ? new Date(from) : new Date(now - 13*86400000);
+        if (rollingEl.checked) {
+          startDay = new Date(now - 13*86400000);
+        }
+        for (let i=0;i<14;i++) {
+          const d = new Date(startDay.getTime() + i*86400000);
+          const k = fmtDate(d);
+          days.push(k);
+          counts[k] = 0;
+        }
+        filtered.forEach(i => {
+          const k = fmtDate(i.createdAt || Date.now());
+          if (k in counts) counts[k] += 1;
+        });
+        const trend = { labels: days, data: days.map(k => counts[k]) };
+
+        // SLA: overdue and due soon (within 3 days)
+        let overdue = 0, dueSoon = 0, resolved = 0;
+        filtered.forEach(i => {
+          if ((i.status || '').toLowerCase() === 'resolved') resolved++;
+          if (i.due) {
+            const dueTs = new Date(i.due).getTime();
+            if (dueTs < now && (i.status||'').toLowerCase() !== 'resolved') overdue++;
+            else if (dueTs - now <= 3*86400000 && dueTs - now >= 0 && (i.status||'').toLowerCase() !== 'resolved') dueSoon++;
+          }
+        });
+
+        return { byType, byStatus, trend, kpis: { total: filtered.length, overdue, dueSoon, resolved } };
+      }
+
+      async function loadIncidents() {
+        try {
+          const res = await fetch('/api/incidents');
+          const incidents = await res.json();
+          render(incidents);
+        } catch (e) {
+          console.error('Analytics load failed', e);
+        }
+      }
+
+      function renderCharts(aggr) {
+        const ctxTypes = document.getElementById('chart-types').getContext('2d');
+        const ctxStatus = document.getElementById('chart-status').getContext('2d');
+        const ctxTrend = document.getElementById('chart-trend').getContext('2d');
+
+        const typeLabels = Object.keys(aggr.byType);
+        const typeData = Object.values(aggr.byType);
+
+        const statusLabels = Object.keys(aggr.byStatus);
+        const statusData = Object.values(aggr.byStatus);
+
+        // Destroy if existing
+        CH_TYPES && CH_TYPES.destroy();
+        CH_STATUS && CH_STATUS.destroy();
+        CH_TREND && CH_TREND.destroy();
+
+        CH_TYPES = new Chart(ctxTypes, {
+          type: 'bar',
+          data: {
+            labels: typeLabels,
+            datasets: [{
+              label: 'Reports',
+              data: typeData,
+              backgroundColor: COLORS.palette,
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+
+        CH_STATUS = new Chart(ctxStatus, {
+          type: 'doughnut',
+          data: {
+            labels: statusLabels,
+            datasets: [{
+              data: statusData,
+              backgroundColor: [COLORS.blue, COLORS.green, COLORS.red, COLORS.orange, COLORS.gray]
+            }]
+          },
+          options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        CH_TREND = new Chart(ctxTrend, {
+          type: 'line',
+          data: {
+            labels: aggr.trend.labels,
+            datasets: [{
+              label: 'Incidents',
+              data: aggr.trend.data,
+              tension: 0.35,
+              fill: true,
+              backgroundColor: 'rgba(24,119,242,0.15)',
+              borderColor: COLORS.blue,
+              pointRadius: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+
+        elTotal.textContent = aggr.kpis.total;
+        elOverdue.textContent = aggr.kpis.overdue;
+        elSoon.textContent = aggr.kpis.dueSoon;
+        elResolved.textContent = aggr.kpis.resolved;
+      }
+
+      function currentRange() {
+        return {
+          from: fromEl.value || null,
+          to: toEl.value || null
+        };
+      }
+
+      let CACHE = [];
+      async function render(incidents) {
+        CACHE = incidents;
+        const aggr = aggregate(CACHE, currentRange());
+        renderCharts(aggr);
+      }
+
+      applyBtn.addEventListener('click', () => render(CACHE));
+      rollingEl.addEventListener('change', () => render(CACHE));
+
+      // Initialize default "To" to today for convenience
+      const today = new Date();
+      toEl.value = fmtDate(today);
+      loadIncidents();
+    })();
+  </script>
+
   <script>
     const logoutLink = document.getElementById("logout-link");
     logoutLink.addEventListener("click", (e) => {
@@ -156,6 +409,7 @@
       window.location.reload();
     });
   </script>
+  <script type="module" src="js/admin.js"></script>
   <script src="js/admin-ui.js"></script>
 </body>
 </html>
