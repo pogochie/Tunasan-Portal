@@ -2349,26 +2349,31 @@ body.modal-open {
 
 /* ... existing code ... */
 
-/* Full-screen Incidents Map Modal (overlay everything) */
+/* Full-screen Incidents Map Modal (edge to edge, overlays only controls) */
 .map-modal {
   position: fixed;
   inset: 0;
   z-index: 1400;
-  background: transparent; /* no dim overlay to maximize visual size */
-  display: none;
+  background: transparent;             /* no dim to maximize map area */
+  display: none;                       /* hidden by default */
 }
-.map-modal.open { display: block; }
+.map-modal.open {
+  display: block;                      /* show overlay */
+}
 
 /* Leaflet canvas fills entire viewport */
 .map-canvas {
   position: fixed;
   inset: 0;
   width: 100vw;
-  height: 100vh;
-  z-index: 1400; /* base layer for map; overlays come above */
+  height: 100vh;                       /* full viewport height */
+  z-index: 1400;
+}
+@supports (height: 100dvh) {
+  .map-canvas { height: 100dvh; }      /* dynamic viewport on mobile */
 }
 
-/* Top overlay header with Close button */
+/* Top overlay header with Close button (X) */
 .map-header {
   position: fixed;
   top: 0;
@@ -2380,7 +2385,7 @@ body.modal-open {
   align-items: center;
   gap: 8px;
   padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
-  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.6));
+  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.65));
   border-bottom: 1px solid var(--border);
   box-shadow: 0 4px 20px rgba(0,0,0,0.12);
   backdrop-filter: saturate(120%) blur(8px);
@@ -2402,7 +2407,7 @@ body.modal-open {
 }
 .map-close:hover { color: var(--danger); }
 
-/* Small legend chips overlay */
+/* Small legend chips overlay (top, under header) */
 .map-legend {
   position: fixed;
   top: calc(56px + 12px + env(safe-area-inset-top));
@@ -2412,10 +2417,10 @@ body.modal-open {
   flex-wrap: wrap;
   gap: 8px;
   z-index: 1402;
-  pointer-events: none; /* let map clicks through; chips are informational */
+  pointer-events: none; /* allow map interactions; chips are read-only */
 }
 .map-legend .chip {
-  pointer-events: auto; /* allow selection if needed */
+  pointer-events: auto; /* allow text selection if needed */
   background: var(--card);
   color: var(--text);
   border: 1px solid var(--border);
@@ -2443,10 +2448,32 @@ body.modal-open {
 }
 .map-fab:hover { background: var(--primary-hover); }
 
-/* Hide any previous bottom controls panel if present */
+/* Hide any previous bottom controls panel to maximize map space */
 .map-controls-panel { display: none !important; }
 
+/* When using a filter-controls card above the list, remove any gap with the first post-card */
+section.filter-controls.post-card {
+  margin-bottom: 0 !important;
+}
+.feed {
+  margin-top: 0 !important;
+}
+
+/* Optional: If you decide to render filters inside the full-screen map, they will overlay here */
+.map-modal .filter-controls {
+  position: fixed;
+  top: calc(56px + 60px + env(safe-area-inset-top)); /* below the header + legend */
+  left: 12px;
+  right: 12px;
+  z-index: 1402;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  padding: 12px;
+}
 @media (max-width: 768px) {
   .map-header h2 { font-size: 1rem; }
   .map-legend { top: calc(48px + 12px + env(safe-area-inset-top)); }
 }
+/* ... existing code ... */
