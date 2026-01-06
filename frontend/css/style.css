@@ -2248,9 +2248,12 @@ body.modal-open {
   padding: 8px;
   box-shadow: var(--shadow);
   cursor: pointer;
-  width: 40px;      /* example width */
-  height: 40px;     /* example height */
-  font-size: 20px; 
+  width: 20px;
+  height: 20px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .app-nav-toggle-btn span,
 .app-nav-toggle-btn span::before,
