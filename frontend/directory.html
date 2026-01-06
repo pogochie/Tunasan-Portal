@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Barangay Officials Directory</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <main class="container">
+    <div class="page-header">
+      <h1 class="title">Barangay Officials</h1>
+      <div class="admin-actions">
+        <input type="search" id="dir-search" placeholder="Search officials…" aria-label="Search officials" />
+      </div>
+    </div>
+
+    <section class="post-card" aria-label="Officials directory">
+      <ul id="dir-list" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px; list-style:none; padding:0; margin:0;"></ul>
+    </section>
+
+    <section class="post-card" aria-label="QR access">
+      <h3 style="margin:0 0 8px;">Scan to open this page</h3>
+      <canvas id="qr" width="160" height="160" aria-label="QR code for Officials Directory"></canvas>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initNavbar } from './js/navbar.js';
+    fetch('partials/navbar.html').then(r => r.text()).then(html => {
+      document.getElementById('navbar-placeholder').innerHTML = html;
+      initNavbar();
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  <script>
+    const OFFICIALS = [
+      { name:"Juan Dela Cruz", role:"Barangay Captain", phone:"(02) 123-0001", email:"captain@tunasan.gov" },
+      { name:"Maria Santos", role:"Kagawad", phone:"(02) 123-0002", email:"kagawad1@tunasan.gov" },
+      { name:"Pedro Reyes", role:"Kagawad", phone:"(02) 123-0003", email:"kagawad2@tunasan.gov" },
+      { name:"Ana Garcia", role:"Secretary", phone:"(02) 123-0004", email:"secretary@tunasan.gov" },
+      { name:"Rico Cruz", role:"Treasurer", phone:"(02) 123-0005", email:"treasurer@tunasan.gov" }
+    ];
+
+    const list = document.getElementById("dir-list");
+    const search = document.getElementById("dir-search");
+
+    function cardHTML(o) {
+      return `
+        <li class="post-card" style="padding:12px;">
+          <div class="post-header">
+            <div class="avatar" style="width:44px;height:44px;border-radius:50%;background:#1877F2;color:#fff;display:grid;place-items:center;font-weight:800;">
+              ${o.name.slice(0,1)}
+            </div>
+            <div class="title-wrap">
+              <h3>${o.name}</h3>
+              <span class="meta">${o.role}</span>
+            </div>
+          </div>
+          <div class="post-content">
+            <p><strong>Phone:</strong> <a href="tel:${o.phone.replace(/[^\d+]/g,'')}">${o.phone}</a></p>
+            <p><strong>Email:</strong> <a href="mailto:${o.email}">${o.email}</a></p>
+          </div>
+        </li>
+      `;
+    }
+
+    function render(items) {
+      list.innerHTML = items.map(cardHTML).join("");
+    }
+    render(OFFICIALS);
+
+    search.addEventListener("input", () => {
+      const q = search.value.trim().toLowerCase();
+      render(OFFICIALS.filter(o =>
+        o.name.toLowerCase().includes(q) || o.role.toLowerCase().includes(q) ||
+        o.phone.toLowerCase().includes(q) || o.email.toLowerCase().includes(q)
+      ));
+    });
+
+    new QRious({ element: document.getElementById("qr"), value: window.location.href, size: 160, level: "H" });
+  </script>
+</body>
+</html>

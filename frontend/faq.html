@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FAQs</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <main class="container">
+    <div class="page-header">
+      <h1 class="title">Frequently Asked Questions</h1>
+    </div>
+
+    <section class="post-card" aria-label="FAQs">
+      <div class="accordion" id="faq" role="tablist">
+        <!-- items injected -->
+      </div>
+    </section>
+
+    <section class="post-card" aria-label="QR access">
+      <h3 style="margin:0 0 8px;">Scan to open this page</h3>
+      <canvas id="qr" width="160" height="160" aria-label="QR code for FAQs"></canvas>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initNavbar } from './js/navbar.js';
+    fetch('partials/navbar.html').then(r => r.text()).then(html => {
+      document.getElementById('navbar-placeholder').innerHTML = html;
+      initNavbar();
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  <script>
+    const QA = [
+      { q: "How do I report an incident?", a: "Open the home page and tap 'Report Incident'. Provide details, set the location on the map, and submit." },
+      { q: "What happens after I submit?", a: "Your report is reviewed by officials. Once approved, it can appear on the public feed and officials will take action." },
+      { q: "Can I upload images?", a: "Yes. Images help officials assess the incident. Upload up to 6 images." },
+      { q: "Will my name be public?", a: "Reports may show 'Reported by' to officials. Public display avoids sensitive data." },
+      { q: "How do I get updates?", a: "Check the feed or enable browser notifications to be alerted when status updates occur." }
+    ];
+    const acc = document.getElementById("faq");
+
+    QA.forEach((item, idx) => {
+      const id = `faq-${idx}`;
+      const wrap = document.createElement("div");
+      wrap.className = "post-card";
+      wrap.style.margin = "8px 0";
+      wrap.innerHTML = `
+        <button aria-expanded="false" aria-controls="${id}" class="pill-btn" style="width:100%; text-align:left; background:#F0F2F5; color:#050505;">
+          ${item.q}
+        </button>
+        <div id="${id}" role="region" aria-labelledby="${id}-btn" style="display:none; padding:10px 12px;">
+          <p>${item.a}</p>
+        </div>
+      `;
+      const btn = wrap.querySelector("button");
+      const panel = wrap.querySelector(`#${id}`);
+      btn.addEventListener("click", () => {
+        const expanded = btn.getAttribute("aria-expanded") === "true";
+        btn.setAttribute("aria-expanded", (!expanded).toString());
+        panel.style.display = expanded ? "none" : "block";
+      });
+      acc.appendChild(wrap);
+    });
+
+    new QRious({ element: document.getElementById("qr"), value: window.location.href, size: 160, level: "H" });
+  </script>
+</body>
+</html>

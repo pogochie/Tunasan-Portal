@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Emergency Hotlines</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <main class="container">
+    <div class="page-header">
+      <h1 class="title">Emergency Hotlines</h1>
+      <div class="admin-actions">
+        <input type="search" id="hotline-search" placeholder="Search…" aria-label="Search hotlines" />
+      </div>
+    </div>
+
+    <section class="post-card" aria-label="Emergency contacts">
+      <p class="form-desc">Save or call important numbers. Tap copy to share quickly.</p>
+      <ul id="hotlines" style="list-style:none; padding:0; margin:0;"></ul>
+    </section>
+
+    <section class="post-card" aria-label="QR access">
+      <h3 style="margin:0 0 8px;">Scan to open this page</h3>
+      <canvas id="qr" width="160" height="160" aria-label="QR code for Emergency Hotlines"></canvas>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initNavbar } from './js/navbar.js';
+    fetch('partials/navbar.html').then(r => r.text()).then(html => {
+      document.getElementById('navbar-placeholder').innerHTML = html;
+      initNavbar();
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  <script>
+    const DATA = [
+      { name: "Barangay Tunasan Hall", number: "(02) 123-4567" },
+      { name: "Muntinlupa Police", number: "911" },
+      { name: "BFP (Fire Department)", number: "911" },
+      { name: "Rescue Team", number: "(02) 234-5678" },
+      { name: "Health Center", number: "(02) 345-6789" }
+    ];
+    const list = document.getElementById("hotlines");
+    const search = document.getElementById("hotline-search");
+
+    function render(items) {
+      list.innerHTML = "";
+      items.forEach(h => {
+        const li = document.createElement("li");
+        li.style.margin = "8px 0";
+        li.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <div>
+              <strong>${h.name}</strong><br>
+              <span style="color:var(--muted)">${h.number}</span>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <a class="pill-btn" href="tel:${h.number.replace(/[^\d+]/g,'')}" aria-label="Call ${h.name}">Call</a>
+              <button class="pill-btn" data-num="${h.number}" aria-label="Copy ${h.name} number">Copy</button>
+            </div>
+          </div>
+        `;
+        list.appendChild(li);
+      });
+    }
+    render(DATA);
+
+    list.addEventListener("click", async (e) => {
+      const btn = e.target.closest("button[data-num]");
+      if (!btn) return;
+      const num = btn.getAttribute("data-num");
+      try {
+        await navigator.clipboard.writeText(num);
+        btn.textContent = "Copied!";
+        setTimeout(() => (btn.textContent = "Copy"), 1000);
+      } catch {
+        alert(num);
+      }
+    });
+
+    search.addEventListener("input", () => {
+      const q = search.value.trim().toLowerCase();
+      render(DATA.filter(h => h.name.toLowerCase().includes(q) || h.number.toLowerCase().includes(q)));
+    });
+
+    new QRious({ element: document.getElementById("qr"), value: window.location.href, size: 160, level: "H" });
+  </script>
+</body>
+</html>

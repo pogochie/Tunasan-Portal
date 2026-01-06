@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Community Schedules</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <main class="container">
+    <div class="page-header">
+      <h1 class="title">Community Schedules</h1>
+      <div class="admin-actions">
+        <input type="search" id="sched-search" placeholder="Search schedules…" aria-label="Search schedules" />
+      </div>
+    </div>
+
+    <section class="post-card" aria-label="Schedules">
+      <ul id="sched-list" style="list-style:none; padding:0; margin:0;"></ul>
+    </section>
+
+    <section class="post-card" aria-label="QR access">
+      <h3 style="margin:0 0 8px;">Scan to open this page</h3>
+      <canvas id="qr" width="160" height="160" aria-label="QR code for Schedules"></canvas>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initNavbar } from './js/navbar.js';
+    fetch('partials/navbar.html').then(r => r.text()).then(html => {
+      document.getElementById('navbar-placeholder').innerHTML = html;
+      initNavbar();
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  <script>
+    const SCHEDULES = [
+      { title:"Garbage Collection - Zone A", days:["Mon","Thu"], time:"7:00 AM", desc:"Please place trash bins outside by 6:30 AM." },
+      { title:"Barangay Assembly", days:["1st Sat"], time:"9:00 AM", desc:"Monthly community meeting at Barangay Hall." },
+      { title:"Street Cleaning - Main Road", days:["Wed"], time:"8:00 AM", desc:"Vehicles are advised to avoid parking along main road." }
+    ];
+
+    const list = document.getElementById("sched-list");
+    const search = document.getElementById("sched-search");
+
+    function itemHTML(s) {
+      const days = Array.isArray(s.days) ? s.days.join(", ") : s.days;
+      return `
+        <li class="post-card" style="margin:8px 0; padding:12px;">
+          <div class="post-header">
+            <div class="title-wrap">
+              <h3>${s.title}</h3>
+              <span class="meta">${days} • ${s.time}</span>
+            </div>
+          </div>
+          <div class="post-content"><p>${s.desc}</p></div>
+          <div class="post-actions">
+            <a class="pill-btn" href="${toICS(s)}" download="${s.title.replace(/\s+/g,'_')}.ics">Add to Calendar</a>
+          </div>
+        </li>
+      `;
+    }
+
+    function render(items) {
+      list.innerHTML = items.map(itemHTML).join("");
+    }
+    render(SCHEDULES);
+
+    search.addEventListener("input", () => {
+      const q = search.value.trim().toLowerCase();
+      render(SCHEDULES.filter(s =>
+        (s.title||"").toLowerCase().includes(q) ||
+        (Array.isArray(s.days)?s.days.join(", "):s.days).toLowerCase().includes(q) ||
+        (s.desc||"").toLowerCase().includes(q)
+      ));
+    });
+
+    function toICS(s) {
+      const pad = n => String(n).padStart(2,"0");
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0);
+      const fmt = (d) => `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
+      const lines = [
+        "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Tunasan Portal//EN","BEGIN:VEVENT",
+        `UID:${Date.now()}@tunasan`,
+        `DTSTAMP:${fmt(new Date())}`,
+        `DTSTART:${fmt(start)}`,
+        `DTEND:${fmt(new Date(start.getTime()+60*60*1000))}`,
+        `SUMMARY:${s.title}`,
+        `DESCRIPTION:${(s.desc||"").replace(/\n/g," ")}`,
+        "END:VEVENT","END:VCALENDAR"
+      ].join("\r\n");
+      const blob = new Blob([lines], { type:"text/calendar;charset=utf-8" });
+      return URL.createObjectURL(blob);
+    }
+
+    new QRious({ element: document.getElementById("qr"), value: window.location.href, size: 160, level: "H" });
+  </script>
+</body>
+</html>
