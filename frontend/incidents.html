@@ -8,15 +8,6 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
 </head>
 <body>
-  <style>
-    #heatmap {
-  height: 200px !important;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
-  width: 100%;
-}
-  </style>
   <div id="navbar-placeholder"></div>
 
   <h1 data-i18n="incidents.title">Recent Incidents</h1>
@@ -70,15 +61,6 @@
   </section>
   <!-- Heatmap container -->
   <div id="heatmap" style="margin: 10px 0; height: 320px;"></div>
-
-  <div id="heatmap" style="margin: 10px 0; height: 200px; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); width: 100%;"></div>
-
-  <button type="button" id="open-heatmap-fullscreen" class="pill-btn" style="margin-bottom: 20px;">View Heatmap Fullscreen</button>
-
-  <div id="heatmap-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen heatmap view" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:3000; justify-content:center; align-items:center;">
-    <button id="heatmap-fullscreen-close" aria-label="Close fullscreen heatmap" style="position:absolute; top:16px; right:16px; background:var(--card); border:none; border-radius:50%; width:36px; height:36px; font-size:1.5rem; cursor:pointer; box-shadow:var(--shadow); z-index:3100;">×</button>
-    <div id="heatmap-fullscreen" style="width:90vw; height:90vh; border-radius:12px; box-shadow:var(--shadow-lg); border:2px solid var(--border);"></div>
-  </div>
 
   <ul id="incidents-list" class="feed"></ul>
 
@@ -377,52 +359,6 @@
     // Run after Leaflet is available
     if (window.L) loadIncidents();
     else window.addEventListener("load", loadIncidents);
-  </script>
-  <script>
-    let fullscreenMap, fullscreenHeat;
-
-    const openBtn = document.getElementById("open-heatmap-fullscreen");
-    const overlay = document.getElementById("heatmap-fullscreen-overlay");
-    const closeBtn = document.getElementById("heatmap-fullscreen-close");
-
-    openBtn.addEventListener("click", () => {
-      overlay.style.display = "flex";
-
-      if (!fullscreenMap) {
-        fullscreenMap = L.map("heatmap-fullscreen").setView([14.4089, 121.0341], 13);
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: '&copy; OpenStreetMap contributors',
-        }).addTo(fullscreenMap);
-
-        if (window.INCIDENTS) {
-          const ptsLatLng = window.INCIDENTS
-            .filter(i => i.location?.lat && i.location?.lng)
-            .map(i => [i.location.lat, i.location.lng]);
-          const pts = ptsLatLng.map(([lat, lng]) => [lat, lng, 0.6]);
-
-          if (window.L && L.heatLayer) {
-            fullscreenHeat = L.heatLayer(pts, {
-              radius: 25,
-              blur: 18,
-              maxZoom: 17,
-              max: 0.6,
-            }).addTo(fullscreenMap);
-          }
-        }
-      } else {
-        fullscreenMap.invalidateSize();
-      }
-    });
-
-    closeBtn.addEventListener("click", () => {
-      overlay.style.display = "none";
-    });
-
-    overlay.addEventListener("click", e => {
-      if (e.target === overlay) {
-        overlay.style.display = "none";
-      }
-    });
   </script>
   <script type="module">
     import { initNavbar } from './js/navbar.js';
