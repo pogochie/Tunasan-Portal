@@ -2473,11 +2473,6 @@ body.modal-open {
 }
 
 /* Ensure no gap between filters card and first list item */
-section.filter-controls.post-card {
-  margin-bottom: 0 !important;
-}
-.feed { margin-top: 0 !important; }
-.feed .post-card:first-child { margin-top: 0 !important; }
 
 /* Mobile fine-tuning */
 @media (max-width: 768px) {
