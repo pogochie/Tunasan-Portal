@@ -2237,10 +2237,10 @@ body.modal-open {
 
 /* Floating hamburger trigger (mobile) */
 .app-nav-toggle-btn {
-  display: none;
+  display: block;                 /* was: none; only mobile */
   position: fixed;
-  left: 12px;
-  bottom: calc(var(--tabbar-height) + 16px + env(safe-area-inset-bottom));
+  top: 12px;
+  right: 16px;
   z-index: 1200;
   background: #fff;
   border: 1px solid var(--border);
@@ -2323,5 +2323,10 @@ body.modal-open {
 
 /* Mobile only: show the floating button */
 @media (max-width: 768px) {
-  .app-nav-toggle-btn { display: block; }
+  .app-nav-toggle-btn {
+    top: auto;
+    right: auto;
+    left: 12px;
+    bottom: calc(var(--tabbar-height) + 16px + env(safe-area-inset-bottom));
+  }
 }
