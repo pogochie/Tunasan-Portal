@@ -1375,3 +1375,203 @@ h1, h2 {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Page subheader and breadcrumbs (modern, white theme) */
+.page-header {
+  margin: 20px auto;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.page-header .title {
+  margin: 0;
+  font-weight: 900;
+  color: var(--primary);
+}
+.breadcrumbs {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  list-style: none;
+  margin: 6px 0 12px;
+  padding: 0;
+  color: var(--muted);
+  font-size: .95rem;
+}
+.breadcrumbs li a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.breadcrumbs li + li::before {
+  content: "›";
+  margin: 0 4px;
+  color: var(--border);
+}
+
+/* Status badge */
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(24,119,242,.08);
+  color: var(--primary);
+  border: 1px solid var(--border);
+  font-weight: 700;
+  font-size: .85rem;
+}
+
+/* Details grid for review page */
+.details-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin: 10px 0 16px;
+}
+@media (max-width: 900px) {
+  .details-grid { grid-template-columns: 1fr; }
+}
+
+/* Card wrapper (reused) */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 12px 14px;
+  animation: fadeInUp .35s ease both;
+}
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.card-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #050505;
+}
+.card-desc {
+  margin: 0;
+  color: var(--muted);
+  font-size: .95rem;
+}
+
+/* Image grid for previews */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+.image-grid img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.image-grid img:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Map card styling */
+.map-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.map-card .map-wrap {
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  height: clamp(220px, 35vh, 420px) !important;
+  width: 100%;
+}
+
+/* Sticky actions bar */
+.actions-bar {
+  position: sticky;
+  bottom: 12px;
+  background: rgba(255,255,255,.92);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+  z-index: 2;
+}
+
+/* Form sections for edit page */
+.form-section {
+  margin: 10px 0 14px;
+}
+.form-section h3 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #050505;
+}
+
+/* File drop area */
+.file-drop {
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.file-drop:hover {
+  background: #f9fafb;
+  box-shadow: var(--shadow-lg);
+}
+.file-list {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: .95rem;
+}
+
+/* Status select chip-like appearance */
+#status {
+  max-width: 220px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-weight: 700;
+}
+
+/* Keep white theme: active nav link highlighting */
+.admin-navbar .nav-menu li a.active {
+  background-color: #eef3ff;
+  border: 1px solid #d9e5ff;
+  border-radius: 999px;
+}
+
+/* Table hover refinement */
+#incident-table tbody tr:hover {
+  background-color: #f7f9fe;
+}
+
+/* Buttons micro-interactions (consistent) */
+.pill-btn.secondary,
+button.action-btn,
+.btn-gradient {
+  box-shadow: 0 6px 16px rgba(24,119,242,0.18);
+}
+.pill-btn.secondary:hover,
+button.action-btn:hover,
+.btn-gradient:hover {
+  box-shadow: 0 10px 24px rgba(24,119,242,0.24);
+}

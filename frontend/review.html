@@ -4,39 +4,64 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Review Incident Report</title>
-  <!-- use admin.css for admin-facing review page -->
   <link rel="stylesheet" href="css/admin.css" />
   <style>
-    #images img { max-width: 200px; margin-right: 10px; margin-bottom: 10px; }
-    #map { width: 100%; margin: 15px 0; }
+    /* remove inline map/image rules in favor of admin.css cards */
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Review Incident Report</h1>
-    <div id="incident-details">
-      <p><strong>Reporter:</strong> <span id="reporterName"></span></p>
-      <p><strong>Type:</strong> <span id="incidentType"></span></p>
-      <p><strong>Description:</strong></p>
-      <p id="description"></p>
-      <p><strong>Location:</strong> <span id="locationText"></span></p>
-      <div id="map"></div>
-      <div id="images"></div>
+    <ul class="breadcrumbs">
+      <li><a href="admin.html">Dashboard</a></li>
+      <li>Review Incident</li>
+    </ul>
+    <div class="page-header">
+      <h1 class="title">Review Incident Report</h1>
+      <span id="statusBadge" class="status-badge">Pending</span>
     </div>
 
-    <h2>Comments</h2>
-    <ul id="comments-list"></ul>
+    <div class="details-grid">
+      <!-- Left column: details -->
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Details</h2>
+        </div>
+        <div id="incident-details">
+          <p><strong>Reporter:</strong> <span id="reporterName"></span></p>
+          <p><strong>Type:</strong> <span id="incidentType"></span></p>
+          <p><strong>Description:</strong></p>
+          <p id="description"></p>
+          <p><strong>Location:</strong> <span id="locationText"></span></p>
+        </div>
+      </div>
+      <!-- Right column: map + images -->
+      <div class="card map-card">
+        <div class="card-head">
+          <h2 class="card-title">Map & Images</h2>
+        </div>
+        <div id="map" class="map-wrap"></div>
+        <div id="images" class="image-grid"></div>
+      </div>
+    </div>
 
-    <form id="comment-form">
-      <label for="comment-text">Add a comment</label>
-      <textarea id="comment-text" required placeholder="Write a comment..."></textarea>
-      <button type="submit">Submit Comment</button>
-    </form>
+    <!-- Comments card -->
+    <div class="card">
+      <div class="card-head">
+        <h2 class="card-title">Comments</h2>
+      </div>
+      <ul id="comments-list"></ul>
+      <form id="comment-form">
+        <label for="comment-text">Add a comment</label>
+        <textarea id="comment-text" required placeholder="Write a comment..."></textarea>
+        <button type="submit" class="pill-btn secondary">Submit Comment</button>
+      </form>
+    </div>
 
-    <div class="actions">
-      <button id="approveBtn">Approve</button>
-      <button id="rejectBtn">Reject</button>
-      <button id="backBtn">Back</button>
+    <!-- Sticky actions bar -->
+    <div class="actions-bar">
+      <button id="backBtn" class="pill-btn">Back</button>
+      <button id="approveBtn" class="pill-btn secondary">Approve</button>
+      <button id="rejectBtn" class="pill-btn" style="background:#E53935;">Reject</button>
     </div>
   </div>
 

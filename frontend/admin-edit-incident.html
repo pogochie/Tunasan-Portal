@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Edit Incident</title>
-  <!-- Removed style.css to avoid conflicts -->
   <link rel="stylesheet" href="css/admin.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <style>#map { margin-bottom: 15px; }</style>
@@ -33,28 +32,68 @@
     <a href="admin-user-approval.html" class="tab-link">Approvals</a>
   </div>
   <div class="container">
-    <h1>Edit Incident</h1>
-    <form id="edit-incident-form" enctype="multipart/form-data">
-      <label for="reporterName">Reporter Name</label>
-      <input type="text" name="reporterName" id="reporterName" placeholder="Reporter Name" required />
+    <div class="page-header">
+      <h1 class="title">Edit Incident</h1>
+      <span id="edit-status-badge" class="status-badge">Pending</span>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <h2 class="card-title">Incident Details</h2>
+        <p class="card-desc">Update fields, adjust location, and add images.</p>
+      </div>
+      <form id="edit-incident-form" enctype="multipart/form-data">
+        <div class="form-section">
+          <h3>Basic Info</h3>
+          <label for="reporterName">Reporter Name</label>
+          <input type="text" name="reporterName" id="reporterName" placeholder="Reporter Name" required />
 
-      <label for="incidentType">Incident Type</label>
-      <input type="text" name="incidentType" id="incidentType" placeholder="Incident Type" required />
+          <label for="incidentType">Incident Type</label>
+          <input type="text" name="incidentType" id="incidentType" placeholder="Incident Type" required />
 
-      <label for="description">Description</label>
-      <textarea name="description" id="description" placeholder="Description" required></textarea>
+          <label for="description">Description</label>
+          <textarea name="description" id="description" placeholder="Description" required></textarea>
+        </div>
 
-      <!-- Hidden inputs for location -->
-      <input type="hidden" name="location[lat]" id="lat" required />
-      <input type="hidden" name="location[lng]" id="lng" required />
+        <div class="form-section">
+          <h3>Status</h3>
+          <select name="status" id="status" required>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </div>
 
-      <div id="map" style="margin-bottom: 15px;"></div>
+        <div class="form-section map-card">
+          <h3>Location</h3>
+          <!-- Hidden inputs for location -->
+          <input type="hidden" name="location[lat]" id="lat" required />
+          <input type="hidden" name="location[lng]" id="lng" required />
+          <div id="map" class="map-wrap"></div>
+          <p class="map-help">Drag the pin to refine the exact location.</p>
+        </div>
 
-      <label for="images">Upload new images (optional)</label>
-      <input type="file" name="images" id="images" multiple accept="image/*" />
+        <div class="form-section">
+          <h3>Current Images</h3>
+          <div id="current-images" class="image-grid"></div>
+        </div>
 
-      <button type="submit">Save Changes</button>
-    </form>
+        <div class="form-section">
+          <h3>Upload New Images</h3>
+          <div class="file-drop" id="file-drop">
+            <span>Drag & drop images here or click to browse</span>
+            <button type="button" class="pill-btn">Browse</button>
+            <input type="file" name="images" id="images" multiple accept="image/*" style="display:none" />
+          </div>
+          <div class="file-list" id="file-list"></div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-gradient">Save Changes</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
@@ -71,8 +110,14 @@
     const reporterNameInput = document.getElementById("reporterName");
     const incidentTypeInput = document.getElementById("incidentType");
     const descriptionInput = document.getElementById("description");
+    const statusSelect = document.getElementById("status");
+    const statusBadge = document.getElementById("edit-status-badge");
     const latInput = document.getElementById("lat");
     const lngInput = document.getElementById("lng");
+    const imagesInput = document.getElementById("images");
+    const fileDrop = document.getElementById("file-drop");
+    const fileList = document.getElementById("file-list");
+    const currentImages = document.getElementById("current-images");
 
     let map, marker;
 
@@ -85,6 +130,10 @@
         reporterNameInput.value = incident.reporterName || "";
         incidentTypeInput.value = incident.incidentType || "";
         descriptionInput.value = incident.description || "";
+        if (incident.status) {
+          statusSelect.value = incident.status;
+          statusBadge.textContent = incident.status;
+        }
 
         if (incident.location && incident.location.lat && incident.location.lng) {
           latInput.value = incident.location.lat;
@@ -92,6 +141,15 @@
           initMap(incident.location.lat, incident.location.lng);
         } else {
           initMap(14.4089, 121.0341); // default coords
+        }
+
+        // Render current images
+        if (Array.isArray(incident.images) && incident.images.length > 0) {
+          currentImages.innerHTML = incident.images
+            .map(src => `<img src="${src}" alt="incident image">`)
+            .join("");
+        } else {
+          currentImages.innerHTML = "<p class='form-desc'>No images uploaded for this incident.</p>";
         }
       } catch (err) {
         alert("Failed to load incident: " + err.message);
@@ -121,6 +179,28 @@
       if (navToggle) {
         navToggle.addEventListener("change", () => setTimeout(() => map.invalidateSize(), 250));
       }
+    }
+
+    // File drop interactions
+    fileDrop.addEventListener("click", () => imagesInput.click());
+    fileDrop.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      fileDrop.style.background = "#f0f2f5";
+    });
+    fileDrop.addEventListener("dragleave", () => {
+      fileDrop.style.background = "#fff";
+    });
+    fileDrop.addEventListener("drop", (e) => {
+      e.preventDefault();
+      fileDrop.style.background = "#fff";
+      imagesInput.files = e.dataTransfer.files;
+      updateFileList();
+    });
+    imagesInput.addEventListener("change", updateFileList);
+    function updateFileList() {
+      const files = Array.from(imagesInput.files || []);
+      if (files.length === 0) { fileList.textContent = "No files selected."; return; }
+      fileList.innerHTML = files.map(f => `• ${f.name}`).join("<br>");
     }
 
     form.addEventListener("submit", async (e) => {
