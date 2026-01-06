@@ -2346,3 +2346,138 @@ body.modal-open {
     bottom: calc(var(--tabbar-height) + 16px + env(safe-area-inset-bottom));
   }
 }
+
+/* ... existing code ... */
+
+/* Fullscreen Incidents Map Modal */
+.map-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: stretch;
+  justify-content: center;
+}
+.map-modal.open { display: grid; grid-template-rows: auto 1fr; }
+
+.map-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  background: var(--card);
+  color: var(--text);
+  padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.map-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+.map-close {
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.map-close:hover { color: var(--danger); }
+
+/* Type legend */
+.map-legend {
+  position: absolute;
+  top: calc(56px + 8px + env(safe-area-inset-top));
+  left: 12px;
+  right: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  z-index: 1402;
+}
+.map-legend .chip {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  box-shadow: var(--shadow);
+}
+
+/* Leaflet canvas fills the screen */
+.map-canvas {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 56px - env(safe-area-inset-top));
+  min-height: 300px;
+}
+
+/* Heatmap controls bottom panel */
+.map-controls-panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
+  z-index: 1401;
+}
+.map-controls-panel .panel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.map-controls-panel .panel-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px 12px;
+}
+.map-controls-panel label {
+  grid-column: span 3;
+  font-weight: 600;
+  color: var(--text);
+}
+.map-controls-panel input[type="range"] {
+  grid-column: span 3;
+  width: 100%;
+}
+
+/* Floating "Locate me" button */
+.map-fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(72px + env(safe-area-inset-bottom));
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1.1rem;
+  box-shadow: 0 8px 20px rgba(24,119,242,0.35);
+  cursor: pointer;
+  z-index: 1402;
+}
+.map-fab:hover {
+  background: var(--primary-hover);
+}
+
+/* Desktop spacing for controls */
+@media (min-width: 769px) {
+  .map-controls-panel .panel-grid {
+    grid-template-columns: repeat(9, 1fr);
+  }
+  .map-controls-panel label,
+  .map-controls-panel input[type="range"] {
+    grid-column: span 3;
+  }
+}
