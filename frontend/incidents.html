@@ -12,7 +12,7 @@
 
   <h1 data-i18n="incidents.title">Recent Incidents</h1>
 
-  <!-- NEW: Open map button -->
+  <!-- Add: Open full-screen map button -->
   <div style="text-align:center; margin: 10px 0 16px;">
     <button id="open-map" class="pill-btn secondary" type="button">Open Incidents Map</button>
   </div>
@@ -39,44 +39,48 @@
     </div>
   </section>
 
-  <!-- REMOVED: Inline heatmap controls + inline map
-  <section class="map-controls" role="region" aria-label="Heatmap controls"> ... </section>
+  <!-- Remove inline heatmap controls and map (now in full-screen modal) -->
+  <!--
+  <section class="map-controls" role="region" aria-label="Heatmap controls">
+    <div class="col-span-12">
+      <strong data-i18n="incidents.heatmapTitle">Heatmap Controls</strong>
+    </div>
+    <label class="toggle col-span-6">
+      <input type="checkbox" id="hm-toggle" checked>
+      <span data-i18n="incidents.showHeatmap">Show heatmap</span>
+    </label>
+    <div class="col-span-6" style="text-align:right;">
+      <button id="hm-fit" class="pill-btn" type="button" data-i18n="incidents.fit">Fit to incidents</button>
+    </div>
+    <div class="col-span-4">
+      <label for="hm-radius"><span data-i18n="incidents.radius">Radius</span>: <span id="hm-radius-val">25</span></label>
+      <input type="range" id="hm-radius" min="10" max="50" step="1" value="25" aria-labelledby="hm-radius">
+    </div>
+    <div class="col-span-4">
+      <label for="hm-blur"><span data-i18n="incidents.blur">Blur</span>: <span id="hm-blur-val">18</span></label>
+      <input type="range" id="hm-blur" min="10" max="40" step="1" value="18" aria-labelledby="hm-blur">
+    </div>
+    <div class="col-span-4">
+      <label for="hm-max"><span data-i18n="incidents.max">Max intensity</span>: <span id="hm-max-val">0.6</span></label>
+      <input type="range" id="hm-max" min="0.1" max="1" step="0.1" value="0.6" aria-labelledby="hm-max">
+    </div>
+  </section>
+  <!-- Heatmap container -->
   <div id="heatmap" style="margin: 10px 0; height: 320px;"></div>
   -->
 
-  <!-- NEW: Fullscreen Map Modal -->
+  <!-- New: Full-screen Map Modal -->
   <div id="map-modal" class="map-modal" aria-hidden="true">
+    <div id="map-screen" class="map-canvas" role="region" aria-label="Incidents map"></div>
+
+    <!-- Overlay header with Close button -->
     <header class="map-header">
       <h2>Incidents Map</h2>
       <button id="close-map" class="map-close" aria-label="Close">&times;</button>
     </header>
 
-    <!-- Optional type legend (auto-populated) -->
+    <!-- Optional: small legend chips for incident types -->
     <div id="map-legend" class="map-legend" aria-live="polite"></div>
-
-    <!-- Fullscreen Leaflet canvas -->
-    <div id="map-screen" class="map-canvas" role="region" aria-label="Incidents map"></div>
-
-    <!-- Heatmap controls panel -->
-    <section class="map-controls-panel" role="region" aria-label="Heatmap controls">
-      <div class="panel-row">
-        <label class="toggle">
-          <input type="checkbox" id="hm-toggle" checked>
-          <span>Show heatmap</span>
-        </label>
-        <button id="hm-fit" class="pill-btn" type="button">Fit to incidents</button>
-      </div>
-      <div class="panel-grid">
-        <label for="hm-radius"><span>Radius</span>: <span id="hm-radius-val">25</span></label>
-        <input type="range" id="hm-radius" min="10" max="50" step="1" value="25" aria-labelledby="hm-radius">
-
-        <label for="hm-blur"><span>Blur</span>: <span id="hm-blur-val">18</span></label>
-        <input type="range" id="hm-blur" min="10" max="40" step="1" value="18" aria-labelledby="hm-blur">
-
-        <label for="hm-max"><span>Max intensity</span>: <span id="hm-max-val">0.6</span></label>
-        <input type="range" id="hm-max" min="0.1" max="1" step="0.1" value="0.6" aria-labelledby="hm-max">
-      </div>
-    </section>
 
     <!-- Floating Locate button -->
     <button id="locate-me" class="map-fab" type="button" title="Locate me" aria-label="Locate me">📍</button>
@@ -91,7 +95,7 @@
   <script>
     let INCIDENTS = []; // cache approved incidents for filtering
 
-    // NEW: cached map objects
+    // New: Map modal state
     let map = null, heat = null, bounds = null, userMarker = null, userCircle = null;
 
     function timeAgo(dateInput) {
@@ -183,36 +187,7 @@
       });
     }
 
-    function initFilterUI(types) {
-      const select = document.getElementById("filter-type");
-      const unique = Array.from(new Set(types.map(t => (t || "").trim()).filter(Boolean))).sort();
-      unique.forEach(t => {
-        const opt = document.createElement("option");
-        opt.value = t; opt.textContent = t;
-        select.appendChild(opt);
-      });
-      const rerender = () => renderIncidents(applyFilters());
-      select.addEventListener("change", rerender);
-      document.getElementById("filter-from").addEventListener("change", rerender);
-      document.getElementById("filter-to").addEventListener("change", rerender);
-      document.getElementById("filter-clear").addEventListener("click", () => {
-        select.value = ""; document.getElementById("filter-from").value = "";
-        document.getElementById("filter-to").value = ""; rerender();
-      });
-    }
-
-    // NEW: Map modal helpers
-    function updateLegend(incidents) {
-      const legend = document.getElementById("map-legend");
-      if (!legend) return;
-      const counts = incidents.reduce((acc, i) => {
-        const k = (i.incidentType || 'Unknown').trim();
-        acc[k] = (acc[k] || 0) + 1; return acc;
-      }, {});
-      const entries = Object.entries(counts).sort((a,b) => b[1]-a[1]);
-      legend.innerHTML = entries.length ? entries.map(([t,c]) => `<span class="chip">${t}: ${c}</span>`).join('') : '<span class="chip">No data</span>';
-    }
-
+    // Full-screen map helpers
     function buildMap() {
       if (map || !window.L) return;
       map = L.map("map-screen").setView([14.4089, 121.0341], 13);
@@ -221,98 +196,60 @@
       }).addTo(map);
     }
 
-    function computeBounds(pointsLatLng) {
-      if (!pointsLatLng.length) return null;
-      return L.latLngBounds(pointsLatLng);
+    function updateLegend(incidents) {
+      const legend = document.getElementById("map-legend");
+      if (!legend) return;
+      const counts = incidents.reduce((acc, i) => {
+        const k = (i.incidentType || 'Unknown').trim();
+        acc[k] = (acc[k] || 0) + 1; return acc;
+      }, {});
+      const entries = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+      legend.innerHTML = entries.length ? entries.map(([t,c]) => `<span class="chip">${t}: ${c}</span>`).join('') : '';
     }
 
     function setHeatData(incidents) {
       if (!map || !window.L) return;
-      const radiusEl = document.getElementById("hm-radius");
-      const blurEl = document.getElementById("hm-blur");
-      const maxEl = document.getElementById("hm-max");
-      const toggleEl = document.getElementById("hm-toggle");
+
+      const defaultRadius = parseInt(document.getElementById("hm-radius")?.value || "25", 10);
+      const defaultBlur = parseInt(document.getElementById("hm-blur")?.value || "18", 10);
+      const defaultMax = parseFloat(document.getElementById("hm-max")?.value || "0.6");
+      const showHeat = document.getElementById("hm-toggle") ? document.getElementById("hm-toggle").checked : true;
 
       const ptsLatLng = incidents
         .filter(i => i.location?.lat && i.location?.lng)
         .map(i => [i.location.lat, i.location.lng]);
-      const pts = ptsLatLng.map(([lat, lng]) => [lat, lng, parseFloat(maxEl.value)]);
+      const pts = ptsLatLng.map(([lat, lng]) => [lat, lng, defaultMax]);
 
-      bounds = computeBounds(ptsLatLng);
+      bounds = ptsLatLng.length ? L.latLngBounds(ptsLatLng) : null;
       if (bounds) { map.fitBounds(bounds.pad(0.15)); }
 
-      // Create or update heat layer
       if (window.L && L.heatLayer) {
         if (!heat) {
           heat = L.heatLayer(pts, {
-            radius: parseInt(radiusEl.value, 10),
-            blur: parseInt(blurEl.value, 10),
+            radius: defaultRadius,
+            blur: defaultBlur,
             maxZoom: 17,
-            max: parseFloat(maxEl.value),
+            max: defaultMax,
           });
-          if (toggleEl.checked) heat.addTo(map);
         } else {
           heat.setLatLngs(pts);
-          heat.setOptions({
-            radius: parseInt(radiusEl.value, 10),
-            blur: parseInt(blurEl.value, 10),
-            max: parseFloat(maxEl.value),
-          });
-          if (toggleEl.checked && !map.hasLayer(heat)) heat.addTo(map);
+          heat.setOptions({ radius: defaultRadius, blur: defaultBlur, max: defaultMax });
         }
-      } else {
-        // Optional: fallback markers if heat plugin not available (left out for brevity)
+        if (showHeat && !map.hasLayer(heat)) heat.addTo(map);
+        if (!showHeat && map.hasLayer(heat)) map.removeLayer(heat);
       }
 
-      // Show/update legend
       updateLegend(incidents);
-
-      // Ensure proper size after showing the modal
       setTimeout(() => { try { map.invalidateSize(); } catch(_) {} }, 50);
-    }
-
-    function attachMapControls() {
-      const radiusEl = document.getElementById("hm-radius");
-      const blurEl = document.getElementById("hm-blur");
-      const maxEl = document.getElementById("hm-max");
-      const toggleEl = document.getElementById("hm-toggle");
-      const fitBtn = document.getElementById("hm-fit");
-
-      function updateLabels() {
-        document.getElementById("hm-radius-val").textContent = radiusEl.value;
-        document.getElementById("hm-blur-val").textContent = blurEl.value;
-        document.getElementById("hm-max-val").textContent = parseFloat(maxEl.value).toFixed(1);
-      }
-      function updateHeatOptions() {
-        if (!heat) return;
-        heat.setOptions({
-          radius: parseInt(radiusEl.value, 10),
-          blur: parseInt(blurEl.value, 10),
-          max: parseFloat(maxEl.value),
-        });
-      }
-      function toggleHeat() {
-        if (!heat) return;
-        if (toggleEl.checked) heat.addTo(map);
-        else map.removeLayer(heat);
-      }
-
-      radiusEl.addEventListener("input", () => { updateLabels(); updateHeatOptions(); });
-      blurEl.addEventListener("input", () => { updateLabels(); updateHeatOptions(); });
-      maxEl.addEventListener("input", () => { updateLabels(); updateHeatOptions(); });
-      toggleEl.addEventListener("change", toggleHeat);
-      fitBtn.addEventListener("click", () => { if (bounds) map.fitBounds(bounds.pad(0.15)); });
-
-      updateLabels();
     }
 
     function openMapModal() {
       const modal = document.getElementById("map-modal");
       if (!modal) return;
       modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
       document.body.classList.add("modal-open");
       buildMap();
-      attachMapControls();
       setHeatData(applyFilters());
     }
 
@@ -327,19 +264,17 @@
     function attachModalButtons() {
       const openBtn = document.getElementById("open-map");
       const closeBtn = document.getElementById("close-map");
-      openBtn?.addEventListener("click", () => {
-        document.getElementById("map-modal")?.setAttribute("aria-hidden", "false");
-        openMapModal();
-      });
+
+      openBtn?.addEventListener("click", openMapModal);
       closeBtn?.addEventListener("click", closeMapModal);
-      // Close on overlay click (optional): not added since we have full-screen canvas
+
       document.addEventListener("keydown", (e) => {
         if (e.key === "Escape" && document.getElementById("map-modal")?.classList.contains("open")) {
           closeMapModal();
         }
       });
 
-      // Locate me
+      // Locate me FAB
       document.getElementById("locate-me")?.addEventListener("click", async () => {
         if (!navigator.geolocation || !map) return;
         try {
@@ -369,7 +304,7 @@
         initFilterUI(approvedIncidents.map(i => i.incidentType));
         renderIncidents(approvedIncidents);
 
-        // Geofence banner: find nearby incidents (1 km)
+        // Geofence banner (unchanged)
         let userLoc = null;
         if ("geolocation" in navigator) {
           try {
@@ -419,6 +354,61 @@
         console.error("Failed to load incidents:", err);
       }
     }
+
+    // Init filter UI (kept from earlier)
+    function initFilterUI(types) {
+      const select = document.getElementById("filter-type");
+      const unique = Array.from(new Set(types.map(t => (t || "").trim()).filter(Boolean))).sort();
+      unique.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t; opt.textContent = t;
+        select.appendChild(opt);
+      });
+      const rerender = () => renderIncidents(applyFilters());
+      select.addEventListener("change", rerender);
+      document.getElementById("filter-from").addEventListener("change", rerender);
+      document.getElementById("filter-to").addEventListener("change", rerender);
+      document.getElementById("filter-clear").addEventListener("click", () => {
+        select.value = ""; document.getElementById("filter-from").value = "";
+        document.getElementById("filter-to").value = ""; rerender();
+      });
+    }
+
+    // Event delegation for like/save/share (unchanged)
+    document.addEventListener("click", (e) => {
+      const list = document.getElementById("incidents-list");
+      if (!list) return;
+      const btn = e.target.closest(".like-btn");
+      if (!btn) {
+        const saveBtn = e.target.closest(".save-btn");
+        if (saveBtn) {
+          const id = saveBtn.getAttribute("data-id");
+          const curr = localStorage.getItem(`saved_inc_${id}`) === "true";
+          localStorage.setItem(`saved_inc_${id}`, (!curr).toString());
+          saveBtn.classList.toggle("active", !curr);
+          return;
+        }
+        const shareBtn = e.target.closest(".share-btn");
+        if (shareBtn) {
+          const link = shareBtn.getAttribute("data-link");
+          if (navigator.share) {
+            navigator.share({ title: "Incident", url: link }).catch(()=>{});
+          } else {
+            navigator.clipboard?.writeText(link);
+            shareBtn.textContent = "✅";
+            setTimeout(() => shareBtn.textContent = "🔗", 1200);
+          }
+        }
+        return;
+      }
+      const id = btn.getAttribute("data-id");
+      const currentlyLiked = isLiked(id);
+      const newCount = setLiked(id, !currentlyLiked);
+      btn.classList.toggle("liked", !currentlyLiked);
+      btn.querySelector(".like-text").textContent = !currentlyLiked ? "Liked" : "Like";
+      const countEl = list.querySelector(`.like-count[data-id="${id}"]`);
+      if (countEl) countEl.textContent = newCount;
+    });
 
     // Run after Leaflet is available
     if (window.L) loadIncidents();

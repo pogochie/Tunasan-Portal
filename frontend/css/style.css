@@ -2349,34 +2349,47 @@ body.modal-open {
 
 /* ... existing code ... */
 
-/* Fullscreen Incidents Map Modal */
+/* Full-screen Incidents Map Modal (overlay everything) */
 .map-modal {
   position: fixed;
   inset: 0;
   z-index: 1400;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(6px);
+  background: transparent; /* no dim overlay to maximize visual size */
   display: none;
-  align-items: stretch;
-  justify-content: center;
 }
-.map-modal.open { display: grid; grid-template-rows: auto 1fr; }
+.map-modal.open { display: block; }
 
+/* Leaflet canvas fills entire viewport */
+.map-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1400; /* base layer for map; overlays come above */
+}
+
+/* Top overlay header with Close button */
 .map-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1402;
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: 8px;
-  background: var(--card);
-  color: var(--text);
   padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
+  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.6));
   border-bottom: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  backdrop-filter: saturate(120%) blur(8px);
 }
 .map-header h2 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 800;
+  color: var(--text);
 }
 .map-close {
   background: transparent;
@@ -2385,99 +2398,55 @@ body.modal-open {
   line-height: 1;
   color: var(--muted);
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 0 6px;
 }
 .map-close:hover { color: var(--danger); }
 
-/* Type legend */
+/* Small legend chips overlay */
 .map-legend {
-  position: absolute;
-  top: calc(56px + 8px + env(safe-area-inset-top));
+  position: fixed;
+  top: calc(56px + 12px + env(safe-area-inset-top));
   left: 12px;
   right: 12px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   z-index: 1402;
+  pointer-events: none; /* let map clicks through; chips are informational */
 }
 .map-legend .chip {
+  pointer-events: auto; /* allow selection if needed */
   background: var(--card);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 9999px;
   padding: 6px 10px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   box-shadow: var(--shadow);
-}
-
-/* Leaflet canvas fills the screen */
-.map-canvas {
-  position: relative;
-  width: 100%;
-  height: calc(100vh - 56px - env(safe-area-inset-top));
-  min-height: 300px;
-}
-
-/* Heatmap controls bottom panel */
-.map-controls-panel {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-  background: var(--card);
-  border-top: 1px solid var(--border);
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
-  z-index: 1401;
-}
-.map-controls-panel .panel-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.map-controls-panel .panel-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px 12px;
-}
-.map-controls-panel label {
-  grid-column: span 3;
-  font-weight: 600;
-  color: var(--text);
-}
-.map-controls-panel input[type="range"] {
-  grid-column: span 3;
-  width: 100%;
 }
 
 /* Floating "Locate me" button */
 .map-fab {
   position: fixed;
   right: 16px;
-  bottom: calc(72px + env(safe-area-inset-bottom));
-  width: 48px;
-  height: 48px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   border: none;
   background: var(--primary);
   color: #fff;
-  font-size: 1.1rem;
-  box-shadow: 0 8px 20px rgba(24,119,242,0.35);
+  font-size: 1.2rem;
+  box-shadow: 0 10px 26px rgba(24,119,242,0.35);
   cursor: pointer;
   z-index: 1402;
 }
-.map-fab:hover {
-  background: var(--primary-hover);
-}
+.map-fab:hover { background: var(--primary-hover); }
 
-/* Desktop spacing for controls */
-@media (min-width: 769px) {
-  .map-controls-panel .panel-grid {
-    grid-template-columns: repeat(9, 1fr);
-  }
-  .map-controls-panel label,
-  .map-controls-panel input[type="range"] {
-    grid-column: span 3;
-  }
+/* Hide any previous bottom controls panel if present */
+.map-controls-panel { display: none !important; }
+
+@media (max-width: 768px) {
+  .map-header h2 { font-size: 1rem; }
+  .map-legend { top: calc(48px + 12px + env(safe-area-inset-top)); }
 }
