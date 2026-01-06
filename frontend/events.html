@@ -10,7 +10,27 @@
   <div id="navbar-placeholder"></div>
 
   <h1 data-i18n="events.title">Upcoming Events</h1>
-  <div id="calendar" class="post-card" style="padding:12px;"></div>
+
+  <!-- NEW: Open calendar overlay button -->
+  <div style="text-align:center; margin: 10px 0 16px;">
+    <button id="open-cal" class="pill-btn secondary" type="button">Open Calendar</button>
+  </div>
+
+  <!-- Hide inline calendar (overlay will be used) -->
+  <div id="calendar" class="post-card" style="display:none;"></div>
+
+  <!-- NEW: Fullscreen Calendar Modal -->
+  <div id="cal-modal" class="cal-modal" aria-hidden="true">
+    <!-- scrollable calendar canvas behind header -->
+    <div id="cal-canvas" class="cal-canvas" role="region" aria-label="Events calendar"></div>
+
+    <!-- overlay header with Close button -->
+    <header class="cal-header">
+      <h2>Events Calendar</h2>
+      <button id="cal-close" class="cal-close" aria-label="Close">&times;</button>
+    </header>
+  </div>
+
   <ul id="events-list" class="feed"></ul>
 
   <script>
@@ -23,20 +43,24 @@
       grid.style.display = "grid";
       grid.style.gridTemplateColumns = "repeat(7, 1fr)";
       grid.style.gap = "6px";
+      grid.style.paddingBottom = "16px";
+
       const labels = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
       labels.forEach(l => {
         const lbl = document.createElement("div");
         lbl.style.fontWeight = "700";
+        lbl.style.textAlign = "center";
         lbl.textContent = l;
         grid.appendChild(lbl);
       });
       for (let i = 0; i < startDay; i++) grid.appendChild(document.createElement("div"));
       for (let d = 1; d <= daysInMonth; d++) {
         const cell = document.createElement("div");
-        cell.style.minHeight = "60px";
+        cell.style.minHeight = "72px";
         cell.style.border = "1px solid var(--border)";
         cell.style.borderRadius = "8px";
         cell.style.padding = "6px";
+        cell.style.background = "var(--card)";
         cell.innerHTML = `<strong>${d}</strong><div class="evt-slot"></div>`;
         grid.appendChild(cell);
       }
@@ -60,39 +84,74 @@
       return URL.createObjectURL(blob);
     }
 
+    // NEW: keep events for overlay rendering
+    let EVENTS_CACHE = [];
+
+    // NEW: render calendar into the overlay canvas
+    function renderCalendarOverlay(events, date = new Date()) {
+      const calCanvas = document.getElementById("cal-canvas");
+      if (!calCanvas) return;
+      const monthLabel = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+      calCanvas.innerHTML = `
+        <div class="cal-month">${monthLabel}</div>
+      `;
+      const grid = buildCalendar(date);
+      calCanvas.appendChild(grid);
+
+      // Place event titles into calendar slots
+      const firstOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+      const startDay = firstOfMonth.getDay();
+      const slots = calCanvas.querySelectorAll(".evt-slot");
+      events.forEach(evt => {
+        const d = new Date(evt.date);
+        if (d.getMonth() === date.getMonth() && d.getFullYear() === date.getFullYear()) {
+          const idx = startDay + d.getDate() - 1;
+          const slot = slots[idx];
+          if (slot) {
+            const badge = document.createElement("div");
+            badge.className = "evt-badge";
+            badge.textContent = evt.title;
+            slot.appendChild(badge);
+          }
+        }
+      });
+    }
+
+    // NEW: modal open/close
+    function openCalModal() {
+      const modal = document.getElementById("cal-modal");
+      if (!modal) return;
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+      renderCalendarOverlay(EVENTS_CACHE, new Date());
+    }
+    function closeCalModal() {
+      const modal = document.getElementById("cal-modal");
+      if (!modal) return;
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
+    }
+    // Bind buttons after DOM is ready
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("open-cal")?.addEventListener("click", openCalModal);
+      document.getElementById("cal-close")?.addEventListener("click", closeCalModal);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && document.getElementById("cal-modal")?.classList.contains("open")) closeCalModal();
+      });
+    });
+
     async function loadEvents() {
       try {
         const res = await fetch("/api/events");
         const events = await res.json();
+        EVENTS_CACHE = events;
 
-        const cal = document.getElementById("calendar");
-        cal.innerHTML = `<h3 style="margin:6px 0;">${new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</h3>`;
-        const grid = buildCalendar();
-        cal.appendChild(grid);
+        // INLINE calendar removed (overlay will render on open)
+        // const cal = document.getElementById("calendar"); ...
 
-        // Place event titles into calendar slots
-        const firstOfMonth = new Date(); firstOfMonth.setDate(1);
-        const startDay = firstOfMonth.getDay();
-        const slots = cal.querySelectorAll(".evt-slot");
-        events.forEach(evt => {
-          const d = new Date(evt.date);
-          if (d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear()) {
-            const idx = startDay + d.getDate() - 1;
-            const slot = slots[idx];
-            if (slot) {
-              const badge = document.createElement("div");
-              badge.style.marginTop = "4px";
-              badge.style.background = "rgba(24,119,242,.08)";
-              badge.style.border = "1px solid var(--border)";
-              badge.style.borderRadius = "6px";
-              badge.style.padding = "2px 4px";
-              badge.textContent = evt.title;
-              slot.appendChild(badge);
-            }
-          }
-        });
-
-        // List view with ICS export
+        // List view with ICS export (unchanged)
         const list = document.getElementById("events-list");
         list.innerHTML = "";
         events.forEach(evt => {
@@ -118,7 +177,7 @@
             </div>
             <div class="post-actions">
               <div class="action-group">
-                <button class="icon-btn save-btn ${localStorage.getItem(`saved_evt_${evt._id}`)==="true"?'active':''}" data-id="${evt._id}" title="Save">⭐</button>
+                <button class="icon-btn save-btn ${localStorage.getItem(\`saved_evt_\${evt._id}\`)==="true"?'active':''}" data-id="${evt._id}" title="Save">⭐</button>
                 <button class="icon-btn share-btn" data-link="${location.origin}/events.html#${evt._id}" title="Share">🔗</button>
               </div>
               <a class="pill-btn" href="${toICS(evt)}" download="${(evt.title||'event').replace(/\s+/g,'_')}.ics">Add to Calendar</a>
