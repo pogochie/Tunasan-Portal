@@ -38,13 +38,41 @@
         <h2 class="form-title">News Details</h2>
         <p class="form-desc">Share official updates with images.</p>
       </div>
-      <label for="title">Title</label>
-      <input type="text" name="title" id="title" placeholder="Title" required />
-      <label for="description">Description</label>
-      <textarea name="description" id="description" placeholder="Description" required></textarea>
-      <label for="images">Upload images</label>
-      <input type="file" name="images" id="images" multiple accept="image/*" />
-      <div class="form-actions">
+
+      <div class="label-row">
+        <label for="title">Title</label>
+        <small class="count-inline"><span id="title-count">0</span>/100</small>
+      </div>
+      <input type="text" name="title" id="title" placeholder="Title" required maxlength="100" />
+
+      <div class="label-row">
+        <label for="description">Description</label>
+        <small class="count-inline"><span id="desc-count">0</span>/500</small>
+      </div>
+      <textarea name="description" id="description" placeholder="Description" required maxlength="500"></textarea>
+
+      <label for="tags">Tags (comma-separated)</label>
+      <input type="text" name="tags" id="tags" placeholder="e.g. Safety, Announcement" />
+
+      <label class="inline">
+        <input type="checkbox" id="pin" name="pin" />
+        Pin this news
+      </label>
+
+      <div class="form-section">
+        <h3>Upload Images</h3>
+        <div class="file-drop" id="file-drop">
+          <span>Drag & drop images here or click to browse</span>
+          <button type="button" class="pill-btn">Browse</button>
+          <input type="file" name="images" id="images" multiple accept="image/*" style="display:none" />
+        </div>
+        <div class="file-list" id="file-list">No files selected.</div>
+        <div id="preview-grid" class="image-grid" aria-live="polite"></div>
+      </div>
+
+      <div class="form-actions" style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="button" id="save-draft" class="pill-btn">Save Draft</button>
+        <button type="button" id="clear-draft" class="pill-btn">Clear Draft</button>
         <button type="submit" class="btn-gradient">Submit News</button>
       </div>
     </form>
@@ -65,10 +93,137 @@
 
   <script>
     const form = document.getElementById("news-form");
+    const titleEl = document.getElementById("title");
+    const descEl = document.getElementById("description");
+    const tagsEl = document.getElementById("tags");
+    const pinEl = document.getElementById("pin");
+
+    const titleCount = document.getElementById("title-count");
+    const descCount = document.getElementById("desc-count");
+
+    const imagesInput = document.getElementById("images");
+    const fileDrop = document.getElementById("file-drop");
+    const fileList = document.getElementById("file-list");
+    const previewGrid = document.getElementById("preview-grid");
+
+    const MAX_IMAGES = 6;
+    const DRAFT_KEY = "news_form_draft_v1";
+
+    // Counters
+    const updateCounts = () => {
+      titleCount.textContent = (titleEl.value || "").length;
+      descCount.textContent = (descEl.value || "").length;
+    };
+    titleEl.addEventListener("input", updateCounts);
+    descEl.addEventListener("input", updateCounts);
+    updateCounts();
+
+    // Draft handling
+    function saveDraft() {
+      const draft = {
+        title: titleEl.value,
+        description: descEl.value,
+        tags: tagsEl.value,
+        pin: pinEl.checked
+      };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      alert("Draft saved locally.");
+    }
+    function loadDraft() {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      try {
+        const d = JSON.parse(raw);
+        if (d.title) titleEl.value = d.title;
+        if (d.description) descEl.value = d.description;
+        if (d.tags) tagsEl.value = d.tags;
+        if (typeof d.pin === "boolean") pinEl.checked = d.pin;
+        updateCounts();
+      } catch {}
+    }
+    function clearDraft() {
+      localStorage.removeItem(DRAFT_KEY);
+      alert("Draft cleared.");
+    }
+    loadDraft();
+
+    document.getElementById("save-draft").addEventListener("click", saveDraft);
+    document.getElementById("clear-draft").addEventListener("click", clearDraft);
+
+    // File input + drag & drop
+    fileDrop.addEventListener("click", () => imagesInput.click());
+    fileDrop.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      fileDrop.classList.add("dragging");
+    });
+    fileDrop.addEventListener("dragleave", () => {
+      fileDrop.classList.remove("dragging");
+    });
+    fileDrop.addEventListener("drop", (e) => {
+      e.preventDefault();
+      fileDrop.classList.remove("dragging");
+      if (!e.dataTransfer?.files?.length) return;
+      appendFiles(e.dataTransfer.files);
+    });
+    imagesInput.addEventListener("change", () => {
+      if (imagesInput.files?.length) appendFiles(imagesInput.files, true);
+    });
+
+    // Manage FileList via DataTransfer
+    function setFiles(filesArr) {
+      const dt = new DataTransfer();
+      filesArr.forEach(f => dt.items.add(f));
+      imagesInput.files = dt.files;
+      updatePreview();
+    }
+
+    function appendFiles(fileListLike, replace = false) {
+      const current = Array.from(imagesInput.files || []);
+      const incoming = Array.from(fileListLike || []).filter(f => f.type.startsWith("image/"));
+      let merged = replace ? [] : current.slice();
+      for (const f of incoming) {
+        if (merged.length >= MAX_IMAGES) break;
+        merged.push(f);
+      }
+      if (merged.length > MAX_IMAGES) merged = merged.slice(0, MAX_IMAGES);
+      setFiles(merged);
+    }
+
+    function updatePreview() {
+      const files = Array.from(imagesInput.files || []);
+      fileList.textContent = files.length
+        ? `${files.length} file${files.length > 1 ? "s" : ""} selected`
+        : "No files selected.";
+      previewGrid.innerHTML = "";
+      files.forEach((file, idx) => {
+        const url = URL.createObjectURL(file);
+        const wrap = document.createElement("div");
+        wrap.className = "thumb";
+        wrap.innerHTML = `
+          <img src="${url}" alt="${file.name}" />
+          <button type="button" class="remove-thumb" aria-label="Remove image" data-index="${idx}">×</button>
+        `;
+        previewGrid.appendChild(wrap);
+      });
+    }
+
+    previewGrid.addEventListener("click", (e) => {
+      const btn = e.target.closest(".remove-thumb");
+      if (!btn) return;
+      const idx = parseInt(btn.getAttribute("data-index"), 10);
+      const files = Array.from(imagesInput.files || []);
+      files.splice(idx, 1);
+      setFiles(files);
+    });
+
+    // Submit
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const formData = new FormData(form);
+      // Append extra meta (backend may ignore unknown fields; harmless)
+      formData.append("tags", tagsEl.value);
+      formData.append("pin", pinEl.checked ? "true" : "false");
 
       try {
         const res = await fetch("/api/news", {
@@ -79,6 +234,9 @@
         if (res.ok) {
           alert(data.message);
           form.reset();
+          updateCounts();
+          setFiles([]);
+          clearDraft();
           loadNews();
         } else {
           alert("Failed to submit news: " + (data.message || ""));
@@ -124,6 +282,9 @@
         li.innerHTML = `
           <div class="news-head">
             <h3>${item.title}</h3>
+            <div class="news-head-actions">
+              <button class="pill-btn copy-link-btn" data-id="${item._id}" title="Copy link">Copy link</button>
+            </div>
           </div>
           <p>${item.description}</p>
           ${imagesHtml}
@@ -161,6 +322,17 @@
           } catch (err) {
             alert("Error deleting news: " + err.message);
           }
+        }
+      }
+      if (e.target.classList.contains("copy-link-btn")) {
+        const id = e.target.getAttribute("data-id");
+        const link = `${location.origin}/news.html#${id}`;
+        try {
+          await navigator.clipboard.writeText(link);
+          e.target.textContent = "Copied!";
+          setTimeout(() => (e.target.textContent = "Copy link"), 1000);
+        } catch {
+          alert(link);
         }
       }
     });

@@ -1575,3 +1575,67 @@ button.action-btn:hover,
 .btn-gradient:hover {
   box-shadow: 0 10px 24px rgba(24,119,242,0.24);
 }
+
+/* Inline count next to labels */
+.label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.count-inline {
+  color: var(--muted);
+}
+
+/* Drag & drop state for file-drop */
+.file-drop.dragging {
+  background: #f0f2f5;
+}
+
+/* Thumbnails with remove button for previews */
+.thumb {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  aspect-ratio: 4/3;
+  background: #f7f9fc;
+}
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.thumb .remove-thumb {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(229, 57, 53, 0.92);
+  color: #fff;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: filter 0.2s ease, transform 0.05s ease;
+}
+.thumb .remove-thumb:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+/* Minor alignment for actions in card head (news list) */
+.news-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.news-head-actions {
+  display: flex;
+  gap: 8px;
+}
