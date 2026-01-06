@@ -2349,43 +2349,65 @@ body.modal-open {
 
 /* ... existing code ... */
 
-/* Full-screen Incidents Map Modal (edge to edge, overlays only controls) */
-.map-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 1400;
-  background: transparent;             /* no dim to maximize map area */
-  display: none;                       /* hidden by default */
-}
-.map-modal.open {
-  display: block;                      /* show overlay */
+/* === Fullscreen Incidents Map: hard overrides to ensure edge-to-edge === */
+#heatmap {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-/* Leaflet canvas fills entire viewport */
-.map-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;                       /* full viewport height */
-  z-index: 1400;
+#map-modal.map-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2000 !important; /* above navbar, tabbar, lightboxes */
+  background: transparent !important;
+  display: none;
+}
+#map-modal.map-modal.open {
+  display: block !important;
+}
+
+/* Map canvas fills the entire viewport */
+#map-screen.map-canvas {
+  position: fixed !important;
+  top: 0; left: 0; right: 0; bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 2000 !important;
+  background: transparent;
+}
+@supports (height: 100svh) {
+  #map-screen.map-canvas { height: 100svh !important; }
 }
 @supports (height: 100dvh) {
-  .map-canvas { height: 100dvh; }      /* dynamic viewport on mobile */
+  #map-screen.map-canvas { height: 100dvh !important; }
 }
 
-/* Top overlay header with Close button (X) */
+/* Make sure Leaflet container occupies full canvas */
+#map-screen.map-canvas,
+#map-screen .leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Overlay controls always on top of the map */
+.map-header,
+.map-legend,
+.map-fab {
+  position: fixed !important;
+  z-index: 2002 !important;
+}
+
+/* Header (X button) */
 .map-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1402;
+  top: 0; left: 0; right: 0;
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: 8px;
   padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
-  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.65));
+  background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.6));
   border-bottom: 1px solid var(--border);
   box-shadow: 0 4px 20px rgba(0,0,0,0.12);
   backdrop-filter: saturate(120%) blur(8px);
@@ -2407,20 +2429,18 @@ body.modal-open {
 }
 .map-close:hover { color: var(--danger); }
 
-/* Small legend chips overlay (top, under header) */
+/* Legend chips just below header */
 .map-legend {
-  position: fixed;
   top: calc(56px + 12px + env(safe-area-inset-top));
   left: 12px;
   right: 12px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  z-index: 1402;
-  pointer-events: none; /* allow map interactions; chips are read-only */
+  pointer-events: none; /* allow map drag/zoom */
 }
 .map-legend .chip {
-  pointer-events: auto; /* allow text selection if needed */
+  pointer-events: auto; /* selectable text if needed */
   background: var(--card);
   color: var(--text);
   border: 1px solid var(--border);
@@ -2430,9 +2450,8 @@ body.modal-open {
   box-shadow: var(--shadow);
 }
 
-/* Floating "Locate me" button */
+/* Locate me FAB above bottom safe area */
 .map-fab {
-  position: fixed;
   right: 16px;
   bottom: calc(16px + env(safe-area-inset-bottom));
   width: 52px;
@@ -2444,36 +2463,24 @@ body.modal-open {
   font-size: 1.2rem;
   box-shadow: 0 10px 26px rgba(24,119,242,0.35);
   cursor: pointer;
-  z-index: 1402;
 }
 .map-fab:hover { background: var(--primary-hover); }
 
-/* Hide any previous bottom controls panel to maximize map space */
-.map-controls-panel { display: none !important; }
+/* Lock body scroll and remove any mobile tabbar padding when modal is open */
+body.modal-open {
+  overflow: hidden !important;
+  padding-bottom: 0 !important;
+}
 
-/* When using a filter-controls card above the list, remove any gap with the first post-card */
+/* Ensure no gap between filters card and first list item */
 section.filter-controls.post-card {
   margin-bottom: 0 !important;
 }
-.feed {
-  margin-top: 0 !important;
-}
+.feed { margin-top: 0 !important; }
+.feed .post-card:first-child { margin-top: 0 !important; }
 
-/* Optional: If you decide to render filters inside the full-screen map, they will overlay here */
-.map-modal .filter-controls {
-  position: fixed;
-  top: calc(56px + 60px + env(safe-area-inset-top)); /* below the header + legend */
-  left: 12px;
-  right: 12px;
-  z-index: 1402;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: var(--shadow-lg);
-  padding: 12px;
-}
+/* Mobile fine-tuning */
 @media (max-width: 768px) {
   .map-header h2 { font-size: 1rem; }
   .map-legend { top: calc(48px + 12px + env(safe-area-inset-top)); }
 }
-/* ... existing code ... */
