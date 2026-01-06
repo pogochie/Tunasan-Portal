@@ -7,51 +7,6 @@
   <link rel="stylesheet" href="css/admin.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <style>#map { margin-bottom: 15px; }</style>
-  <style>
-    /* Smaller map height */
-    #map {
-      height: 200px !important;
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
-      transition: height 0.3s ease;
-    }
-
-    /* Fullscreen map overlay */
-    #map-fullscreen-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.75);
-      z-index: 3000;
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
-    #map-fullscreen-overlay.active {
-      display: flex;
-    }
-    #map-fullscreen {
-      width: 90vw;
-      height: 90vh;
-      border-radius: 12px;
-      box-shadow: var(--shadow-lg);
-      border: 2px solid var(--border);
-    }
-    #map-fullscreen-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: var(--card);
-      border: none;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      font-size: 1.5rem;
-      cursor: pointer;
-      box-shadow: var(--shadow);
-      z-index: 3100;
-    }
-  </style>
 </head>
 <body>
   <nav class="admin-navbar">
@@ -137,7 +92,6 @@
           <input type="hidden" name="location[lng]" id="lng" required />
           <div id="map" class="map-wrap"></div>
           <p class="map-help">Drag the pin to refine the exact location.</p>
-          <button type="button" id="open-map-fullscreen" class="pill-btn" style="margin-top: 8px;">View Map Fullscreen</button>
         </div>
 
         <div class="form-section">
@@ -420,74 +374,5 @@
 
     loadIncident();
   </script>
-  <!-- Fullscreen map overlay -->
-<div id="map-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen map view">
-  <button id="map-fullscreen-close" aria-label="Close fullscreen map">×</button>
-  <div id="map-fullscreen"></div>
-</div>
-
-<!-- Add this script at the end of body or inside your existing <script> -->
-<script>
-  let fullscreenMap, fullscreenMarker;
-
-  const openBtn = document.getElementById("open-map-fullscreen");
-  const overlay = document.getElementById("map-fullscreen-overlay");
-  const closeBtn = document.getElementById("map-fullscreen-close");
-
-  openBtn.addEventListener("click", () => {
-    overlay.classList.add("active");
-
-    const lat = parseFloat(document.getElementById("lat").value) || 14.4089;
-    const lng = parseFloat(document.getElementById("lng").value) || 121.0341;
-
-    if (!fullscreenMap) {
-      fullscreenMap = L.map("map-fullscreen").setView([lat, lng], 15);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; OpenStreetMap contributors',
-      }).addTo(fullscreenMap);
-
-      fullscreenMarker = L.marker([lat, lng], { draggable: true }).addTo(fullscreenMap);
-
-      fullscreenMarker.on("dragend", e => {
-        const pos = e.target.getLatLng();
-        document.getElementById("lat").value = pos.lat;
-        document.getElementById("lng").value = pos.lng;
-
-        // Update small map marker and view
-        if (window.marker) {
-          window.marker.setLatLng(pos);
-          window.map.setView(pos);
-        }
-      });
-
-      fullscreenMap.on("click", e => {
-        fullscreenMarker.setLatLng(e.latlng);
-        document.getElementById("lat").value = e.latlng.lat;
-        document.getElementById("lng").value = e.latlng.lng;
-
-        if (window.marker) {
-          window.marker.setLatLng(e.latlng);
-          window.map.setView(e.latlng);
-        }
-      });
-    } else {
-      fullscreenMarker.setLatLng([lat, lng]);
-      fullscreenMap.setView([lat, lng], 15);
-    }
-
-    setTimeout(() => fullscreenMap.invalidateSize(), 100);
-  });
-
-  closeBtn.addEventListener("click", () => {
-    overlay.classList.remove("active");
-  });
-
-  // Close overlay if clicking outside the map container
-  overlay.addEventListener("click", e => {
-    if (e.target === overlay) {
-      overlay.classList.remove("active");
-    }
-  });
-</script>
 </body>
 </html>
