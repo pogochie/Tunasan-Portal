@@ -20,51 +20,6 @@
       font-size: 2rem;
       margin-bottom: 15px;
     }
-    .features-slider {
-  display: flex;
-  gap: 1.25rem;
-  padding: 0 1.25rem 1rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-}
-
-.features-slider::-webkit-scrollbar {
-  display: none;
-}
-
-    .features {
-  padding: 4rem 0 3rem;
-  background: linear-gradient(180deg, #0b1a2a, #0f2740);
-}
-
-.section-title {
-  text-align: center;
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  color: #fff;
-}
-
-.features-slider {
-  display: flex;
-  gap: 1.25rem;
-  padding: 0 1.25rem 1rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-}
-
-.features-slider::-webkit-scrollbar {
-  display: none;
-}
-
-.feature-card i {
-  font-size: 2.4rem;
-  color: #4fc3f7;
-  margin-bottom: 1rem;
-}
-
-
   </style>
   <style>
     /* Center the report form section vertically and horizontally */
@@ -78,66 +33,80 @@
       font-size: 2rem;
       margin-bottom: 15px;
     }
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin: 30px 0;
-    }
-    .feature-card {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-    }
   </style>
   <style>
-    /* Center the report form section vertically and horizontally */
-    .report-section {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 60vh; /* adjust as needed */
-      padding: 20px;
-    }
-    /* Optional: constrain form width */
-    #incident-form {
-      max-width: 500px;
-      width: 100%;
-    }
-    .swipe-indicator {
+    /* FEATURES SECTION */
+.features {
+  padding: 4rem 0 3rem;
+  background: linear-gradient(180deg, #0b1a2a, #0f2740);
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+/* SWIPE INDICATOR */
+.swipe-indicator {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 0.4rem;
-
   font-size: 0.85rem;
   letter-spacing: 0.05em;
   color: rgba(255, 255, 255, 0.7);
-
   margin-bottom: 1.2rem;
   animation: swipeHint 1.6s ease-in-out infinite;
 }
 
-.swipe-indicator i {
-  font-size: 0.9rem;
-}
-
 @keyframes swipeHint {
-  0% {
-    transform: translateX(0);
-    opacity: 0.4;
-  }
-  50% {
-    transform: translateX(6px);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 0.4;
-  }
+  0% { transform: translateX(0); opacity: 0.4; }
+  50% { transform: translateX(6px); opacity: 1; }
+  100% { transform: translateX(0); opacity: 0.4; }
 }
 
+/* SLIDER */
+.features-slider {
+  display: flex;
+  gap: 1.25rem;
+  padding: 0 1.25rem 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.features-slider::-webkit-scrollbar {
+  display: none;
+}
+
+/* CARD */
+.feature-card {
+  flex: 0 0 260px;
+  scroll-snap-align: start;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+
+  color: #fff;
+  backdrop-filter: blur(12px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card i {
+  font-size: 2.4rem;
+  color: #4fc3f7;
+  margin-bottom: 1rem;
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+}
   </style>
 </head>
 <body>
@@ -153,6 +122,11 @@
 
     <section class="features">
   <h2 class="section-title">What You Can Do</h2>
+
+  <div class="swipe-indicator" id="swipeIndicator">
+    <span>Swipe</span>
+    <i class="fa-solid fa-arrow-right"></i>
+  </div>
 
   <div class="features-slider">
     <div class="feature-card">
@@ -180,10 +154,7 @@
     </div>
   </div>
 </section>
-<div class="swipe-indicator" id="swipeIndicator">
-  <span>Swipe</span>
-  <i class="fa-solid fa-arrow-right"></i>
-</div>
+
 
 
 
