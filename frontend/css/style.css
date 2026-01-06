@@ -801,6 +801,16 @@ p {
   box-shadow: var(--shadow-lg);
 }
 
+section.filter-controls.post-card {
+  justify-content: center;
+  display: grid;
+  align-items: center;
+  max-width: 720px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  margin: 0px auto 30px;
+  padding: 20px 24px;
+}
+
 /* Heatmap controls container */
 .map-controls {
   max-width: 720px;

@@ -6,7 +6,53 @@
   <title>Edit Incident</title>
   <link rel="stylesheet" href="css/admin.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-  <style>#map { margin-bottom: 15px; }</style>
+  <style>
+    #map {
+      margin-bottom: 15px;
+    }
+  </style>
+  <style>
+    /* Make the map smaller by default */
+    #map {
+      height: 200px; /* smaller height */
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: height 0.3s ease;
+    }
+
+    /* Fullscreen map overlay styles */
+    #map-fullscreen-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 2000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    #map-fullscreen {
+      width: 90vw;
+      height: 90vh;
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      border: 2px solid var(--border);
+    }
+    #map-fullscreen-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: var(--card);
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      z-index: 2100;
+    }
+  </style>
 </head>
 <body>
   <nav class="admin-navbar">
@@ -92,6 +138,7 @@
           <input type="hidden" name="location[lng]" id="lng" required />
           <div id="map" class="map-wrap"></div>
           <p class="map-help">Drag the pin to refine the exact location.</p>
+          <button type="button" id="open-map-fullscreen" class="pill-btn" style="margin-top: 8px;">View Map Fullscreen</button>
         </div>
 
         <div class="form-section">
@@ -372,7 +419,71 @@
       }
     });
 
+    let fullscreenMap, fullscreenMarker;
+
+    document.getElementById("open-map-fullscreen").addEventListener("click", () => {
+      const overlay = document.getElementById("map-fullscreen-overlay");
+      overlay.style.display = "flex";
+
+      // Initialize fullscreen map if not already
+      if (!fullscreenMap) {
+        fullscreenMap = L.map("map-fullscreen").setView([latInput.value || 14.4089, lngInput.value || 121.0341], 15);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '&copy; OpenStreetMap contributors',
+        }).addTo(fullscreenMap);
+
+        fullscreenMarker = L.marker([latInput.value || 14.4089, lngInput.value || 121.0341], { draggable: true }).addTo(fullscreenMap);
+
+        fullscreenMarker.on("dragend", function(e) {
+          const pos = e.target.getLatLng();
+          latInput.value = pos.lat;
+          lngInput.value = pos.lng;
+
+          // Update main map marker and view
+          if (marker) {
+            marker.setLatLng(pos);
+            map.setView(pos);
+          }
+        });
+
+        fullscreenMap.on("click", function(e) {
+          fullscreenMarker.setLatLng(e.latlng);
+          latInput.value = e.latlng.lat;
+          lngInput.value = e.latlng.lng;
+
+          if (marker) {
+            marker.setLatLng(e.latlng);
+            map.setView(e.latlng);
+          }
+        });
+      } else {
+        // Update marker position and map view on open
+        const lat = parseFloat(latInput.value) || 14.4089;
+        const lng = parseFloat(lngInput.value) || 121.0341;
+        fullscreenMarker.setLatLng([lat, lng]);
+        fullscreenMap.setView([lat, lng], 15);
+      }
+
+      setTimeout(() => fullscreenMap.invalidateSize(), 100);
+    });
+
+    document.getElementById("map-fullscreen-close").addEventListener("click", () => {
+      document.getElementById("map-fullscreen-overlay").style.display = "none";
+    });
+
+    // Optional: close fullscreen on overlay click outside map
+    document.getElementById("map-fullscreen-overlay").addEventListener("click", (e) => {
+      if (e.target.id === "map-fullscreen-overlay") {
+        e.target.style.display = "none";
+      }
+    });
+
     loadIncident();
   </script>
+  <!-- Fullscreen map overlay -->
+  <div id="map-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen map view">
+    <button id="map-fullscreen-close" aria-label="Close fullscreen map">×</button>
+    <div id="map-fullscreen"></div>
+  </div>
 </body>
 </html>
