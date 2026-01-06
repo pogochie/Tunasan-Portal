@@ -82,6 +82,20 @@
 
     <!-- Floating Locate button -->
     <button id="locate-me" class="map-fab" type="button" title="Locate me" aria-label="Locate me">📍</button>
+
+    <!-- NEW: Floating info card for selected incident -->
+    <div id="map-info" class="map-info-card" hidden>
+      <button id="map-info-close" class="map-info-close" aria-label="Close">&times;</button>
+      <div class="map-info-body">
+        <div class="map-info-title">
+          <span id="map-info-type" class="chip"></span>
+          <strong id="map-info-heading"></strong>
+        </div>
+        <p id="map-info-desc"></p>
+        <p id="map-info-meta" class="muted"></p>
+        <p id="map-info-loc" class="muted"></p>
+      </div>
+    </div>
   </div>
 
   <ul id="incidents-list" class="feed"></ul>
@@ -93,8 +107,8 @@
   <script>
     let INCIDENTS = []; // cache approved incidents for filtering
 
-    // New: Map modal state
-    let map = null, heat = null, bounds = null, userMarker = null, userCircle = null;
+    // Map modal state
+    let map = null, heat = null, bounds = null, userMarker = null, userCircle = null, markersLayer = null;
 
     function timeAgo(dateInput) {
       const d = new Date(dateInput);
@@ -205,6 +219,42 @@
       legend.innerHTML = entries.length ? entries.map(([t,c]) => `<span class="chip">${t}: ${c}</span>`).join('') : '';
     }
 
+    // NEW: add labeled markers with type chip + info card on click
+    function setMarkers(incidents) {
+      if (!map || !window.L) return;
+      if (markersLayer) { map.removeLayer(markersLayer); markersLayer = null; }
+      markersLayer = L.layerGroup().addTo(map);
+
+      const info = document.getElementById('map-info');
+      const infoClose = document.getElementById('map-info-close');
+      const setInfo = (i) => {
+        if (!info) return;
+        document.getElementById('map-info-type').textContent = i.incidentType || 'Unknown';
+        document.getElementById('map-info-heading').textContent = i.incidentType || 'Incident';
+        document.getElementById('map-info-desc').textContent = i.description || '';
+        document.getElementById('map-info-meta').textContent = `Reported by ${i.reporterName || 'Unknown'} • ${timeAgo(i.createdAt || Date.now())}`;
+        const locTxt = i.location?.lat && i.location?.lng
+          ? `${i.location.lat.toFixed(5)}, ${i.location.lng.toFixed(5)}`
+          : 'Location not specified';
+        document.getElementById('map-info-loc').textContent = `📍 ${locTxt}`;
+        info.hidden = false;
+      };
+      infoClose?.addEventListener('click', () => { info.hidden = true; });
+
+      incidents.forEach(i => {
+        if (!(i.location?.lat && i.location?.lng)) return;
+        const type = (i.incidentType || 'Unknown');
+        const icon = L.divIcon({
+          className: 'type-marker',
+          html: `<span class="type-chip">${type}</span>`,
+          iconSize: [0,0],
+        });
+        const m = L.marker([i.location.lat, i.location.lng], { icon, zIndexOffset: 500 });
+        m.on('click', () => setInfo(i));
+        m.addTo(markersLayer);
+      });
+    }
+
     function setHeatData(incidents) {
       if (!map || !window.L) return;
 
@@ -216,7 +266,8 @@
       const ptsLatLng = incidents
         .filter(i => i.location?.lat && i.location?.lng)
         .map(i => [i.location.lat, i.location.lng]);
-      const pts = ptsLatLng.length ? ptsLatLng.map(([lat, lng]) => [lat, lng, defaultMax]) : [];
+      const pts = ptsLatLng.map(([lat, lng]) => [lat, lng, defaultMax]);
+
       bounds = ptsLatLng.length ? L.latLngBounds(ptsLatLng) : null;
       if (bounds) { map.fitBounds(bounds.pad(0.15)); }
 
@@ -235,6 +286,9 @@
         if (showHeat && !map.hasLayer(heat)) heat.addTo(map);
         if (!showHeat && map.hasLayer(heat)) map.removeLayer(heat);
       }
+
+      // NEW: also place labeled markers
+      setMarkers(incidents);
 
       updateLegend(incidents);
       setTimeout(() => { try { map.invalidateSize(); } catch(_) {} }, 50);
