@@ -16,34 +16,35 @@
     <button id="open-cal" class="pill-btn secondary" type="button">Open Calendar</button>
   </div>
 
-  <!-- Hide inline calendar (overlay will be used) -->
+  <!-- Hide inline calendar; use overlay instead -->
   <div id="calendar" class="post-card" style="display:none;"></div>
 
   <!-- NEW: Fullscreen Calendar Modal -->
   <div id="cal-modal" class="cal-modal" aria-hidden="true">
-    <!-- scrollable calendar canvas behind header -->
-    <div id="cal-canvas" class="cal-canvas" role="region" aria-label="Events calendar"></div>
-
-    <!-- overlay header with Close button -->
     <header class="cal-header">
       <h2>Events Calendar</h2>
       <button id="cal-close" class="cal-close" aria-label="Close">&times;</button>
     </header>
+    <div id="cal-canvas" class="cal-canvas" role="region" aria-label="Events calendar"></div>
   </div>
 
   <ul id="events-list" class="feed"></ul>
 
   <script>
+    // Simplified calendar grid builder
     function buildCalendar(date = new Date()) {
       const year = date.getFullYear(), month = date.getMonth();
       const first = new Date(year, month, 1);
       const startDay = first.getDay(); // 0=Sun
       const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      const container = document.createElement("div");
       const grid = document.createElement("div");
+
+      container.style.padding = "8px 0";
       grid.style.display = "grid";
       grid.style.gridTemplateColumns = "repeat(7, 1fr)";
       grid.style.gap = "6px";
-      grid.style.paddingBottom = "16px";
 
       const labels = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
       labels.forEach(l => {
@@ -53,7 +54,15 @@
         lbl.textContent = l;
         grid.appendChild(lbl);
       });
-      for (let i = 0; i < startDay; i++) grid.appendChild(document.createElement("div"));
+
+      // Leading blanks before day 1
+      for (let i = 0; i < startDay; i++) {
+        const empty = document.createElement("div");
+        empty.style.minHeight = "0";
+        grid.appendChild(empty);
+      }
+
+      // Day cells
       for (let d = 1; d <= daysInMonth; d++) {
         const cell = document.createElement("div");
         cell.style.minHeight = "72px";
@@ -64,7 +73,57 @@
         cell.innerHTML = `<strong>${d}</strong><div class="evt-slot"></div>`;
         grid.appendChild(cell);
       }
-      return grid;
+
+      container.appendChild(grid);
+      return container;
+    }
+
+    // Cache events for overlay
+    let EVENTS_CACHE = [];
+
+    // Render calendar in overlay
+    function renderCalendarOverlay(events, date = new Date()) {
+      const calCanvas = document.getElementById("cal-canvas");
+      if (!calCanvas) return;
+
+      const monthLabel = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+      calCanvas.innerHTML = `<div class="cal-month">${monthLabel}</div>`;
+      const calGrid = buildCalendar(date);
+      calCanvas.appendChild(calGrid);
+
+      // Place event titles into the correct day slot
+      const slots = calCanvas.querySelectorAll(".evt-slot"); // one per day (1..daysInMonth)
+      events.forEach(evt => {
+        const d = new Date(evt.date);
+        if (isNaN(d)) return;
+        if (d.getMonth() === date.getMonth() && d.getFullYear() === date.getFullYear()) {
+          const idx = d.getDate() - 1; // slot index for the day
+          const slot = slots[idx];
+          if (slot) {
+            const badge = document.createElement("div");
+            badge.className = "evt-badge";
+            badge.textContent = evt.title;
+            slot.appendChild(badge);
+          }
+        }
+      });
+    }
+
+    // Modal controls
+    function openCalModal() {
+      const modal = document.getElementById("cal-modal");
+      if (!modal) return;
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+      renderCalendarOverlay(EVENTS_CACHE, new Date());
+    }
+    function closeCalModal() {
+      const modal = document.getElementById("cal-modal");
+      if (!modal) return;
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
     }
 
     function toICS(evt) {
@@ -84,61 +143,13 @@
       return URL.createObjectURL(blob);
     }
 
-    // NEW: keep events for overlay rendering
-    let EVENTS_CACHE = [];
-
-    // NEW: render calendar into the overlay canvas
-    function renderCalendarOverlay(events, date = new Date()) {
-      const calCanvas = document.getElementById("cal-canvas");
-      if (!calCanvas) return;
-      const monthLabel = date.toLocaleString('default', { month: 'long', year: 'numeric' });
-      calCanvas.innerHTML = `
-        <div class="cal-month">${monthLabel}</div>
-      `;
-      const grid = buildCalendar(date);
-      calCanvas.appendChild(grid);
-
-      // Place event titles into calendar slots
-      const firstOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-      const startDay = firstOfMonth.getDay();
-      const slots = calCanvas.querySelectorAll(".evt-slot");
-      events.forEach(evt => {
-        const d = new Date(evt.date);
-        if (d.getMonth() === date.getMonth() && d.getFullYear() === date.getFullYear()) {
-          const idx = startDay + d.getDate() - 1;
-          const slot = slots[idx];
-          if (slot) {
-            const badge = document.createElement("div");
-            badge.className = "evt-badge";
-            badge.textContent = evt.title;
-            slot.appendChild(badge);
-          }
-        }
-      });
-    }
-
-    // NEW: modal open/close
-    function openCalModal() {
-      const modal = document.getElementById("cal-modal");
-      if (!modal) return;
-      modal.classList.add("open");
-      modal.setAttribute("aria-hidden", "false");
-      document.body.classList.add("modal-open");
-      renderCalendarOverlay(EVENTS_CACHE, new Date());
-    }
-    function closeCalModal() {
-      const modal = document.getElementById("cal-modal");
-      if (!modal) return;
-      modal.classList.remove("open");
-      modal.setAttribute("aria-hidden", "true");
-      document.body.classList.remove("modal-open");
-    }
-    // Bind buttons after DOM is ready
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("open-cal")?.addEventListener("click", openCalModal);
       document.getElementById("cal-close")?.addEventListener("click", closeCalModal);
       document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && document.getElementById("cal-modal")?.classList.contains("open")) closeCalModal();
+        if (e.key === "Escape" && document.getElementById("cal-modal")?.classList.contains("open")) {
+          closeCalModal();
+        }
       });
     });
 
@@ -148,13 +159,11 @@
         const events = await res.json();
         EVENTS_CACHE = events;
 
-        // INLINE calendar removed (overlay will render on open)
-        // const cal = document.getElementById("calendar"); ...
-
-        // List view with ICS export (unchanged)
+        // List view with ICS export
         const list = document.getElementById("events-list");
         list.innerHTML = "";
         events.forEach(evt => {
+          const isSaved = localStorage.getItem(`saved_evt_${evt._id}`) === "true";
           const images = Array.isArray(evt.images) && evt.images.length > 0
             ? `
               <div class="post-images ${evt.images.length === 1 ? 'single' : ''}">
@@ -177,7 +186,7 @@
             </div>
             <div class="post-actions">
               <div class="action-group">
-                <button class="icon-btn save-btn ${localStorage.getItem(\`saved_evt_\${evt._id}\`)==="true"?'active':''}" data-id="${evt._id}" title="Save">⭐</button>
+                <button class="icon-btn save-btn ${isSaved ? 'active' : ''}" data-id="${evt._id}" title="Save">⭐</button>
                 <button class="icon-btn share-btn" data-link="${location.origin}/events.html#${evt._id}" title="Share">🔗</button>
               </div>
               <a class="pill-btn" href="${toICS(evt)}" download="${(evt.title||'event').replace(/\s+/g,'_')}.ics">Add to Calendar</a>
@@ -185,6 +194,7 @@
           `;
           list.appendChild(li);
         });
+
         // Save/share interactions
         list.addEventListener("click", (e) => {
           const saveBtn = e.target.closest(".save-btn");
@@ -198,8 +208,9 @@
           const shareBtn = e.target.closest(".share-btn");
           if (shareBtn) {
             const link = shareBtn.getAttribute("data-link");
-            if (navigator.share) navigator.share({ title: "Event", url: link }).catch(()=>{});
-            else {
+            if (navigator.share) {
+              navigator.share({ title: "Event", url: link }).catch(()=>{});
+            } else {
               navigator.clipboard?.writeText(link);
               shareBtn.textContent = "✅";
               setTimeout(() => shareBtn.textContent = "🔗", 1200);
