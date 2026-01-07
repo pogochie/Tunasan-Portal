@@ -1554,6 +1554,24 @@ h1, h2 {
   font-weight: 700;
 }
 
+#priority {
+  max-width: 220px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-weight: 700;
+}
+
+#due {
+  max-width: 220px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #fff;
+    font-weight: 700;
+}
+
 /* Keep white theme: active nav link highlighting */
 .admin-navbar .nav-menu li a.active {
   background-color: #eef3ff;
