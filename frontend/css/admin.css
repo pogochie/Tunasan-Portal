@@ -1716,9 +1716,10 @@ button.action-btn:hover,
   overflow: hidden; 
 }
 .analytics-controls .range {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: 8px 12px;
+  display: grid;
+  align-items: end;
 }
 .analytics-controls .range label {
   display: block;
@@ -1745,12 +1746,6 @@ button.action-btn:hover,
   align-items: center;
   gap: 6px;
   user-select: none;
-}
-.analytics-controls input[type="date"],
-.analytics-controls input[type="text"],
-.analytics-controls select {
-  width: 100%;                  /* make controls fluid */
-  min-width: 0;                 /* avoid overflow in flex/grid */
 }
 
 @media (max-width: 768px) {
