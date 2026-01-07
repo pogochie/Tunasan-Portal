@@ -6,6 +6,12 @@ export function initNavbar() {
   const overlay = document.querySelector(".nav-overlay");
   const navMenu = document.querySelector(".nav-menu");
 
+
+  const fbNav = document.querySelector(".fb-navbar");
+  if (fbNav) {
+    document.body.classList.add("has-fb-navbar");
+  }
+
   function checkAdminAuth() {
     const isLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
     if (adminLink) adminLink.style.display = isLoggedIn ? "inline-block" : "none";
@@ -136,7 +142,9 @@ export function initNavbar() {
     const lists = [
       document.querySelector("#home-feed"),
       document.querySelector("#news-list"),
-      document.querySelector("#incidents-list")
+      document.querySelector("#incidents-list"),
+      // ADD: include events feed
+      document.querySelector("#events-list")
     ].filter(Boolean);
 
     lists.forEach(list => {
