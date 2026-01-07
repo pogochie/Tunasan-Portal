@@ -1114,7 +1114,7 @@ section.filter-controls.post-card {
 
 /* Facebook-like top nav (desktop/tablet) + mobile bottom tabbar */
 .fb-navbar {
-  position: sticky;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
