@@ -2,8 +2,10 @@
 
 /* Admin top navigation */
 .admin-navbar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
   background: var(--card);
   border-bottom: 1px solid var(--border);
@@ -1702,6 +1704,8 @@ button.action-btn:hover,
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  box-sizing: border-box;
   gap: 12px;
   margin: 8px 0 12px;
   background: var(--card);
@@ -1709,6 +1713,7 @@ button.action-btn:hover,
   border-radius: 12px;
   box-shadow: var(--shadow);
   padding: 10px 12px;
+  overflow: hidden; 
 }
 .analytics-controls .range {
   display: flex;
@@ -1716,11 +1721,13 @@ button.action-btn:hover,
   gap: 8px;
 }
 .analytics-controls .range label {
-  display: flex;
+  display: block;
+  white-space: normal;
   align-items: center;
   gap: 6px;
   font-weight: 600;
   color: #050505;
+  min-width: 0;
 }
 .analytics-controls input[type="date"] {
   padding: 8px 10px;
@@ -1738,6 +1745,12 @@ button.action-btn:hover,
   align-items: center;
   gap: 6px;
   user-select: none;
+}
+.analytics-controls input[type="date"],
+.analytics-controls input[type="text"],
+.analytics-controls select {
+  width: 100%;                  /* make controls fluid */
+  min-width: 0;                 /* avoid overflow in flex/grid */
 }
 
 .analytics-grid {
