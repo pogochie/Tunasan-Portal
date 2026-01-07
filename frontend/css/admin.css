@@ -1753,6 +1753,23 @@ button.action-btn:hover,
   min-width: 0;                 /* avoid overflow in flex/grid */
 }
 
+@media (max-width: 768px) {
+  .analytics-controls {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .analytics-controls .range {
+    grid-template-columns: 1fr;
+  }
+  .analytics-controls .pill-btn {
+    width: 100%;
+  }
+  .analytics-controls .toggles {
+    justify-self: start;
+  }
+}
+
 .analytics-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
