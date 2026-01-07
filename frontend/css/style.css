@@ -1116,6 +1116,8 @@ section.filter-controls.post-card {
 .fb-navbar {
   position: sticky;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
   background: #fff;
   box-shadow: 0 2px 12px rgba(0,0,0,0.1);
@@ -1154,6 +1156,10 @@ section.filter-controls.post-card {
 .fb-navbar .logo:hover {
   color: #145dbf;
 }
+
+:root { --nav-height: 56px; } /* already defined; keep for consistency */
+body.has-fb-navbar { padding-top: var(--nav-height); }
+
 
 /* Navigation menu */
 .nav-center .nav-items {
