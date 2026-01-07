@@ -1228,6 +1228,24 @@ h1, h2 {
   gap: 10px;
   animation: fadeInUp .35s ease both;
 }
+.approval-card .approval-media {
+  width: 100%;
+  overflow: hidden;                 /* clip any accidental overflow */
+  border-radius: 12px;              /* match card rounding */
+}
+.approval-card .approval-media .id-image {
+  display: block;                   /* remove inline image whitespace */
+  width: 100%;                      /* scale down to container */
+  max-width: 100%;
+  height: auto;                     /* keep aspect ratio */
+  object-fit: contain;              /* avoid cropping on narrow screens */
+}
+@media (max-width: 768px) {
+  /* Optional: constrain height further on very small devices */
+  .approval-card .approval-media .id-image {
+    max-height: 60vh;               /* prevents overly tall images from pushing layout */
+  }
+}
 
 .approval-card .user-row {
   display: flex;
