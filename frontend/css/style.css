@@ -1751,6 +1751,28 @@ body.has-fb-navbar { padding-top: var(--nav-height); }
   box-shadow: 0 0 0 3px rgba(59,130,242,0.3);
 }
 
+.theme-dark #theme-toggle {
+  background: #2a2a2a;
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.theme-dark #lang-toggle {
+  background: #2a2a2a;
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.theme-dark #theme-toggle:hover {
+  background: var(--primary-hover);
+  color: #fff;
+}
+
+.theme-dark #lang-toggle:hover {
+  background: var(--primary-hover);
+  color: #fff;
+}
+
 /* Notification button and panel */
 .theme-dark #notif-btn {
   background: #2a2a2a;
