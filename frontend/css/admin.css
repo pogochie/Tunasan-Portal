@@ -1278,7 +1278,7 @@ h1, h2 {
   font-weight: 600;
 }
 .approval-card .status-badge {
-  display: inline-block;
+  display: inline block;
   padding: 2px 8px;
   border-radius: 999px;
   background: rgba(24,119,242,.08);
@@ -1809,6 +1809,7 @@ button.action-btn:hover,
 }
 .chart-card {
   grid-column: span 6;
+ 
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -1847,4 +1848,92 @@ button.action-btn:hover,
 
 @media (max-width: 960px) {
   .chart-card { grid-column: span 12; }
+}
+
+/* Analytics controls: add filters group styling */
+.analytics-controls .filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+  gap: 8px 12px;
+  align-items: end;
+  min-width: 0;
+}
+.analytics-controls .filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  color: #050505;
+}
+.analytics-controls select {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  font-weight: 600;
+}
+
+/* Mobile: stack analytics filters */
+@media (max-width: 768px) {
+  .analytics-controls .filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Print-friendly report generation */
+@media print {
+  /* Hide chrome */
+  .admin-navbar,
+  .admin-mobile-tabbar,
+  .admin-toolbar,
+  .page-header,
+  .actions-bar,
+  .pill-btn,
+  button,
+  .chip { display: none !important; }
+
+  body {
+    margin: 0;
+    background: #fff;
+  }
+
+  .container {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+
+  /* Remove heavy decoration to save ink and fit more content */
+  .card,
+  .chart-card,
+  .kpi-item,
+  #incident-table {
+    box-shadow: none !important;
+    border-color: #ccc !important;
+    background: #fff !important;
+  }
+
+  /* Ensure table is visible fully */
+  #incident-table {
+    display: table !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+  #incident-table thead { display: table-header-group !important; }
+  #incident-table tr { display: table-row !important; }
+  #incident-table th, #incident-table td {
+    display: table-cell !important;
+    padding: 6px 8px !important;
+    border: 1px solid #ddd !important;
+  }
+
+  /* Make charts printable at full width */
+  .analytics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  canvas {
+    max-width: 100% !important;
+  }
 }

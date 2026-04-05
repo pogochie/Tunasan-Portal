@@ -62,6 +62,8 @@
       </div>
       <div class="toolbar-actions">
         <button id="export-csv" class="pill-btn">Export CSV</button>
+        <!-- ADD: print-friendly report generation -->
+        <button id="print-report" class="pill-btn">Print Report</button>
       </div>
     </div>
 
@@ -102,6 +104,21 @@
           <input type="date" id="ana-to" />
         </label>
         <button id="ana-apply" class="pill-btn">Apply</button>
+      </div>
+      <!-- ADD: type and status filters that drive charts -->
+      <div class="filters">
+        <label>
+          Type
+          <select id="ana-type">
+            <option value="">All</option>
+          </select>
+        </label>
+        <label>
+          Status
+          <select id="ana-status">
+            <option value="">All</option>
+          </select>
+        </label>
       </div>
       <div class="toggles">
         <label class="toggle">
@@ -165,6 +182,9 @@
       const toEl = document.getElementById('ana-to');
       const applyBtn = document.getElementById('ana-apply');
       const rollingEl = document.getElementById('ana-rolling');
+      // ADD: refs for new filters
+      const typeEl = document.getElementById('ana-type');
+      const statusEl = document.getElementById('ana-status');
 
       const elTotal = document.getElementById('kpi-total');
       const elOverdue = document.getElementById('kpi-overdue');
@@ -195,9 +215,15 @@
         const from = range.from ? new Date(range.from).setHours(0,0,0,0) : null;
         const to = range.to ? new Date(range.to).setHours(23,59,59,999) : null;
 
+        const tFilter = (typeEl?.value || "").toLowerCase();
+        const sFilter = (statusEl?.value || "").toLowerCase();
+
         const filtered = incidents.filter(i => {
-          const t = new Date(i.createdAt || i.time || Date.now()).getTime();
-          return inRange(t, from, to);
+          const ts = new Date(i.createdAt || i.time || Date.now()).getTime();
+          const okDate = inRange(ts, from, to);
+          const okType = !tFilter || (i.incidentType || "").toLowerCase() === tFilter;
+          const okStatus = !sFilter || (i.status || "").toLowerCase() === sFilter;
+          return okDate && okType && okStatus;
         });
 
         // By type
@@ -345,6 +371,9 @@
 
       applyBtn.addEventListener('click', () => render(CACHE));
       rollingEl.addEventListener('change', () => render(CACHE));
+      // ADD: re-render when changing Type/Status
+      typeEl?.addEventListener('change', () => render(CACHE));
+      statusEl?.addEventListener('change', () => render(CACHE));
 
       // Initialize default "To" to today for convenience
       const today = new Date();
@@ -393,7 +422,7 @@
 
     // Export table to CSV
     document.getElementById("export-csv")?.addEventListener("click", () => {
-      const rows = Array.from(document.querySelectorAll("#incident-table tr"));
+      const rows = Array.from(tableBody.querySelectorAll("tr"));
       const data = rows.map(row => Array.from(row.children).map(td => `"${(td.textContent || "").replace(/"/g, '""')}"`).join(","));
       const csv = data.join("\n");
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
